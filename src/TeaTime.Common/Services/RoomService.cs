@@ -20,7 +20,7 @@
             if (objectId.Equals(Guid.Empty))
                 return null;
 
-            throw new System.NotImplementedException();
+            return await Get(objectId).ConfigureAwait(false);
         }
 
         public Task<bool> AddLink(string link, Room obj)
@@ -29,6 +29,11 @@
         }
 
         public Task<Room> Create()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Room> Get(Guid id)
         {
             throw new NotImplementedException();
         }

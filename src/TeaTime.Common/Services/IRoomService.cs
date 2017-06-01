@@ -1,5 +1,6 @@
 namespace TeaTime.Common.Services
 {
+    using System;
     using System.Threading.Tasks;
     using Abstractions;
     using Models;
@@ -11,6 +12,13 @@ namespace TeaTime.Common.Services
         /// </summary>
         /// <returns></returns>
         Task<Room> Create();
+
+        /// <summary>
+        /// Get a room by its Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<Room> Get(Guid id);
 
         /// <summary>
         /// Add an option to be displayed when a run for this room is created
