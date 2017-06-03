@@ -1,5 +1,7 @@
 ﻿namespace TeaTime
 {
+    using Common.Services;
+    using Data.MySql;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -25,9 +27,15 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IRoomService, RoomService>();
+            services.AddSingleton<IRunService, RunSerivice>();
+            services.AddSingleton<IUserService, UserService>();
+
             // Add framework services.
             var mvcBuilder = services.AddMvc();
 
+            //TODO: Allow these to be loaded dynamically
+            services.AddMySql("");
             services.AddSlack(mvcBuilder);
         }
 

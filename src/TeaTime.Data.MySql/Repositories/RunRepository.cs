@@ -2,7 +2,10 @@
 {
     using Common.Abstractions.Data;
 
-    public class RunRepository : IRunRepository
+    public class RunRepository : BaseRepository, IRunRepository
     {
+        public RunRepository(ConnectionFactory factory) : base(factory)
+        {
+        }
     }
 }

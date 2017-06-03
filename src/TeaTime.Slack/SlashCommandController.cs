@@ -1,6 +1,10 @@
 ﻿namespace TeaTime.Slack
 {
+    using System;
+    using System.Collections.Generic;
+    using Common.Models;
     using Microsoft.AspNetCore.Mvc;
+    using Models;
 
     [Route("slack")]
     public class SlackController : Controller
@@ -9,53 +13,31 @@
         [Route("slash")]
         public ActionResult SlashCommandHook(SlashCommand slashCommand)
         {
-            return Ok(slashCommand);
+
+            var options = new List<Option>
+            {
+                new Option
+                {
+                    Id = Guid.NewGuid(),
+                    Text = "Option 1"
+                }
+            };
+
+            return Ok(new SlashCommandResponse
+            {
+                InChannel = true,
+                Text = "Hell world!",
+                Attachments = AttachmentBuilder.BuildOptions(options)
+            });
+        }
+
+        [HttpPost]
+        [Route("interactive-messages")]
+        public ActionResult InteractiveMessageHook()
+        {
+            return Ok();
         }
     }
 
-    /*
 
-    token=gIkuvaNzQIHg97ATvDxqgjtO
-    team_id=T0001
-    team_domain=example
-    enterprise_id=E0001
-    enterprise_name=Globular%20Construct%20Inc
-    channel_id=C2147483705
-    channel_name=test
-    user_id=U2147483697
-    user_name=Steve
-    command=/weather
-    text=94070
-    response_url=https://hooks.slack.com/commands/1234/5678
-
- */
-    public class SlashCommand
-    {
-        public string Token { get; set; }
-
-        [FromForm(Name = "team_id")]
-        public string TeamId { get; set; }
-        [FromForm(Name = "team_domain")]
-        public string TeamDomain { get; set; }
-
-        [FromForm(Name = "enterprise_id")]
-        public string EnterpriseId { get; set; }
-        [FromForm(Name = "enterprise_name")]
-        public string EnterpriseName { get; set; }
-
-        [FromForm(Name = "channel_id")]
-        public string ChannelId { get; set; }
-        [FromForm(Name = "channel_name")]
-        public string ChannelName { get; set; }
-
-        [FromForm(Name = "user_id")]
-        public string UserId { get; set; }
-        [FromForm(Name = "user_name")]
-        public string UserName { get; set; }
-
-        public string Command { get; set; }
-        public string Text { get; set; }
-        [FromForm(Name = "response_url")]
-        public string ResponseUrl { get; set; }
-    }
 }

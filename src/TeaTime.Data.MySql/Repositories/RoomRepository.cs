@@ -2,7 +2,10 @@
 {
     using Common.Abstractions.Data;
 
-    public class RoomRepository : IRoomRepository
+    public class RoomRepository : BaseRepository, IRoomRepository
     {
+        public RoomRepository(ConnectionFactory factory) : base(factory)
+        {
+        }
     }
 }

@@ -11,6 +11,11 @@
             throw new System.NotImplementedException();
         }
 
+        public Task<Run> Start(Room room, User user, string @group)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Task<bool> Join(Room room, User user, string option)
         {
             throw new System.NotImplementedException();

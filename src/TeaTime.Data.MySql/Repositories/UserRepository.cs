@@ -2,8 +2,10 @@
 {
     using Common.Abstractions.Data;
 
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository, IUserRepository
     {
-
+        public UserRepository(ConnectionFactory factory) : base(factory)
+        {
+        }
     }
 }

@@ -1,21 +1,23 @@
 ﻿namespace TeaTime.Common.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Abstractions.Data;
     using Models;
 
     public class RoomService : IRoomService
     {
-        private readonly ILinkService _linkService;
+        private readonly ILinkRepository _linkRepository;
 
-        public RoomService(ILinkService linkService)
+        public RoomService(ILinkRepository linkRepository)
         {
-            _linkService = linkService;
+            _linkRepository = linkRepository;
         }
 
         public async Task<Room> GetByLink(string link)
         {
-            var objectId = await _linkService.GetLinkedObjectId<Guid>(link, LinkType.Room).ConfigureAwait(false);
+            var objectId = await _linkRepository.GetObjectId<Guid>(link, LinkType.Room).ConfigureAwait(false);
 
             if (objectId.Equals(Guid.Empty))
                 return null;
@@ -25,7 +27,7 @@
 
         public Task<bool> AddLink(string link, Room obj)
         {
-            return _linkService.AddLink(obj.Id, LinkType.Room, link);
+            return _linkRepository.Add(obj.Id, LinkType.Room, link);
         }
 
         public Task<Room> Create()
@@ -38,12 +40,32 @@
             throw new NotImplementedException();
         }
 
-        public Task AddOption(Room room, string option)
+        Task<Option> IRoomService.AddOption(Room room, string @group, string option)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveOption(Room room, string option)
+        public Task RemoveOption(Room room, string @group, Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<Option>> IRoomService.GetOptions(Room room, string @group)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddOption(Room room, string group, string option)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveOption(Room room, string group, string option)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> GetOptions(Room room, string @group)
         {
             throw new NotImplementedException();
         }
