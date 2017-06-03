@@ -11,8 +11,9 @@ namespace TeaTime.Common.Services
         /// <summary>
         /// Create a new room
         /// </summary>
+        /// <param name="name"></param>
         /// <returns></returns>
-        Task<Room> Create();
+        Task<Room> Create(string name);
 
         /// <summary>
         /// Get a room by its Id

@@ -30,7 +30,7 @@
             return _linkRepository.Add(obj.Id, LinkType.Room, link);
         }
 
-        public Task<Room> Create()
+        public Task<Room> Create(string name)
         {
             throw new NotImplementedException();
         }
@@ -40,7 +40,7 @@
             throw new NotImplementedException();
         }
 
-        Task<Option> IRoomService.AddOption(Room room, string @group, string option)
+        public Task<Option> AddOption(Room room, string @group, string option)
         {
             throw new NotImplementedException();
         }
@@ -50,22 +50,7 @@
             throw new NotImplementedException();
         }
 
-        Task<IEnumerable<Option>> IRoomService.GetOptions(Room room, string @group)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task AddOption(Room room, string group, string option)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task RemoveOption(Room room, string group, string option)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<string> GetOptions(Room room, string @group)
+        public Task<IEnumerable<Option>> GetOptions(Room room, string @group)
         {
             throw new NotImplementedException();
         }

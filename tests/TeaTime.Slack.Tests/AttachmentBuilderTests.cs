@@ -9,7 +9,7 @@
     public class AttachmentBuilderTests
     {
         [Fact]
-        public void X()
+        public void BuildOptions_SixOptions_TwoAttachments()
         {
             var options = new List<Option>
             {

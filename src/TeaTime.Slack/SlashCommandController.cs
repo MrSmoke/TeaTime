@@ -4,7 +4,8 @@
     using System.Collections.Generic;
     using Common.Models;
     using Microsoft.AspNetCore.Mvc;
-    using Models;
+    using Models.Requests;
+    using Models.Responses;
 
     [Route("slack")]
     public class SlackController : Controller
@@ -19,13 +20,38 @@
                 new Option
                 {
                     Id = Guid.NewGuid(),
-                    Text = "Option 1"
-                }
+                    Text = ":fire:"
+                },
+                new Option
+                {
+                    Id = Guid.NewGuid(),
+                    Text = ":fire: 2"
+                },
+                new Option
+                {
+                    Id = Guid.NewGuid(),
+                    Text = ":fire: 3"
+                },
+                new Option
+                {
+                    Id = Guid.NewGuid(),
+                    Text = ":fire: 4"
+                },
+                new Option
+                {
+                    Id = Guid.NewGuid(),
+                    Text = ":fire: 5"
+                },
+                new Option
+                {
+                    Id = Guid.NewGuid(),
+                    Text = ":fire: 6"
+                },
             };
 
             return Ok(new SlashCommandResponse
             {
-                InChannel = true,
+                Type = ResponseType.Channel,
                 Text = "Hell world!",
                 Attachments = AttachmentBuilder.BuildOptions(options)
             });
@@ -33,7 +59,7 @@
 
         [HttpPost]
         [Route("interactive-messages")]
-        public ActionResult InteractiveMessageHook()
+        public ActionResult InteractiveMessageHook(MessageAction messageAction)
         {
             return Ok();
         }

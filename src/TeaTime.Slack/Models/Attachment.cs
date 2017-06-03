@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    internal class Attachment
+    public class Attachment
     {
         internal Attachment()
         {
@@ -13,6 +13,7 @@
         /// <summary>
         /// This is the main text in a message attachment
         /// </summary>
+        /// <remarks>Optional</remarks>
         public string Text { get; set; }
 
         /// <summary>

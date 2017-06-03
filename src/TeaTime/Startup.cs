@@ -28,7 +28,7 @@
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IRoomService, RoomService>();
-            services.AddSingleton<IRunService, RunSerivice>();
+            services.AddSingleton<IRunService, RunService>();
             services.AddSingleton<IUserService, UserService>();
 
             // Add framework services.

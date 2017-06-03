@@ -17,7 +17,7 @@
             //Add initial attachment
             var attachment = new Attachment
             {
-                Text = "It's Tea Time baby!",
+                Text = "Select an option to join this round!",
                 CallBackId = "teatime"
             };
             attachment.Actions.AddRange(actions.Take(maxButtons));
@@ -42,11 +42,10 @@
 
         internal static Action CreateButton(Option option, string name = "tea-option")
         {
-            return new Action
+            return new Button
             {
                 Name = name,
                 Text = option.Text,
-                Type = "button",
                 Value = option.Id.ToString()
             };
         }

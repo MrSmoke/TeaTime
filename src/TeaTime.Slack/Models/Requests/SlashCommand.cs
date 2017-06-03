@@ -1,4 +1,4 @@
-namespace TeaTime.Slack
+namespace TeaTime.Slack.Models.Requests
 {
     using Microsoft.AspNetCore.Mvc;
 

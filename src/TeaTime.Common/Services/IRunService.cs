@@ -20,9 +20,17 @@ namespace TeaTime.Common.Services
         /// </summary>
         /// <param name="room"></param>
         /// <param name="user"></param>
+        /// <returns></returns>
+        Task<bool> Join(Room room, User user);
+
+        /// <summary>
+        /// Join a run with a given option
+        /// </summary>
+        /// <param name="room"></param>
+        /// <param name="user"></param>
         /// <param name="option"></param>
         /// <returns></returns>
-        Task<bool> Join(Room room, User user, string option);
+        Task<bool> Join(Room room, User user, Option option);
 
         /// <summary>
         /// Leaave the run
@@ -44,8 +52,15 @@ namespace TeaTime.Common.Services
         /// The the run and choose a runner
         /// </summary>
         /// <param name="room"></param>
-        /// <param name="user"></param>
+        /// <param name="user">The user ending the run</param>
         /// <returns></returns>
         Task<RunEndResult> End(Room room, User user);
+
+        /// <summary>
+        /// Gets a currently running run in a room
+        /// </summary>
+        /// <param name="room"></param>
+        /// <returns></returns>
+        Task<Run> GetCurrent(Room room);
     }
 }
