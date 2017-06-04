@@ -13,7 +13,7 @@ namespace TeaTime.Common.Services
         /// <param name="user"></param>
         /// <param name="group"></param>
         /// <returns></returns>
-        Task<Run> Start(Room room, User user, string group);
+        Task<Run> Start(Room room, User user, Group group);
 
         /// <summary>
         /// Join a run

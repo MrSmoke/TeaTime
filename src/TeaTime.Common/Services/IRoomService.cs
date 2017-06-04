@@ -22,17 +22,21 @@ namespace TeaTime.Common.Services
         /// <returns></returns>
         Task<Room> Get(Guid id);
 
+        Task<Group> AddGroup(Room room, string name);
+
+        Task<Group> GetGroupByName(Room room, string name);
+
         /// <summary>
         /// Add an option to be displayed when a run for this room is created
         /// </summary>
         /// <returns></returns>
-        Task<Option> AddOption(Room room, string group, string option);
+        Task<Option> AddOption(Group group, string option);
 
         /// <summary>
         /// Remove an option from this room
         /// </summary>
         /// <returns></returns>
-        Task RemoveOption(Room room, string group, Guid id);
+        Task RemoveOption(Guid optionId);
 
         /// <summary>
         /// Gets all the room options by the given group name
@@ -40,6 +44,6 @@ namespace TeaTime.Common.Services
         /// <param name="room"></param>
         /// <param name="group"></param>
         /// <returns></returns>
-        Task<IEnumerable<Option>> GetOptions(Room room, string group);
+        Task<IEnumerable<Option>> GetOptions(Group group);
     }
 }

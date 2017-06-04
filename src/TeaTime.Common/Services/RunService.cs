@@ -7,7 +7,7 @@
 
     public class RunService : IRunService
     {
-        public Task<Run> Start(Room room, User user, string group)
+        public Task<Run> Start(Room room, User user, Group group)
         {
             throw new System.NotImplementedException();
         }

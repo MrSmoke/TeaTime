@@ -2,18 +2,11 @@
 {
     using System;
 
-    public class Room
+    public class Group
     {
         public Guid Id { get; set; }
-
-        /// <summary>
-        /// The name of the room
-        /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// The date the room was created
-        /// </summary>
+        public Guid RoomId { get; set; }
         public DateTime DateCreated { get; set; }
     }
 }

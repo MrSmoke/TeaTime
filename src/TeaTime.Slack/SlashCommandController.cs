@@ -2,7 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Common.Models;
+    using Common.Services;
     using Microsoft.AspNetCore.Mvc;
     using Models.Requests;
     using Models.Responses;
@@ -10,51 +12,27 @@
     [Route("slack")]
     public class SlackController : Controller
     {
+        private readonly IUserService _userService;
+        private readonly IRoomService _roomService;
+        private readonly IRunService _runService;
+
+        public SlackController(IUserService userService, IRoomService roomService, IRunService runService)
+        {
+            _userService = userService;
+            _roomService = roomService;
+            _runService = runService;
+        }
+
         [HttpPost]
         [Route("slash")]
-        public ActionResult SlashCommandHook(SlashCommand slashCommand)
+        public async Task<ActionResult> SlashCommandHook(SlashCommand slashCommand)
         {
+            var slackService = new SlackService(_userService, _runService, _roomService);
 
-            var options = new List<Option>
-            {
-                new Option
-                {
-                    Id = Guid.NewGuid(),
-                    Text = ":fire:"
-                },
-                new Option
-                {
-                    Id = Guid.NewGuid(),
-                    Text = ":fire: 2"
-                },
-                new Option
-                {
-                    Id = Guid.NewGuid(),
-                    Text = ":fire: 3"
-                },
-                new Option
-                {
-                    Id = Guid.NewGuid(),
-                    Text = ":fire: 4"
-                },
-                new Option
-                {
-                    Id = Guid.NewGuid(),
-                    Text = ":fire: 5"
-                },
-                new Option
-                {
-                    Id = Guid.NewGuid(),
-                    Text = ":fire: 6"
-                },
-            };
+            slackService.Command = slashCommand;
+            var result = await slackService.Start();
 
-            return Ok(new SlashCommandResponse
-            {
-                Type = ResponseType.Channel,
-                Text = "Hell world!",
-                Attachments = AttachmentBuilder.BuildOptions(options)
-            });
+            return Ok(result);
         }
 
         [HttpPost]

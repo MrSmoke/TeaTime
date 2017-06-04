@@ -8,10 +8,12 @@
     public class UserService : IUserService
     {
         private readonly ILinkRepository _linkRepository;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(ILinkRepository linkRepository)
+        public UserService(ILinkRepository linkRepository, IUserRepository userRepository)
         {
             _linkRepository = linkRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<User> GetByLink(string link)
@@ -28,12 +30,22 @@
 
         public Task<User> Get(Guid id)
         {
-            throw new NotImplementedException();
+            return _userRepository.Get(id);
         }
 
-        public Task<User> Create(User user)
+        public async Task<User> Create(string name)
         {
-            throw new NotImplementedException();
+            var user = new User
+            {
+                Name = name,
+
+                Id = Guid.NewGuid(),
+                DateCreated = DateTime.UtcNow
+            };
+
+            await _userRepository.Create(user).ConfigureAwait(false);
+
+            return user;
         }
     }
 }

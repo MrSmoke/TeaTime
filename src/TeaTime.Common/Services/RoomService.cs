@@ -9,10 +9,12 @@
     public class RoomService : IRoomService
     {
         private readonly ILinkRepository _linkRepository;
+        private readonly IRoomRepository _roomRepository;
 
-        public RoomService(ILinkRepository linkRepository)
+        public RoomService(ILinkRepository linkRepository, IRoomRepository roomRepository)
         {
             _linkRepository = linkRepository;
+            _roomRepository = roomRepository;
         }
 
         public async Task<Room> GetByLink(string link)
@@ -30,29 +32,74 @@
             return _linkRepository.Add(obj.Id, LinkType.Room, link);
         }
 
-        public Task<Room> Create(string name)
+        public async Task<Room> Create(string name)
         {
-            throw new NotImplementedException();
+            var room = new Room
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                DateCreated = DateTime.UtcNow
+            };
+
+            if(!await _roomRepository.Create(room).ConfigureAwait(false))
+                throw new Exception("Failed to create room");
+
+            return room;
         }
 
         public Task<Room> Get(Guid id)
         {
-            throw new NotImplementedException();
+            return _roomRepository.Get(id);
         }
 
-        public Task<Option> AddOption(Room room, string @group, string option)
+        public async Task<Group> AddGroup(Room room, string name)
+        {
+            var group = new Group
+            {
+                Name = name,
+                Id = Guid.NewGuid(),
+                DateCreated = DateTime.UtcNow,
+                RoomId = room.Id
+            };
+
+            await _roomRepository.AddGroup(group).ConfigureAwait(false);
+
+            return group;
+        }
+
+        public Task<Group> GetGroupByName(Room room, string name)
+        {
+            return _roomRepository.GetGroupByName(room.Id, name);
+        }
+
+        public async Task<Option> AddOption(Group group, string text)
+        {
+            var option = new Option
+            {
+                Text = text,
+                Id = Guid.NewGuid(),
+                RoomGroupId = group.Id,
+                DateCreated = DateTime.UtcNow
+            };
+
+            await _roomRepository.AddGroupOption(option).ConfigureAwait(false);
+
+            return option;
+        }
+
+        public Task RemoveOption(Guid optionId)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveOption(Room room, string @group, Guid id)
+        public Task RemoveOption(Group group, Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Option>> GetOptions(Room room, string @group)
+        public Task<IEnumerable<Option>> GetOptions(Group group)
         {
-            throw new NotImplementedException();
+            return _roomRepository.GetGroupOptions(group.Id);
         }
     }
 }

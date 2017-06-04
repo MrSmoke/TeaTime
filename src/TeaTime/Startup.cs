@@ -35,7 +35,7 @@
             var mvcBuilder = services.AddMvc();
 
             //TODO: Allow these to be loaded dynamically
-            services.AddMySql("");
+            services.AddMySql("host=192.168.99.100;port=32768;user id=root;password=password;database=teatime;");
             services.AddSlack(mvcBuilder);
         }
 

@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{58FDB70F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeaTime.Slack.Tests", "tests\TeaTime.Slack.Tests\TeaTime.Slack.Tests.csproj", "{50871A2D-A26D-4323-A52E-8619F0225B2D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeaTime.Data.MySql.Tests", "tests\TeaTime.Data.MySql.Tests\TeaTime.Data.MySql.Tests.csproj", "{34D57613-75DD-4559-B540-3163DCE428C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,11 +43,16 @@ Global
 		{50871A2D-A26D-4323-A52E-8619F0225B2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50871A2D-A26D-4323-A52E-8619F0225B2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50871A2D-A26D-4323-A52E-8619F0225B2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34D57613-75DD-4559-B540-3163DCE428C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34D57613-75DD-4559-B540-3163DCE428C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34D57613-75DD-4559-B540-3163DCE428C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34D57613-75DD-4559-B540-3163DCE428C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{50871A2D-A26D-4323-A52E-8619F0225B2D} = {58FDB70F-AEB1-4CA2-8BD9-BB93069AFFE0}
+		{34D57613-75DD-4559-B540-3163DCE428C9} = {58FDB70F-AEB1-4CA2-8BD9-BB93069AFFE0}
 	EndGlobalSection
 EndGlobal

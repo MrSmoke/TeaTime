@@ -25,18 +25,23 @@
             //Only support tea for now
             const string group = "tea";
 
-            var user = await GetOrCreateUser();
+            var user = GetOrCreateUser();
             var room = await GetOrCreateRoom();
 
-            await _runService.Start(room, user, group);
+            var roomGroup = await _roomService.GetGroupByName(room, group);
 
-            var options = await _roomService.GetOptions(room, group);
+            if(roomGroup == null)
+                return new SlashCommandResponse($"{group} is not a valid teatime group. Please create it first", ResponseType.User);
+
+            await _runService.Start(room, await user, roomGroup);
+
+            var options = await _roomService.GetOptions(roomGroup);
 
             var attachments = AttachmentBuilder.BuildOptions(options);
 
             return new SlashCommandResponse
             {
-                Text = $"{user.Name} wants tea",
+                Text = $"{(await user).Name} wants tea",
                 Type = ResponseType.Channel,
                 Attachments = attachments
             };
@@ -73,7 +78,7 @@
             if (user != null)
                 return user;
 
-            user = await _userService.Create(new User());
+            user = await _userService.Create(Command.UserName);
             await _userService.AddLink(Command.UserId, user);
 
             return user;
@@ -91,6 +96,6 @@
             return room;
         }
 
-        private SlashCommand Command => new SlashCommand();
+        public SlashCommand Command { get; set; }
     }
 }
