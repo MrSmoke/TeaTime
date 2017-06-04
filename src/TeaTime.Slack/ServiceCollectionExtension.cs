@@ -1,6 +1,7 @@
 ﻿namespace TeaTime.Slack
 {
     using System.Reflection;
+    using CommandRouter.Integration.AspNetCore.Extensions;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class ServiceCollectionExtension
@@ -11,6 +12,8 @@
 
             //Add current assembly controllers
             mvcBuilder.AddApplicationPart(assembly);
+
+            services.AddCommandRouter();
         }
     }
 }

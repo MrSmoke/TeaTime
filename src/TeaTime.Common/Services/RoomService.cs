@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Abstractions.Data;
+    using Exceptions;
     using Models;
 
     public class RoomService : IRoomService
@@ -42,7 +43,7 @@
             };
 
             if(!await _roomRepository.Create(room).ConfigureAwait(false))
-                throw new Exception("Failed to create room");
+                throw new TeaTimeException("Failed to create room");
 
             return room;
         }
@@ -62,7 +63,8 @@
                 RoomId = room.Id
             };
 
-            await _roomRepository.AddGroup(group).ConfigureAwait(false);
+            if(!await _roomRepository.AddGroup(group).ConfigureAwait(false))
+                throw new TeaTimeException("Failed to create group");
 
             return group;
         }
@@ -82,7 +84,8 @@
                 DateCreated = DateTime.UtcNow
             };
 
-            await _roomRepository.AddGroupOption(option).ConfigureAwait(false);
+            if(!await _roomRepository.AddGroupOption(option).ConfigureAwait(false))
+                throw new TeaTimeException("Failed to create option");
 
             return option;
         }

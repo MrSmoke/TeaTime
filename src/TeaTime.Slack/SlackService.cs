@@ -2,34 +2,35 @@
 {
     using System;
     using System.Threading.Tasks;
+    using CommandRouter.Attributes;
+    using CommandRouter.Commands;
     using Common.Models;
     using Common.Services;
     using Models.Requests;
     using Models.Responses;
 
-    public class SlackService
+    public class SlackCommand : Command
     {
         private readonly IUserService _userService;
         private readonly IRunService _runService;
         private readonly IRoomService _roomService;
 
-        public SlackService(IUserService userService, IRunService runService, IRoomService roomService)
+        public SlackCommand(IUserService userService, IRunService runService, IRoomService roomService)
         {
             _userService = userService;
             _runService = runService;
             _roomService = roomService;
         }
 
-        public async Task<SlashCommandResponse> Start()
+        [Command("tea")]
+        public async Task<SlashCommandResponse> Start(string gg = "")
         {
-            //Only support tea for now
             const string group = "tea";
 
             var user = GetOrCreateUser();
             var room = await GetOrCreateRoom();
 
             var roomGroup = await _roomService.GetGroupByName(room, group);
-
             if(roomGroup == null)
                 return new SlashCommandResponse($"{group} is not a valid teatime group. Please create it first", ResponseType.User);
 
@@ -47,6 +48,7 @@
             };
         }
 
+        [Command("join")]
         public async Task<SlashCommandResponse> Join()
         {
             var user = GetOrCreateUser();
@@ -62,6 +64,7 @@
             throw new NotImplementedException();
         }
 
+        [Command("end")]
         public async Task<SlashCommandResponse> End()
         {
             var user = await GetOrCreateUser();
