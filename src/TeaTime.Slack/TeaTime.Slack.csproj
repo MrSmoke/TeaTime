@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="commandrouter" Version="1.0.0-beta1" />
-    <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta1" />
+    <PackageReference Include="commandrouter" Version="1.0.0-beta3" />
+    <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta2" />
     <PackageReference Include="microsoft.aspnetcore.mvc" Version="1.1.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
     <PackageReference Include="newtonsoft.json" Version="10.0.2" />

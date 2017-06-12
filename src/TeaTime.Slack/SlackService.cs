@@ -4,10 +4,12 @@
     using System.Threading.Tasks;
     using CommandRouter.Attributes;
     using CommandRouter.Commands;
+    using CommandRouter.Results;
     using Common.Models;
     using Common.Services;
     using Models.Requests;
     using Models.Responses;
+    using Newtonsoft.Json;
 
     public class SlackCommand : Command
     {
@@ -22,17 +24,24 @@
             _roomService = roomService;
         }
 
-        [Command("tea")]
-        public async Task<SlashCommandResponse> Start(string gg = "")
+        [Command("add")]
+        public async Task<ICommandResult> AddGroup(string name)
         {
-            const string group = "tea";
+            var room = await GetOrCreateRoom();
+            var group = await _roomService.AddGroup(room, name);
 
+            return Response($"Group `{group.Name}` created", ResponseType.User);
+        }
+
+        [Command("tea")]
+        public async Task<ICommandResult> Start(string group = "tea")
+        {
             var user = GetOrCreateUser();
             var room = await GetOrCreateRoom();
 
             var roomGroup = await _roomService.GetGroupByName(room, group);
             if(roomGroup == null)
-                return new SlashCommandResponse($"{group} is not a valid teatime group. Please create it first", ResponseType.User);
+                return Response($"{group} is not a valid teatime group. Please create it first", ResponseType.User);
 
             await _runService.Start(room, await user, roomGroup);
 
@@ -40,12 +49,12 @@
 
             var attachments = AttachmentBuilder.BuildOptions(options);
 
-            return new SlashCommandResponse
+            return Response(new SlashCommandResponse
             {
                 Text = $"{(await user).Name} wants tea",
                 Type = ResponseType.Channel,
                 Attachments = attachments
-            };
+            });
         }
 
         [Command("join")]
@@ -99,6 +108,16 @@
             return room;
         }
 
-        public SlashCommand Command { get; set; }
+        public SlashCommand Command => (SlashCommand) Context.Items["SLASHCOMMAND"];
+
+        protected ICommandResult Response(string text, ResponseType responseType)
+        {
+            return Response(new SlashCommandResponse(text, responseType));
+        }
+
+        protected ICommandResult Response(SlashCommandResponse response)
+        {
+            return StringResult(JsonConvert.SerializeObject(response));
+        }
     }
 }

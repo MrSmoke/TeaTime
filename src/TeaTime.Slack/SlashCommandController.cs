@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using CommandRouter;
     using CommandRouter.Exceptions;
+    using CommandRouter.Integration.AspNetCore;
     using Common.Services;
     using Microsoft.AspNetCore.Mvc;
     using Models.Requests;
@@ -26,8 +27,6 @@
         [Route("slash")]
         public async Task<IActionResult> SlashCommandHook(SlashCommand slashCommand)
         {
-            _slackService.Command = slashCommand;
-
             try
             {
                 var result = await _commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
@@ -35,14 +34,15 @@
                     {"SLASHCOMMAND", slashCommand}
                 }).ConfigureAwait(false);
 
-                return new CommandRunnerActionResult(result);
+                return new CommandRouterResult(result);
             }
             catch (CommandNotFoundException)
             {
                 return Ok(new SlashCommandResponse("Unknown command", ResponseType.User));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return Ok(new SlashCommandResponse("Failed to run command", ResponseType.User));
             }
         }
