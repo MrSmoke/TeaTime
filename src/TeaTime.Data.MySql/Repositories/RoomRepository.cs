@@ -36,7 +36,7 @@
 
         public Task<Group> GetGroupByName(Guid roomId, string name)
         {
-            const string sql = "SELECT id, name, roomId, date_created as DateCreated FROM room_groups WHERE roomId = @roomId AND name = @name LIMIT 1";
+            const string sql = "SELECT id, name, room_id as RoomId, date_created as DateCreated FROM room_groups WHERE room_id = @roomId AND name = @name LIMIT 1";
 
             return SingleOrDefault<Group>(sql, new {roomId, name});
         }

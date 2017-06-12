@@ -13,7 +13,7 @@ create table rooms (
 create table room_groups (
 	`id` char(36) primary key,
 	`name` varchar(32) not null,
-	`roomId` char(36) not null,
+	`room_id` char(36) not null,
 	`date_created` datetime not null,
 	`date_deleted` datetime default null,
 	
@@ -28,7 +28,7 @@ create table room_group_options (
 	`date_created` datetime not null,
 	`date_deleted` datetime default null,
 	
-	unique (roomId, name),
+	unique (room_group_id, name),
 	foreign key fk_roomgroupoptions_roomgroups_roomgroupid (room_group_id) references room_groups(id)
 );
 
