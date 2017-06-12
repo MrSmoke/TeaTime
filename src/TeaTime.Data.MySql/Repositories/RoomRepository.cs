@@ -48,7 +48,7 @@
 
         public Task<bool> AddGroupOption(Option option)
         {
-            const string sql = "INSERT INTO room_group_options (id, name, group_id, date_created) VALUES (@id, @name, @groupId, @dateCreated)";
+            const string sql = "INSERT INTO room_group_options (id, name, room_group_id, date_created) VALUES (@id, @name, @roomGroupId, @dateCreated)";
 
             return Insert(sql, option);
         }

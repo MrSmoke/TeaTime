@@ -10,6 +10,7 @@
     using Models.Requests;
     using Models.Responses;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Serialization;
 
     public class SlackCommand : Command
     {
@@ -24,13 +25,27 @@
             _roomService = roomService;
         }
 
-        [Command("add")]
+        [Command("addgroup")]
         public async Task<ICommandResult> AddGroup(string name)
         {
             var room = await GetOrCreateRoom();
             var group = await _roomService.AddGroup(room, name);
 
             return Response($"Group `{group.Name}` created", ResponseType.User);
+        }
+
+        [Command("addoption")]
+        public async Task<ICommandResult> AddOption(string groupName, string option)
+        {
+            var room = await GetOrCreateRoom();
+
+            var roomGroup = await _roomService.GetGroupByName(room, groupName);
+            if (roomGroup == null)
+                return Response($"{groupName} is not a valid teatime group. Please create it first", ResponseType.User);
+
+            var o = await _roomService.AddOption(roomGroup, option);
+
+            return Response($"Added option {o.Name} to group {roomGroup.Name}", ResponseType.User);
         }
 
         [Command("tea")]
@@ -115,9 +130,13 @@
             return Response(new SlashCommandResponse(text, responseType));
         }
 
+        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
         protected ICommandResult Response(SlashCommandResponse response)
         {
-            return StringResult(JsonConvert.SerializeObject(response));
+            return StringResult(JsonConvert.SerializeObject(response, JsonSettings));
         }
     }
 }

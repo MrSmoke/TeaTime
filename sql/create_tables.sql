@@ -17,8 +17,8 @@ create table room_groups (
 	`date_created` datetime not null,
 	`date_deleted` datetime default null,
 	
-	unique (roomId, name),
-	foreign key fk_roomgroups_rooms_roomid (roomId) references rooms(id)
+	unique (room_id, name),
+	foreign key fk_roomgroups_rooms_roomid (room_id) references rooms(id)
 );
 
 create table room_group_options (

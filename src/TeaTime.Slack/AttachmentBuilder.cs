@@ -45,7 +45,7 @@
             return new Button
             {
                 Name = name,
-                Text = option.Text,
+                Text = option.Name,
                 Value = option.Id.ToString()
             };
         }

@@ -16,32 +16,32 @@
                 new Option
                 {
                     Id = Guid.NewGuid(),
-                    Text = "test1"
+                    Name = "test1"
                 },
                 new Option
                 {
                     Id = Guid.NewGuid(),
-                    Text = "test2"
+                    Name = "test2"
                 },
                 new Option
                 {
                     Id = Guid.NewGuid(),
-                    Text = "test3"
+                    Name = "test3"
                 },
                 new Option
                 {
                     Id = Guid.NewGuid(),
-                    Text = "test4"
+                    Name = "test4"
                 },
                 new Option
                 {
                     Id = Guid.NewGuid(),
-                    Text = "test5"
+                    Name = "test5"
                 },
                 new Option
                 {
                     Id = Guid.NewGuid(),
-                    Text = "test6"
+                    Name = "test6"
                 },
             };
 

@@ -78,7 +78,7 @@
         {
             var option = new Option
             {
-                Text = text,
+                Name = text,
                 Id = Guid.NewGuid(),
                 RoomGroupId = group.Id,
                 DateCreated = DateTime.UtcNow
