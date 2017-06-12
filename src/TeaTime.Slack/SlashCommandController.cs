@@ -41,7 +41,7 @@
             {
                 return Ok(new SlashCommandResponse("Unknown command", ResponseType.User));
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Ok(new SlashCommandResponse("Failed to run command", ResponseType.User));
             }
