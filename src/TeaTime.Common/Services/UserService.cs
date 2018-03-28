@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using Abstractions.Data;
     using Models;
+    using Models.Data;
 
     public class UserService : IUserService
     {

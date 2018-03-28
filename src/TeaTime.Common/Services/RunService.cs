@@ -3,11 +3,12 @@
     using System;
     using System.Threading.Tasks;
     using Models;
+    using Models.Data;
     using Models.Results;
 
     public class RunService : IRunService
     {
-        public Task<Run> Start(Room room, User user, Group group)
+        public Task<Run> Start(Room room, User user, RoomGroup group)
         {
             throw new System.NotImplementedException();
         }

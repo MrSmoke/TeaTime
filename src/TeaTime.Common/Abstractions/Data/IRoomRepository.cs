@@ -4,18 +4,19 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Models;
+    using Models.Data;
 
     public interface IRoomRepository
     {
-        Task<bool> Create(Room room);
+        Task Create(Room room);
         Task<Room> Get(Guid id);
 
-        Task<bool> AddGroup(Group group);
-        Task<Group> GetGroupByName(Guid roomId, string name);
-        Task<bool> DeleteGroup(Guid groupId);
+        Task AddGroup(RoomGroup group);
+        Task<RoomGroup> GetGroupByName(Guid roomId, string name);
+        Task DeleteGroup(Guid groupId);
 
-        Task<bool> AddGroupOption(Option option);
+        Task AddGroupOption(Option option);
         Task<IEnumerable<Option>> GetGroupOptions(Guid groupId);
-        Task<bool> DeleteGroupOption(Guid optionId);
+        Task DeleteGroupOption(Guid optionId);
     }
 }

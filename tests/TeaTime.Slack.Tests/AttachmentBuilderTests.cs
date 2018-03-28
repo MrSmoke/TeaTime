@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Common.Models;
+    using Common.Models.Data;
     using Xunit;
 
     public class AttachmentBuilderTests

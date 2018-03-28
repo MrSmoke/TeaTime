@@ -6,6 +6,7 @@
     using CommandRouter.Commands;
     using CommandRouter.Results;
     using Common.Models;
+    using Common.Models.Data;
     using Common.Services;
     using Models.Requests;
     using Models.Responses;

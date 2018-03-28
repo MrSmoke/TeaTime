@@ -3,6 +3,7 @@
     using System;
     using System.Threading.Tasks;
     using Models;
+    using Models.Data;
 
     public interface IUserRepository
     {

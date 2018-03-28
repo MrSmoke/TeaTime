@@ -1,29 +1,29 @@
-﻿namespace TeaTime.Common.Models
+﻿namespace TeaTime.Common.Models.Data
 {
     using System;
 
     public class Run
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// The room in which the run is associated to
         /// </summary>
-        public Guid RoomId { get; set; }
+        public long RoomId { get; set; }
 
         /// <summary>
         /// The user who started the run
         /// </summary>
-        public Guid UserId { get; set; }
+        public long UserId { get; set; }
 
         /// <summary>
         /// The time the run was started
         /// </summary>
-        public DateTime StartTime { get; set; }
+        public DateTimeOffset StartTime { get; set; }
 
         /// <summary>
         /// The end time of the run (optional)
         /// </summary>
-        public DateTime? EndTime { get; set; }
+        public DateTimeOffset? EndTime { get; set; }
     }
 }

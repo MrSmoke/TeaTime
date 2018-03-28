@@ -5,6 +5,7 @@ namespace TeaTime.Common.Services
     using System.Threading.Tasks;
     using Abstractions;
     using Models;
+    using Models.Data;
 
     public interface IRoomService : ILinkable<Room>
     {
@@ -22,15 +23,15 @@ namespace TeaTime.Common.Services
         /// <returns></returns>
         Task<Room> Get(Guid id);
 
-        Task<Group> AddGroup(Room room, string name);
+        Task<RoomGroup> AddGroup(Room room, string name);
 
-        Task<Group> GetGroupByName(Room room, string name);
+        Task<RoomGroup> GetGroupByName(Room room, string name);
 
         /// <summary>
         /// Add an option to be displayed when a run for this room is created
         /// </summary>
         /// <returns></returns>
-        Task<Option> AddOption(Group group, string option);
+        Task<Option> AddOption(RoomGroup group, string option);
 
         /// <summary>
         /// Remove an option from this room
@@ -44,6 +45,6 @@ namespace TeaTime.Common.Services
         /// <param name="room"></param>
         /// <param name="group"></param>
         /// <returns></returns>
-        Task<IEnumerable<Option>> GetOptions(Group group);
+        Task<IEnumerable<Option>> GetOptions(RoomGroup group);
     }
 }

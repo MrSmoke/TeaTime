@@ -6,6 +6,7 @@
     using Abstractions.Data;
     using Exceptions;
     using Models;
+    using Models.Data;
 
     public class RoomService : IRoomService
     {
@@ -53,9 +54,9 @@
             return _roomRepository.Get(id);
         }
 
-        public async Task<Group> AddGroup(Room room, string name)
+        public async Task<RoomGroup> AddGroup(Room room, string name)
         {
-            var group = new Group
+            var group = new RoomGroup
             {
                 Name = name,
                 Id = Guid.NewGuid(),
@@ -69,12 +70,12 @@
             return group;
         }
 
-        public Task<Group> GetGroupByName(Room room, string name)
+        public Task<RoomGroup> GetGroupByName(Room room, string name)
         {
             return _roomRepository.GetGroupByName(room.Id, name);
         }
 
-        public async Task<Option> AddOption(Group group, string text)
+        public async Task<Option> AddOption(RoomGroup group, string text)
         {
             var option = new Option
             {
@@ -95,12 +96,12 @@
             throw new NotImplementedException();
         }
 
-        public Task RemoveOption(Group group, Guid id)
+        public Task RemoveOption(RoomGroup group, Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Option>> GetOptions(Group group)
+        public Task<IEnumerable<Option>> GetOptions(RoomGroup group)
         {
             return _roomRepository.GetGroupOptions(group.Id);
         }

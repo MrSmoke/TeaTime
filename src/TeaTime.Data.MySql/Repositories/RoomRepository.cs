@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
     using Common.Models;
+    using Common.Models.Data;
     using Dapper;
 
     public class RoomRepository : BaseRepository, IRoomRepository
@@ -27,18 +28,18 @@
             return SingleOrDefault<Room>(sql, new {id});
         }
 
-        public Task<bool> AddGroup(Group group)
+        public Task<bool> AddGroup(RoomGroup group)
         {
             const string sql = "INSERT INTO room_groups (id, name, room_id, date_created) VALUES (@id, @name, @roomId, @dateCreated)";
 
             return Insert(sql, group);
         }
 
-        public Task<Group> GetGroupByName(Guid roomId, string name)
+        public Task<RoomGroup> GetGroupByName(Guid roomId, string name)
         {
             const string sql = "SELECT id, name, room_id as RoomId, date_created as DateCreated FROM room_groups WHERE room_id = @roomId AND name = @name LIMIT 1";
 
-            return SingleOrDefault<Group>(sql, new {roomId, name});
+            return SingleOrDefault<RoomGroup>(sql, new {roomId, name});
         }
 
         public Task<bool> DeleteGroup(Guid groupId)

@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
     using Common.Models;
+    using Common.Models.Data;
     using Dapper;
 
     public class UserRepository : BaseRepository, IUserRepository

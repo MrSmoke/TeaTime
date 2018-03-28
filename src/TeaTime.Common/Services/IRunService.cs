@@ -2,6 +2,7 @@ namespace TeaTime.Common.Services
 {
     using System.Threading.Tasks;
     using Models;
+    using Models.Data;
     using Models.Results;
 
     public interface IRunService
@@ -13,7 +14,7 @@ namespace TeaTime.Common.Services
         /// <param name="user"></param>
         /// <param name="group"></param>
         /// <returns></returns>
-        Task<Run> Start(Room room, User user, Group group);
+        Task<Run> Start(Room room, User user, RoomGroup group);
 
         /// <summary>
         /// Join a run
