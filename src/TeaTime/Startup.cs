@@ -27,10 +27,6 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IRoomService, RoomService>();
-            services.AddSingleton<IRunService, RunService>();
-            services.AddSingleton<IUserService, UserService>();
-
             // Add framework services.
             var mvcBuilder = services.AddMvc();
 

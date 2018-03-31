@@ -21,7 +21,7 @@
             return rows == 1;
         }
 
-        protected Task<T> SingleOrDefault<T>(string sql, object obj)
+        protected Task<T> SingleOrDefault<T>(string sql, object obj = null)
         {
             return GetConnection(conn => conn.QuerySingleOrDefaultAsync<T>(sql, obj));
         }

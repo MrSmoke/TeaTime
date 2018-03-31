@@ -2,10 +2,8 @@
 {
     using System;
 
-    public class Run
+    public class Run : BaseDataObject
     {
-        public long Id { get; set; }
-
         /// <summary>
         /// The room in which the run is associated to
         /// </summary>

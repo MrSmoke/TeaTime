@@ -1,31 +1,27 @@
 ﻿namespace TeaTime.Data.MySql.Repositories
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
     using Common.Models.Data;
 
-    public class RunRepository : BaseRepository, IRunRepository
+    public class OrderRepository : BaseRepository, IOrderRepository
     {
-        public RunRepository(ConnectionFactory factory) : base(factory)
+        public OrderRepository(ConnectionFactory factory) : base(factory)
         {
         }
 
-        public Task CreateAsync(Run run)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task UpdateAsync(Run run)
+        public Task CreateAsync(Order order)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<Run> GetAsync(long runId)
+        public Task UpdateAsync(Order order)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task CreateResultAsync(RunResult result)
+        public Task<IEnumerable<Order>> GetOrdersAsync(long runId)
         {
             throw new System.NotImplementedException();
         }

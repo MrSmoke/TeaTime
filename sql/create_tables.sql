@@ -1,19 +1,19 @@
 create table users (
-	`id` char(36) primary key,
+	`id` bigint primary key,
 	`name` varchar(200) not null,
 	`date_created` datetime not null
 );
 
 create table rooms (
-	`id` char(36) primary key,
+	`id` bigint primary key,
 	`name` varchar(200) not null,
 	`date_created` datetime not null
 );
 
 create table room_groups (
-	`id` char(36) primary key,
+	`id` bigint primary key,
 	`name` varchar(32) not null,
-	`room_id` char(36) not null,
+	`room_id` bigint not null,
 	`date_created` datetime not null,
 	`date_deleted` datetime default null,
 	
@@ -22,9 +22,9 @@ create table room_groups (
 );
 
 create table room_group_options (
-	`id` char(36) primary key,
+	`id` bigint primary key,
 	`name` varchar(40) not null,
-	`room_group_id` char(36) not null,
+	`room_group_id` bigint not null,
 	`date_created` datetime not null,
 	`date_deleted` datetime default null,
 	
@@ -35,7 +35,14 @@ create table room_group_options (
 create table links (
 	`link` varchar(100) not null,
 	`linkType` smallint not null,
-	`objectId` char(36) not null,
+	`objectId` bigint not null,
 	
 	primary key (link, linkType)
+);
+
+CREATE TABLE `ids64` (
+  `id` bigint(20) unsigned NOT NULL auto_increment,
+  `stub` char(1) NOT NULL default '',
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `stub` (`stub`)
 );

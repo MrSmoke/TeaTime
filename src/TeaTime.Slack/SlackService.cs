@@ -5,9 +5,9 @@
     using CommandRouter.Attributes;
     using CommandRouter.Commands;
     using CommandRouter.Results;
-    using Common.Models;
+    using Common.Features.Users.Commands;
     using Common.Models.Data;
-    using Common.Services;
+    using MediatR;
     using Models.Requests;
     using Models.Responses;
     using Newtonsoft.Json;
@@ -15,38 +15,38 @@
 
     public class SlackCommand : Command
     {
-        private readonly IUserService _userService;
-        private readonly IRunService _runService;
-        private readonly IRoomService _roomService;
+        private readonly IMediator _mediator;
 
-        public SlackCommand(IUserService userService, IRunService runService, IRoomService roomService)
+        public SlackCommand(IMediator mediator)
         {
-            _userService = userService;
-            _runService = runService;
-            _roomService = roomService;
+            _mediator = mediator;
         }
 
         [Command("addgroup")]
-        public async Task<ICommandResult> AddGroup(string name)
+        public Task<ICommandResult> AddGroup(string name)
         {
-            var room = await GetOrCreateRoom();
-            var group = await _roomService.AddGroup(room, name);
+            throw new NotImplementedException();
 
-            return Response($"Group `{group.Name}` created", ResponseType.User);
+            //var room = await GetOrCreateRoom();
+            //var group = await _roomService.AddGroup(room, name);
+
+            //return Response($"Group `{group.Name}` created", ResponseType.User);
         }
 
         [Command("addoption")]
-        public async Task<ICommandResult> AddOption(string groupName, string option)
+        public Task<ICommandResult> AddOption(string groupName, string option)
         {
-            var room = await GetOrCreateRoom();
+            throw new NotImplementedException();
 
-            var roomGroup = await _roomService.GetGroupByName(room, groupName);
-            if (roomGroup == null)
-                return Response($"{groupName} is not a valid teatime group. Please create it first", ResponseType.User);
+            //var room = await GetOrCreateRoom();
 
-            var o = await _roomService.AddOption(roomGroup, option);
+            //var roomGroup = await _roomService.GetGroupByName(room, groupName);
+            //if (roomGroup == null)
+            //    return Response($"{groupName} is not a valid teatime group. Please create it first", ResponseType.User);
 
-            return Response($"Added option {o.Name} to group {roomGroup.Name}", ResponseType.User);
+            //var o = await _roomService.AddOption(roomGroup, option);
+
+            //return Response($"Added option {o.Name} to group {roomGroup.Name}", ResponseType.User);
         }
 
         [Command("tea")]
@@ -67,7 +67,7 @@
 
             return Response(new SlashCommandResponse
             {
-                Text = $"{(await user).Name} wants tea",
+                Text = $"{(await user).DisplayName} wants tea",
                 Type = ResponseType.Channel,
                 Attachments = attachments
             });
@@ -106,7 +106,13 @@
             if (user != null)
                 return user;
 
-            user = await _userService.Create(Command.UserName);
+            var command = new CreateUserCommand
+            {
+                Username = Command.UserName,
+                DisplayName = Command.UserName,
+            };
+            await _mediator.Send(command).ConfigureAwait(false);
+
             await _userService.AddLink(Command.UserId, user);
 
             return user;

@@ -16,32 +16,32 @@
             {
                 new Option
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 1,
                     Name = "test1"
                 },
                 new Option
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 2,
                     Name = "test2"
                 },
                 new Option
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 3,
                     Name = "test3"
                 },
                 new Option
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 4,
                     Name = "test4"
                 },
                 new Option
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 5,
                     Name = "test5"
                 },
                 new Option
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 6,
                     Name = "test6"
                 },
             };
@@ -54,7 +54,7 @@
             var attachment2 = attachments[1];
 
             Assert.Equal(5, attachment1.Actions.Count);
-            Assert.Equal(1, attachment2.Actions.Count);
+            Assert.Single(attachment2.Actions);
 
             Assert.Equal(options[5].Id.ToString(), attachment2.Actions[0].Value);
         }

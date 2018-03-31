@@ -16,6 +16,7 @@
             services.AddSingleton<IRoomRepository, RoomRepository>();
             services.AddSingleton<IRunRepository, RunRepository>();
             services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddSingleton<IOrderRepository, OrderRepository>();
         }
     }
 }
