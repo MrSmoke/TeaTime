@@ -6,7 +6,8 @@
     using CommandRouter;
     using CommandRouter.Exceptions;
     using CommandRouter.Integration.AspNetCore;
-    using Common.Services;
+    using Common.Abstractions;
+    using MediatR;
     using Microsoft.AspNetCore.Mvc;
     using Models.Requests;
     using Models.Responses;
@@ -17,10 +18,10 @@
         private readonly ICommandRunner _commandRunner;
         private readonly SlackCommand _slackService;
 
-        public SlackController(IUserService userService, IRoomService roomService, IRunService runService, ICommandRunner commandRunner)
+        public SlackController(ICommandRunner commandRunner, IMediator mediator, IIdGenerator<long> idGenerator)
         {
             _commandRunner = commandRunner;
-            _slackService = new SlackCommand(userService, runService, roomService);
+            _slackService = new SlackCommand(mediator, idGenerator);
         }
 
         [HttpPost]

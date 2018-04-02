@@ -1,7 +1,9 @@
 ﻿namespace TeaTime
 {
+    using Common.Abstractions;
     using Common.Services;
     using Data.MySql;
+    using MediatR;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -33,6 +35,8 @@
             //TODO: Allow these to be loaded dynamically
             services.AddMySql("host=192.168.99.100;port=32768;user id=root;password=password;database=teatime;");
             services.AddSlack(mvcBuilder);
+
+            services.AddMediatR(typeof(ICommand).Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

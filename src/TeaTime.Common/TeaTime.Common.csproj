@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Links\" />
     <Folder Include="Features\Rooms\" />
   </ItemGroup>
 

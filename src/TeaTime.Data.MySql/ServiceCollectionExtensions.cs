@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Data.MySql
 {
+    using Common.Abstractions;
     using Common.Abstractions.Data;
     using Microsoft.Extensions.DependencyInjection;
     using Repositories;
@@ -17,6 +18,8 @@
             services.AddSingleton<IRunRepository, RunRepository>();
             services.AddSingleton<IUserRepository, UserRepository>();
             services.AddSingleton<IOrderRepository, OrderRepository>();
+
+            services.AddSingleton<IIdGenerator<long>, MySqlIdGenerator>();
         }
     }
 }

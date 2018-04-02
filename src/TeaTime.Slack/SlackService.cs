@@ -5,7 +5,12 @@
     using CommandRouter.Attributes;
     using CommandRouter.Commands;
     using CommandRouter.Results;
+    using Common.Abstractions;
+    using Common.Features.Links.Commands;
+    using Common.Features.Links.Queries;
     using Common.Features.Users.Commands;
+    using Common.Features.Users.Queries;
+    using Common.Models;
     using Common.Models.Data;
     using MediatR;
     using Models.Requests;
@@ -16,10 +21,12 @@
     public class SlackCommand : Command
     {
         private readonly IMediator _mediator;
+        private readonly IIdGenerator<long> _idGenerator;
 
-        public SlackCommand(IMediator mediator)
+        public SlackCommand(IMediator mediator, IIdGenerator<long> idGenerator)
         {
             _mediator = mediator;
+            _idGenerator = idGenerator;
         }
 
         [Command("addgroup")]
@@ -49,39 +56,43 @@
             //return Response($"Added option {o.Name} to group {roomGroup.Name}", ResponseType.User);
         }
 
-        [Command("tea")]
-        public async Task<ICommandResult> Start(string group = "tea")
+        [Command("start")]
+        public Task<ICommandResult> Start(string group = "tea")
         {
-            var user = GetOrCreateUser();
-            var room = await GetOrCreateRoom();
+            throw new NotImplementedException();
 
-            var roomGroup = await _roomService.GetGroupByName(room, group);
-            if(roomGroup == null)
-                return Response($"{group} is not a valid teatime group. Please create it first", ResponseType.User);
+            //var user = GetOrCreateUser();
+            //var room = await GetOrCreateRoom();
 
-            await _runService.Start(room, await user, roomGroup);
+            //var roomGroup = await _roomService.GetGroupByName(room, group);
+            //if(roomGroup == null)
+            //    return Response($"{group} is not a valid teatime group. Please create it first", ResponseType.User);
 
-            var options = await _roomService.GetOptions(roomGroup);
+            //await _runService.Start(room, await user, roomGroup);
 
-            var attachments = AttachmentBuilder.BuildOptions(options);
+            //var options = await _roomService.GetOptions(roomGroup);
 
-            return Response(new SlashCommandResponse
-            {
-                Text = $"{(await user).DisplayName} wants tea",
-                Type = ResponseType.Channel,
-                Attachments = attachments
-            });
+            //var attachments = AttachmentBuilder.BuildOptions(options);
+
+            //return Response(new SlashCommandResponse
+            //{
+            //    Text = $"{(await user).DisplayName} wants tea",
+            //    Type = ResponseType.Channel,
+            //    Attachments = attachments
+            //});
         }
 
         [Command("join")]
-        public async Task<SlashCommandResponse> Join()
+        public Task<SlashCommandResponse> Join()
         {
-            var user = GetOrCreateUser();
-            var room = await GetOrCreateRoom();
+            throw new NotImplementedException();
 
-            await _runService.Join(room, await user);
+            //var user = GetOrCreateUser();
+            //var room = await GetOrCreateRoom();
 
-            return new SlashCommandResponse("You have joined this round of tea!", ResponseType.User);
+            //await _runService.Join(room, await user);
+
+            //return new SlashCommandResponse("You have joined this round of tea!", ResponseType.User);
         }
 
         public Task IllMake()
@@ -92,42 +103,41 @@
         [Command("end")]
         public async Task<SlashCommandResponse> End()
         {
-            var user = await GetOrCreateUser();
-            var room = await GetOrCreateRoom();
-
-            var runEndResult = await _runService.End(room, user);
-
             throw new NotImplementedException();
         }
 
         private async Task<User> GetOrCreateUser()
         {
-            var user = await _userService.GetByLink(Command.UserId);
-            if (user != null)
-                return user;
+            var userId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, Command.UserId)).ConfigureAwait(false);
+            if (userId > 0)
+                return await _mediator.Send(new GetUserQuery(userId)).ConfigureAwait(false);
 
+            //we need to create a new user
             var command = new CreateUserCommand
             {
-                Username = Command.UserName,
-                DisplayName = Command.UserName,
+                Id = await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                Username = "slack_" + Command.UserId,
+                DisplayName = Command.UserName
             };
             await _mediator.Send(command).ConfigureAwait(false);
 
-            await _userService.AddLink(Command.UserId, user);
+            //add link
+            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, Command.UserId)).ConfigureAwait(false);
 
-            return user;
+            //this is not great because its not really a proper entity model, but it will do for now
+            //we shouldn't query here because the command COULD eventually be eventual consistency
+            return new User
+            {
+                Id = command.Id,
+                DisplayName = command.DisplayName,
+                Username = command.Username,
+                CreatedDate = DateTimeOffset.MinValue //dunno this value *shrug*
+            };
         }
 
         private async Task<Room> GetOrCreateRoom()
         {
-            var room = await _roomService.GetByLink(Command.ChannelId);
-            if (room != null)
-                return room;
-
-            room = await _roomService.Create(Command.ChannelName);
-            await _roomService.AddLink(Command.ChannelId, room);
-
-            return room;
+            throw new NotImplementedException();
         }
 
         public SlashCommand Command => (SlashCommand) Context.Items["SLASHCOMMAND"];
