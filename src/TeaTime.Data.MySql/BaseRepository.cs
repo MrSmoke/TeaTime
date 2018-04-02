@@ -14,11 +14,9 @@
             _factory = factory;
         }
 
-        protected async Task<bool> Insert(string sql, object obj)
+        protected Task<int> Insert(string sql, object obj)
         {
-            var rows = await GetConnection(conn => conn.ExecuteAsync(sql, obj)).ConfigureAwait(false);
-
-            return rows == 1;
+            return GetConnection(conn => conn.ExecuteAsync(sql, obj));
         }
 
         protected Task<T> SingleOrDefault<T>(string sql, object obj = null)

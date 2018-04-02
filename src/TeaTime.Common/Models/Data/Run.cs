@@ -14,6 +14,8 @@
         /// </summary>
         public long UserId { get; set; }
 
+        public long GroupId { get; set; }
+
         /// <summary>
         /// The time the run was started
         /// </summary>

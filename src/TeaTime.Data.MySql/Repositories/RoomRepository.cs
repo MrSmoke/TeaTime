@@ -1,11 +1,9 @@
 ﻿namespace TeaTime.Data.MySql.Repositories
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
     using Common.Models.Data;
-    using Dapper;
 
     public class RoomRepository : BaseRepository, IRoomRepository
     {
@@ -38,44 +36,6 @@
         }
 
         public Task DeleteCurrentRunAsync(long roomId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task AddGroupAsync(RoomGroup group)
-        {
-            const string sql = "INSERT INTO room_groups (id, name, room_id, date_created) VALUES (@id, @name, @roomId, @dateCreated)";
-
-            return Insert(sql, group);
-        }
-
-        public Task<RoomGroup> GetGroupByNameAsync(long roomId, string name)
-        {
-            const string sql = "SELECT id, name, room_id as RoomId, date_created as DateCreated FROM room_groups WHERE room_id = @roomId AND name = @name LIMIT 1";
-
-            return SingleOrDefault<RoomGroup>(sql, new {roomId, name});
-        }
-
-        public Task DeleteGroupAsync(long groupId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task AddGroupOptionAsync(Option option)
-        {
-            const string sql = "INSERT INTO room_group_options (id, name, room_group_id, date_created) VALUES (@id, @name, @roomGroupId, @dateCreated)";
-
-            return Insert(sql, option);
-        }
-
-        public Task<IEnumerable<Option>> GetGroupOptionsAsync(long groupId)
-        {
-            const string sql = "SELECT id, text, group_id as RoomGroupId, date_created AS DateCreated FROM room_group_options WHERE group_id = @groupId";
-
-            return GetConnection(conn => conn.QueryAsync<Option>(sql, new {groupId}));
-        }
-
-        public Task DeleteGroupOptionAsync(long optionId)
         {
             throw new NotImplementedException();
         }

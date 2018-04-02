@@ -6,8 +6,6 @@
     using CommandRouter;
     using CommandRouter.Exceptions;
     using CommandRouter.Integration.AspNetCore;
-    using Common.Abstractions;
-    using MediatR;
     using Microsoft.AspNetCore.Mvc;
     using Models.Requests;
     using Models.Responses;
@@ -16,12 +14,10 @@
     public class SlackController : Controller
     {
         private readonly ICommandRunner _commandRunner;
-        private readonly SlackCommand _slackService;
 
-        public SlackController(ICommandRunner commandRunner, IMediator mediator, IIdGenerator<long> idGenerator)
+        public SlackController(ICommandRunner commandRunner)
         {
             _commandRunner = commandRunner;
-            _slackService = new SlackCommand(mediator, idGenerator);
         }
 
         [HttpPost]
@@ -52,9 +48,7 @@
         [Route("interactive-messages")]
         public ActionResult InteractiveMessageHook(MessageAction messageAction)
         {
-            return Ok();
+            throw new NotImplementedException();
         }
     }
-
-
 }

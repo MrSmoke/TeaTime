@@ -4,10 +4,17 @@
 
     public class JoinRunCommand : IUserCommand
     {
-        public long Id { get; set; }
+        public long Id { get; }
+        public long UserId { get; }
+        public long OptionId { get; }
+        public long RunId { get; }
 
-        public long UserId { get; set; }
-
-        public long RunId { get; set; }
+        public JoinRunCommand(long id, long runId, long userId, long optionId)
+        {
+            Id = id;
+            RunId = runId;
+            UserId = userId;
+            OptionId = optionId;
+        }
     }
 }

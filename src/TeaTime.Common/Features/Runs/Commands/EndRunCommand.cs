@@ -9,10 +9,18 @@
     /// </summary>
     public class EndRunCommand : IUserCommand
     {
-        public long RoomId { get; set; }
+        public long RunId { get; }
+        public long RoomId { get; }
+        public long UserId { get; }
 
-        public long UserId { get; set; }
+        public IEnumerable<Order> Orders { get; }
 
-        public IEnumerable<Order> Orders { get; set; }
+        public EndRunCommand(long runId, long roomId, long userId, IEnumerable<Order> orders)
+        {
+            RunId = runId;
+            RoomId = roomId;
+            UserId = userId;
+            Orders = orders;
+        }
     }
 }

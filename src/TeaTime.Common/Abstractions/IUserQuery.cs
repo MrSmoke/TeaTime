@@ -6,5 +6,6 @@
     /// <typeparam name="T"></typeparam>
     public interface IUserQuery<out T> : IQuery<T>
     {
+        long UserId { get; }
     }
 }

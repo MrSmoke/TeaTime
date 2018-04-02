@@ -2,6 +2,6 @@
 {
     public class Option : BaseNamedDataObject
     {
-        public long RoomGroupId { get; set; }
+        public long GroupId { get; set; }
     }
 }
