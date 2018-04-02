@@ -8,6 +8,8 @@
     using Common.Abstractions;
     using Common.Features.Links.Commands;
     using Common.Features.Links.Queries;
+    using Common.Features.Rooms.Commands;
+    using Common.Features.Rooms.Queries;
     using Common.Features.Users.Commands;
     using Common.Features.Users.Queries;
     using Common.Models;
@@ -106,23 +108,22 @@
             throw new NotImplementedException();
         }
 
-        private async Task<User> GetOrCreateUser()
+        private async Task<User> GetOrCreateUser(SlashCommand slashCommand)
         {
-            var userId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, Command.UserId)).ConfigureAwait(false);
+            var userId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, slashCommand.UserId)).ConfigureAwait(false);
             if (userId > 0)
                 return await _mediator.Send(new GetUserQuery(userId)).ConfigureAwait(false);
 
             //we need to create a new user
-            var command = new CreateUserCommand
-            {
-                Id = await _idGenerator.GenerateAsync().ConfigureAwait(false),
-                Username = "slack_" + Command.UserId,
-                DisplayName = Command.UserName
-            };
+            var command = new CreateUserCommand(
+                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                username: "slack_" + slashCommand.UserId,
+                displayName: slashCommand.UserName
+            );
             await _mediator.Send(command).ConfigureAwait(false);
 
             //add link
-            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, Command.UserId)).ConfigureAwait(false);
+            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, slashCommand.UserId)).ConfigureAwait(false);
 
             //this is not great because its not really a proper entity model, but it will do for now
             //we shouldn't query here because the command COULD eventually be eventual consistency
@@ -135,8 +136,24 @@
             };
         }
 
-        private async Task<Room> GetOrCreateRoom()
+        private async Task<Room> GetOrCreateRoom(SlashCommand slashCommand, long userId)
         {
+            var roomId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, slashCommand.ChannelId)).ConfigureAwait(false);
+            if (roomId > 0)
+                return await _mediator.Send(new GetRoomQuery(roomId)).ConfigureAwait(false);
+
+            var command = new CreateRoomCommand(
+                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                name: slashCommand.ChannelName,
+                userId: userId
+            );
+
+            await _mediator.Send(command).ConfigureAwait(false);
+
+            //add link
+            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.Room, slashCommand.ChannelId)).ConfigureAwait(false);
+
+            //create default group 'tea'
             throw new NotImplementedException();
         }
 

@@ -7,5 +7,12 @@
         public long Id { get; set; }
         public string Username { get; set; }
         public string DisplayName { get; set; }
+
+        public CreateUserCommand(long id, string username, string displayName)
+        {
+            Id = id;
+            Username = username;
+            DisplayName = displayName;
+        }
     }
 }

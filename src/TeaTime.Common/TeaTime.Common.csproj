@@ -9,8 +9,4 @@
     <PackageReference Include="mediatr" Version="4.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Rooms\" />
-  </ItemGroup>
-
 </Project>
