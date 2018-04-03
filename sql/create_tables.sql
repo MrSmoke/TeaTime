@@ -1,37 +1,3 @@
-create table users (
-	`id` bigint primary key,
-	`name` varchar(200) not null,
-	`date_created` datetime not null
-);
-
-create table rooms (
-	`id` bigint primary key,
-	`name` varchar(200) not null,
-	`date_created` datetime not null
-);
-
-create table room_groups (
-	`id` bigint primary key,
-	`name` varchar(32) not null,
-	`room_id` bigint not null,
-	`date_created` datetime not null,
-	`date_deleted` datetime default null,
-	
-	unique (room_id, name),
-	foreign key fk_roomgroups_rooms_roomid (room_id) references rooms(id)
-);
-
-create table room_group_options (
-	`id` bigint primary key,
-	`name` varchar(40) not null,
-	`room_group_id` bigint not null,
-	`date_created` datetime not null,
-	`date_deleted` datetime default null,
-	
-	unique (room_group_id, name),
-	foreign key fk_roomgroupoptions_roomgroups_roomgroupid (room_group_id) references room_groups(id)
-);
-
 create table links (
 	`link` varchar(100) not null,
 	`linkType` smallint not null,
@@ -45,4 +11,39 @@ CREATE TABLE `ids64` (
   `stub` char(1) NOT NULL default '',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `stub` (`stub`)
+);
+
+CREATE TABLE `locks` (
+  `lockKey` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`lockKey`)
+);
+
+create table users (
+	`id` bigint primary key,
+	`username` varchar(100) not null,
+	`displayName` varchar(100) not null,
+	`createdDate` datetime not null
+);
+
+CREATE TABLE runs (
+	`id` bigint primary key,
+	`roomId` bigint not null,
+	`userId` bigint not null,
+	`groupId` bigint not null,
+	`startTime` datetime not null,
+	`endTime` datetime default null,
+	`createdDate` datetime not null
+);
+
+CREATE TABLE run_results (
+	`runId` bigint primary key,
+	`runnerUserId` bigint not null,
+	`endedTime` datetime not null
+);
+
+CREATE TABLE rooms (
+	`id` bigint primary key,
+	`name` varchar(200) not null,
+	`createdBy` bigint not null,
+	`createdDate` datetime not null
 );

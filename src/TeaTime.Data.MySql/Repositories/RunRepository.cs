@@ -12,22 +12,28 @@
 
         public Task CreateAsync(Run run)
         {
-            throw new System.NotImplementedException();
-        }
+            const string sql = "INSERT INTO runs " +
+                               "(id, roomId, userId, groupId, startTime, endTime, createdDate) VALUES " +
+                               "(@id, @roomId, @userId, @groupId, @startTime, @endTime, @createdDate)";
 
-        public Task UpdateAsync(Run run)
-        {
-            throw new System.NotImplementedException();
+            return ExecuteAsync(sql, run);
         }
 
         public Task<Run> GetAsync(long runId)
         {
-            throw new System.NotImplementedException();
+            const string sql =
+                "SELECT id, roomId, userId, groupId, startTime, endTime, createdDate FROM runs WHERE id = @runId";
+
+            return SingleOrDefaultAsync<Run>(sql, new {runId});
         }
 
         public Task CreateResultAsync(RunResult result)
         {
-            throw new System.NotImplementedException();
+            const string sql = "INSERT INTO run_results " +
+                               "(runId, runnerUserId, endedTime) VALUES " +
+                               "(@runId, @runnerUserId, @endedTime)";
+
+            return ExecuteAsync(sql, result);
         }
     }
 }

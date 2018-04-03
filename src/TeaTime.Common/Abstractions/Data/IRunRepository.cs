@@ -6,7 +6,6 @@
     public interface IRunRepository
     {
         Task CreateAsync(Run run);
-        Task UpdateAsync(Run run);
         Task<Run> GetAsync(long runId);
 
         Task CreateResultAsync(RunResult result);

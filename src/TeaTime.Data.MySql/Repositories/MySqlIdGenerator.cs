@@ -13,7 +13,7 @@
         {
             const string sql = "REPLACE INTO ids64 (stub) VALUES ('a'); SELECT LAST_INSERT_ID();";
 
-            return SingleOrDefault<long>(sql);
+            return SingleOrDefaultAsync<long>(sql);
         }
     }
 }

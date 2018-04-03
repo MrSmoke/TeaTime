@@ -13,31 +13,18 @@
 
         public Task CreateAsync(Room room)
         {
-            const string sql = "INSERT INTO rooms (id, name, date_created) VALUES (@id, @name, @dateCreated)";
+            const string sql = "INSERT INTO rooms " +
+                               "(id, name, createdBy, createdDate) VALUES " +
+                               "(@id, @name, @createdBy, @createdDate)";
 
-            return Insert(sql, room);
+            return ExecuteAsync(sql, room);
         }
 
         public Task<Room> GetAsync(long id)
         {
-            const string sql = "SELECT id, name, date_created as DateCreated FROM rooms WHERE id = @id LIMIT 1";
+            const string sql = "SELECT id, name, createdBy, createdDate FROM rooms WHERE id = @id";
 
-            return SingleOrDefault<Room>(sql, new {id});
-        }
-
-        public Task CreateCurrentRunAsync(long roomId, long runId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<long> GetCurrentRunAsync(long roomId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteCurrentRunAsync(long roomId)
-        {
-            throw new NotImplementedException();
+            return SingleOrDefaultAsync<Room>(sql, new {id});
         }
     }
 }

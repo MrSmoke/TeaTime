@@ -115,7 +115,7 @@
             var room = await GetOrCreateRoom(slashCommand, user.Id).ConfigureAwait(false);
             var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
 
-            var group = await _mediator.Send(new GetRoomItemGroupQuery(roomId: run.RoomId, userId: user.Id, groupId: run.GroupId));
+            var group = await _mediator.Send(new GetRoomItemGroupQuery(roomId: run.RoomId, userId: user.Id, groupId: run.GroupId)).ConfigureAwait(false);
 
             var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionText));
             if (option == null)

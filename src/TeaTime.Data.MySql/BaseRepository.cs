@@ -14,12 +14,12 @@
             _factory = factory;
         }
 
-        protected Task<int> Insert(string sql, object obj)
+        protected Task<int> ExecuteAsync(string sql, object obj)
         {
             return GetConnection(conn => conn.ExecuteAsync(sql, obj));
         }
 
-        protected Task<T> SingleOrDefault<T>(string sql, object obj = null)
+        protected Task<T> SingleOrDefaultAsync<T>(string sql, object obj = null)
         {
             return GetConnection(conn => conn.QuerySingleOrDefaultAsync<T>(sql, obj));
         }
