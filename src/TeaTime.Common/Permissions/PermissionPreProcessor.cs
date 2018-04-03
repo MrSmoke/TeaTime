@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common
+﻿namespace TeaTime.Common.Permissions
 {
     using System.Threading;
     using System.Threading.Tasks;
