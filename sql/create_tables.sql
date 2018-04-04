@@ -68,3 +68,11 @@ create table option_groups (
 	
 	unique `idx_optiongroups_name` (`roomId`, `name`)
 );
+
+create table orders (
+	`id` bigint primary key,
+	`runId` bigint not null,
+	`userId` bigint not null,
+	`optionId` bigint not null,
+	`createdDate` datetime not null
+);

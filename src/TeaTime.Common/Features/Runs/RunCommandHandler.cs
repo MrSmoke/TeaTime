@@ -46,8 +46,14 @@
         //End run
         public async Task Handle(EndRunCommand request, CancellationToken cancellationToken)
         {
+            var run = await _runRepository.GetAsync(request.RunId).ConfigureAwait(false);
+
             //random runner
             var runnerUserId = await _randomizer.GetRunnerUserId(request.Orders).ConfigureAwait(false);
+
+            //update run
+            run.Ended = true;
+            await _runRepository.UpdateAsync(run).ConfigureAwait(false);
 
             //store result
             var runResult = new RunResult

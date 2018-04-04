@@ -7,9 +7,10 @@
     public interface IOptionsRepository
     {
         Task CreateGroupAsync(RoomItemGroup group);
+        Task<RoomItemGroup> GetGroupAsync(long groupId);
         Task<RoomItemGroup> GetGroupByNameAsync(long roomId, string name);
 
         Task CreateAsync(Option option);
-        Task<IEnumerable<Option>> GetByGroupIdAsync(long groupId);
+        Task<IEnumerable<Option>> GetOptionsByGroupIdAsync(long groupId);
     }
 }

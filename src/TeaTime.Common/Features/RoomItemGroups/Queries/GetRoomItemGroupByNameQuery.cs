@@ -3,17 +3,17 @@
     using Abstractions;
     using Models;
 
-    public class GetRoomItemGroupQuery : IUserQuery<RoomItemGroupModel>
+    public class GetRoomItemGroupByNameQuery : IUserQuery<RoomItemGroupModel>
     {
         public long RoomId { get; }
-        public long GroupId { get; }
+        public string Name { get; }
         public long UserId { get; }
 
-        public GetRoomItemGroupQuery(long roomId, long userId, long groupId)
+        public GetRoomItemGroupByNameQuery(long roomId, long userId, string name)
         {
             RoomId = roomId;
             UserId = userId;
-            GroupId = groupId;
+            Name = name;
         }
     }
 }

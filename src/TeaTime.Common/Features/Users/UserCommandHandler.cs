@@ -22,15 +22,15 @@
             _clock = clock;
         }
 
-        public async Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             var user = _mapper.Map<CreateUserCommand, User>(request);
 
             user.CreatedDate = _clock.UtcNow();
 
-            await _userRepository.Create(user).ConfigureAwait(false);
+            return _userRepository.Create(user);
 
-            //create event
+            //todo: create event
         }
     }
 }

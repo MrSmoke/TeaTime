@@ -60,10 +60,10 @@
             var user = await GetOrCreateUser(slashCommand).ConfigureAwait(false);
             var room = await GetOrCreateRoom(slashCommand, user.Id).ConfigureAwait(false);
 
-            var group = _mediator.Send(new GetRoomItemGroupByNameQuery(
+            var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(
                 roomId: room.Id,
                 userId: user.Id,
-                name: groupName));
+                name: groupName)).ConfigureAwait(false);
 
             if(group == null)
                 return Response($"{groupName} is not a valid teatime group. Please create it first", ResponseType.User);
@@ -74,6 +74,8 @@
                     userId: user.Id,
                     groupId: group.Id,
                     name: optionName);
+
+            await _mediator.Send(command).ConfigureAwait(false);
 
             return Response($"Added option {optionName} to group {room.Name}", ResponseType.User);
         }
@@ -95,7 +97,7 @@
 
             var runId = await _idGenerator.GenerateAsync().ConfigureAwait(false);
 
-            var command = new StartRunCommand(runId, user.Id, room.Id, 0, _clock.UtcNow());
+            var command = new StartRunCommand(runId, user.Id, room.Id, roomItemGroup.Id, _clock.UtcNow());
 
             await _mediator.Send(command).ConfigureAwait(false);
 
@@ -116,9 +118,12 @@
             var room = await GetOrCreateRoom(slashCommand, user.Id).ConfigureAwait(false);
             var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
 
+            if(run == null)
+                return Response($"Please start first", ResponseType.User);
+
             var group = await _mediator.Send(new GetRoomItemGroupQuery(roomId: run.RoomId, userId: user.Id, groupId: run.GroupId)).ConfigureAwait(false);
 
-            var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionText));
+            var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionText, StringComparison.OrdinalIgnoreCase));
             if (option == null)
                 return Response($"Unknown option '{optionText}'", ResponseType.User);
 

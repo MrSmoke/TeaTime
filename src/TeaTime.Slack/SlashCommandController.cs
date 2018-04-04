@@ -31,6 +31,7 @@
                     {"SLASHCOMMAND", slashCommand}
                 }).ConfigureAwait(false);
 
+                Response.ContentType = "application/json";
                 return new CommandRouterResult(result);
             }
             catch (CommandNotFoundException)

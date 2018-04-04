@@ -7,6 +7,8 @@
 
     public class OptionsRepository : BaseRepository, IOptionsRepository
     {
+        private const string SelectColumns = "id, name, roomId, createdBy, createdDate";
+
         public OptionsRepository(ConnectionFactory factory) : base(factory)
         {
         }
@@ -20,10 +22,18 @@
             return ExecuteAsync(sql, group);
         }
 
+        public Task<RoomItemGroup> GetGroupAsync(long groupId)
+        {
+            const string sql = "SELECT " + SelectColumns +
+                               " FROM option_groups WHERE id = @groupId";
+
+            return SingleOrDefaultAsync<RoomItemGroup>(sql, new {groupId});
+        }
+
         public Task<RoomItemGroup> GetGroupByNameAsync(long roomId, string name)
         {
-            const string sql =
-                "SELECT id, name, roomId, createdBy, createdDate FROM option_groups WHERE roomId = @roomId AND name = @name";
+            const string sql = "SELECT " + SelectColumns +
+                               " FROM option_groups WHERE roomId = @roomId AND name = @name";
 
             return SingleOrDefaultAsync<RoomItemGroup>(sql, new {roomId, name});
         }
@@ -37,7 +47,7 @@
             return ExecuteAsync(sql, option);
         }
 
-        public Task<IEnumerable<Option>> GetByGroupIdAsync(long groupId)
+        public Task<IEnumerable<Option>> GetOptionsByGroupIdAsync(long groupId)
         {
             const string sql = "SELECT id, name, groupId, createdBy, createdDate FROM options WHERE groupId = @groupId";
 
