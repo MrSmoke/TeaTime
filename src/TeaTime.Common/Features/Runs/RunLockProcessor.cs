@@ -7,9 +7,9 @@
     using Commands;
     using MediatR.Pipeline;
 
-    public class RunLockProcessor :
-        IRequestPreProcessor<StartRunCommand>,
-        IRequestPreProcessor<EndRunCommand>
+    public class RunLockProcessor //:
+        //IRequestPreProcessor<StartRunCommand>,
+        //IRequestPreProcessor<EndRunCommand>
     {
         private readonly IRoomRunLockService _lockService;
 

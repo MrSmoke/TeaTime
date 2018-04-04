@@ -7,6 +7,7 @@
     {
         Task CreateAsync(Run run);
         Task<Run> GetAsync(long runId);
+        Task<Run> GetCurrentRunAsync(long roomId);
 
         Task CreateResultAsync(RunResult result);
     }

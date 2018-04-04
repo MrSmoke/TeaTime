@@ -9,7 +9,7 @@
         Task CreateGroupAsync(RoomItemGroup group);
         Task<RoomItemGroup> GetGroupByNameAsync(long roomId, string name);
 
-        Task CreateAsync(IEnumerable<Option> options);
+        Task CreateAsync(Option option);
         Task<IEnumerable<Option>> GetByGroupIdAsync(long groupId);
     }
 }

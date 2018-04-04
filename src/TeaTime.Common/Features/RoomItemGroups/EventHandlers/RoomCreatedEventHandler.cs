@@ -40,6 +40,7 @@
                 var optionCommand = new CreateOptionCommand(
                     id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
                     userId: notification.CreatedBy,
+                    groupId: command.Id,
                     name: name);
 
                 await _mediator.Send(optionCommand, CancellationToken.None).ConfigureAwait(false);

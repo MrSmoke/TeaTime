@@ -1,6 +1,7 @@
 ﻿namespace TeaTime.Data.MySql
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Dapper;
     using global::MySql.Data.MySqlClient;
@@ -22,6 +23,11 @@
         protected Task<T> SingleOrDefaultAsync<T>(string sql, object obj = null)
         {
             return GetConnection(conn => conn.QuerySingleOrDefaultAsync<T>(sql, obj));
+        }
+
+        protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object obj = null)
+        {
+            return GetConnection(conn => conn.QueryAsync<T>(sql, obj));
         }
 
         protected async Task<T> GetConnection<T>(Func<MySqlConnection, Task<T>> func)

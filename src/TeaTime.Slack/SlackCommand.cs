@@ -72,6 +72,7 @@
                 new CreateOptionCommand(
                     id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
                     userId: user.Id,
+                    groupId: group.Id,
                     name: optionName);
 
             return Response($"Added option {optionName} to group {room.Name}", ResponseType.User);

@@ -27,6 +27,14 @@
             return SingleOrDefaultAsync<Run>(sql, new {runId});
         }
 
+        public Task<Run> GetCurrentRunAsync(long roomId)
+        {
+            const string sql =
+                "SELECT id, roomId, userId, groupId, startTime, endTime, createdDate FROM runs WHERE roomId = @roomId AND ended = 0";
+
+            return SingleOrDefaultAsync<Run>(sql, new { roomId });
+        }
+
         public Task CreateResultAsync(RunResult result)
         {
             const string sql = "INSERT INTO run_results " +

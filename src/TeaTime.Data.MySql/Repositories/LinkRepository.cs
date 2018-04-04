@@ -10,14 +10,14 @@
         {
         }
 
-        public Task<T> GetObjectId<T>(string link, LinkType linkType)
+        public Task<long> GetObjectId(string link, LinkType linkType)
         {
-            const string sql = "SELECT objectId FROM links WHERE linkType = @linkType AND link = @link LIMIT 1";
+            const string sql = "SELECT objectId FROM links WHERE linkType = @linkType AND link = @link";
 
-            return SingleOrDefaultAsync<T>(sql, new {linkType, link});
+            return SingleOrDefaultAsync<long>(sql, new {linkType, link});
         }
 
-        public Task Add<T>(T objectId, LinkType linkType, string link)
+        public Task Add(long objectId, LinkType linkType, string link)
         {
             const string sql = "INSERT INTO links (link, linkType, objectId) VALUES (@link, @linkType, @objectId)";
 

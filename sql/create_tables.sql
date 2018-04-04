@@ -32,6 +32,7 @@ CREATE TABLE runs (
 	`groupId` bigint not null,
 	`startTime` datetime not null,
 	`endTime` datetime default null,
+	`ended` boolean default false,
 	`createdDate` datetime not null
 );
 
@@ -46,4 +47,24 @@ CREATE TABLE rooms (
 	`name` varchar(200) not null,
 	`createdBy` bigint not null,
 	`createdDate` datetime not null
+);
+
+create table options (
+	`id` bigint primary key,
+	`name` varchar(40) not null,
+	`groupId` bigint not null,
+	`createdBy` bigint not null,
+	`createdDate` datetime not null,
+	
+	unique `idx_options_name` (`groupId`, `name`)
+);
+
+create table option_groups (
+	`id` bigint primary key,
+	`name` varchar(40) not null,
+	`roomId` bigint not null,
+	`createdBy` bigint not null,
+	`createdDate` datetime not null,
+	
+	unique `idx_optiongroups_name` (`roomId`, `name`)
 );

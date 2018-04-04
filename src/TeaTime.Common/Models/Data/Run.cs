@@ -25,5 +25,10 @@
         /// The end time of the run (optional)
         /// </summary>
         public DateTimeOffset? EndTime { get; set; }
+
+        /// <summary>
+        /// True if the run has ended
+        /// </summary>
+        public bool Ended { get; set; }
     }
 }
