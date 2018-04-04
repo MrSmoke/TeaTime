@@ -45,7 +45,6 @@
             services.AddSingleton<IEventPublisher, EventPublisher>();
 
             services.AddTransient<RunLockProcessor>();
-            services.AddSingleton<IRunEventListner, RunEventListner>();
 
             services.AddMediatR(typeof(ICommand));
             services.AddAutoMapper(typeof(ICommand));

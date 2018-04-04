@@ -7,18 +7,13 @@
     using CommandRouter.Commands;
     using CommandRouter.Results;
     using Common.Abstractions;
-    using Common.Features.Links.Commands;
-    using Common.Features.Links.Queries;
     using Common.Features.Options.Commands;
     using Common.Features.RoomItemGroups.Queries;
-    using Common.Features.Rooms.Commands;
     using Common.Features.Rooms.Queries;
     using Common.Features.Runs.Commands;
     using Common.Features.Runs.Events;
     using Common.Features.Runs.Queries;
-    using Common.Features.Users.Commands;
     using Common.Features.Users.Queries;
-    using Common.Models;
     using Common.Models.Data;
     using MediatR;
     using Models.Requests;
@@ -31,14 +26,16 @@
         private readonly IMediator _mediator;
         private readonly IIdGenerator<long> _idGenerator;
         private readonly ISystemClock _clock;
-        private readonly IRunEventListner _runEventListner;
+        private readonly IRunEventListener _runEventListener;
+        private readonly ISlackService _slackService;
 
-        public SlackCommand(IMediator mediator, IIdGenerator<long> idGenerator, ISystemClock clock, IRunEventListner runEventListner)
+        public SlackCommand(IMediator mediator, IIdGenerator<long> idGenerator, ISystemClock clock, IRunEventListener runEventListener, ISlackService slackService)
         {
             _mediator = mediator;
             _idGenerator = idGenerator;
             _clock = clock;
-            _runEventListner = runEventListner;
+            _runEventListener = runEventListener;
+            _slackService = slackService;
         }
 
         [Command("addgroup")]
@@ -110,22 +107,22 @@
         }
 
         [Command("join")]
-        public async Task<ICommandResult> Join(string optionText)
+        public async Task<ICommandResult> Join(string optionName)
         {
             var slashCommand = GetCommand();
 
             var user = await GetOrCreateUser(slashCommand).ConfigureAwait(false);
             var room = await GetOrCreateRoom(slashCommand, user.Id).ConfigureAwait(false);
-            var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
 
-            if(run == null)
+            var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
+            if (run == null)
                 return Response($"Please start first", ResponseType.User);
 
             var group = await _mediator.Send(new GetRoomItemGroupQuery(roomId: run.RoomId, userId: user.Id, groupId: run.GroupId)).ConfigureAwait(false);
 
-            var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionText, StringComparison.OrdinalIgnoreCase));
+            var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.OrdinalIgnoreCase));
             if (option == null)
-                return Response($"Unknown option '{optionText}'", ResponseType.User);
+                return Response($"Unknown option '{optionName}'", ResponseType.User);
 
             var command = new JoinRunCommand(
                 id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
@@ -161,11 +158,9 @@
                 orders: orders
             );
 
-            await _mediator.Send(command).ConfigureAwait(false);
-
             //todo: how to return?
             //not the best but it will do for now
-            var response = await _runEventListner.WaitOnceAsync<RunEndedEvent, SlashCommandResponse>(
+            var response = await _runEventListener.WaitOnceAsync<RunEndedEvent, SlashCommandResponse>(
                 async evt =>
                 {
                     var runner = await _mediator.Send(new GetUserQuery(evt.RunnerUserId)).ConfigureAwait(false);
@@ -176,62 +171,21 @@
                         Type = ResponseType.Channel
                     };
 
-                }, TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+                }, TimeSpan.FromMinutes(60)).ConfigureAwait(false);
+
+            await _mediator.Send(command).ConfigureAwait(false);
 
             return Response(response);
         }
 
-        private async Task<User> GetOrCreateUser(SlashCommand slashCommand)
+        private Task<User> GetOrCreateUser(SlashCommand slashCommand)
         {
-            var userId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, slashCommand.UserId)).ConfigureAwait(false);
-            if (userId > 0)
-                return await _mediator.Send(new GetUserQuery(userId)).ConfigureAwait(false);
-
-            //we need to create a new user
-            var command = new CreateUserCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
-                username: "slack_" + slashCommand.UserId,
-                displayName: slashCommand.UserName
-            );
-            await _mediator.Send(command).ConfigureAwait(false);
-
-            //add link
-            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, slashCommand.UserId)).ConfigureAwait(false);
-
-            //this is not great because its not really a proper entity model, but it will do for now
-            //we shouldn't query here because the command COULD eventually be eventual consistency
-            return new User
-            {
-                Id = command.Id,
-                DisplayName = command.DisplayName,
-                Username = command.Username,
-                CreatedDate = DateTimeOffset.MinValue //dunno this value *shrug*
-            };
+            return _slackService.GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
         }
 
-        private async Task<Room> GetOrCreateRoom(SlashCommand slashCommand, long userId)
+        private Task<Room> GetOrCreateRoom(SlashCommand slashCommand, long userId)
         {
-            var roomId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, slashCommand.ChannelId)).ConfigureAwait(false);
-            if (roomId > 0)
-                return await _mediator.Send(new GetRoomQuery(roomId)).ConfigureAwait(false);
-
-            var command = new CreateRoomCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
-                name: slashCommand.ChannelName,
-                userId: userId
-            );
-
-            await _mediator.Send(command).ConfigureAwait(false);
-
-            //add link
-            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.Room, slashCommand.ChannelId)).ConfigureAwait(false);
-
-            return new Room
-            {
-                Id = command.Id,
-                Name = command.Name,
-                CreatedDate = DateTimeOffset.MinValue //dunno this value *shrug*
-            };
+            return _slackService.GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, userId);
         }
 
         public SlashCommand GetCommand() => (SlashCommand) Context.Items["SLASHCOMMAND"];

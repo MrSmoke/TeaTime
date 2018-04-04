@@ -11,6 +11,7 @@
         Task<RoomItemGroup> GetGroupByNameAsync(long roomId, string name);
 
         Task CreateAsync(Option option);
+        Task<Option> GetAsync(long id);
         Task<IEnumerable<Option>> GetOptionsByGroupIdAsync(long groupId);
     }
 }

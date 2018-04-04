@@ -4,27 +4,37 @@
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using Common.Abstractions;
     using Common.Features.Runs.Events;
     using MediatR;
 
-    public interface IRunEventListner
+    public interface IRunEventListener
     {
-        //void Once<T, TResult>(Func<T, Task<TResult>> func, TimeSpan timeout);
-
+        void Trigger<T>(T evt) where T : IEvent;
         Task<TResult> WaitOnceAsync<TIn, TResult>(Func<TIn, Task<TResult>> func, TimeSpan timeout);
     }
 
-    public class RunEventListner : INotificationHandler<RunEndedEvent>, IRunEventListner
+    public class RunEndedListener : INotificationHandler<RunEndedEvent>
     {
-        private readonly Dictionary<Type, List<TaskCompletionSource<object>>> _waitHandles = new Dictionary<Type, List<TaskCompletionSource<object>>>();
-        private readonly object _lock = new object();
+        private readonly IRunEventListener _eventListener;
+
+        public RunEndedListener(IRunEventListener eventListener)
+        {
+            _eventListener = eventListener;
+        }
 
         public Task Handle(RunEndedEvent notification, CancellationToken cancellationToken)
         {
-            Trigger(notification);
+            _eventListener.Trigger(notification);
 
             return Task.CompletedTask;
         }
+    }
+
+    public class RunEventListener : IRunEventListener
+    {
+        private readonly Dictionary<Type, List<TaskCompletionSource<object>>> _waitHandles = new Dictionary<Type, List<TaskCompletionSource<object>>>();
+        private readonly object _lock = new object();
 
         public async Task<TResult> WaitOnceAsync<TIn, TResult>(Func<TIn, Task<TResult>> func, TimeSpan timeout)
         {
@@ -50,7 +60,7 @@
             }
         }
 
-        private void Trigger<T>(T evt)
+        public void Trigger<T>(T evt) where T : IEvent
         {
             var evtType = typeof(T);
 
