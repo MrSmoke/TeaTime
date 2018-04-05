@@ -5,6 +5,7 @@
     using Common.Features.Runs.Events;
     using MediatR;
     using Microsoft.Extensions.DependencyInjection;
+    using Services;
 
     public static class ServiceCollectionExtension
     {

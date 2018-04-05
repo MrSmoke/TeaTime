@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack
+﻿namespace TeaTime.Slack.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -8,15 +8,17 @@
     using CommandRouter.Exceptions;
     using CommandRouter.Integration.AspNetCore;
     using Common.Abstractions;
+    using Common.Exceptions;
     using Common.Features.Options;
     using Common.Features.Rooms.Queries;
     using Common.Features.Runs.Commands;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
-    using Models;
     using Models.Requests;
     using Models.Responses;
     using Newtonsoft.Json;
+    using Resources;
+    using Services;
 
     [Route("slack")]
     public class SlackController : Controller
@@ -50,13 +52,44 @@
             }
             catch (CommandNotFoundException)
             {
-                return Ok(new SlashCommandResponse("Unknown command", ResponseType.User));
+                return Ok(new SlashCommandResponse(ErrorStrings.CommandUnknown(slashCommand.Text), ResponseType.User));
+            }
+            catch (RunStartException e)
+            {
+                switch (e.Reason)
+                {
+                    case RunStartException.RunStartExceptionReason.ExistingActiveRun:
+                        return Ok(new SlashCommandResponse(ErrorStrings.StartRun_RunAlreadyStarted(), ResponseType.User));
+
+                    case RunStartException.RunStartExceptionReason.Unspecified:
+                    default:
+                        break;
+                }
+            }
+            catch (RunEndException e)
+            {
+                switch (e.Reason)
+                {
+                    case RunEndException.RunEndExceptionReason.NoActiveRun:
+                        return Ok(new SlashCommandResponse(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User));
+
+                    case RunEndException.RunEndExceptionReason.NoOrders:
+                        return Ok(new SlashCommandResponse(ErrorStrings.EndRun_NoOrders(), ResponseType.User));
+
+                    case RunEndException.RunEndExceptionReason.NotJoined:
+                        return Ok(new SlashCommandResponse(ErrorStrings.EndRun_NotJoined(), ResponseType.User));
+
+                    case RunEndException.RunEndExceptionReason.Unspecified:
+                    default:
+                        break;
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Ok(new SlashCommandResponse("Failed to run command", ResponseType.User));
             }
+
+            return Ok(new SlashCommandResponse(ErrorStrings.CommandFailed(), ResponseType.User));
         }
 
         [HttpPost]
@@ -72,13 +105,13 @@
 
             var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
             if (run == null)
-                return Ok($"Please start first", ResponseType.User);
+                return Ok(ErrorStrings.JoinRun_RunNotStarted(), ResponseType.User);
 
             var optionId = long.Parse(firstAction.Value);
 
             var option = await _mediator.Send(new GetOptionQuery(optionId)).ConfigureAwait(false);
             if (option == null)
-                return Ok("Unknown option", ResponseType.User);
+                return Ok(ErrorStrings.OptionUnknown(), ResponseType.User);
 
             var command = new JoinRunCommand(
                 id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
@@ -88,7 +121,7 @@
 
             await _mediator.Send(command).ConfigureAwait(false);
 
-            return Ok($"{user.DisplayName} has joined this round", ResponseType.Channel);
+            return Ok(ResponseStrings.RunUserJoined(message.User.Id), ResponseType.Channel);
         }
 
         private IActionResult Ok(string message, ResponseType responseType)

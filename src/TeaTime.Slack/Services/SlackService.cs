@@ -1,27 +1,18 @@
-﻿namespace TeaTime.Slack
+﻿namespace TeaTime.Slack.Services
 {
     using System;
-    using System.Linq;
     using System.Threading.Tasks;
     using Common.Abstractions;
     using Common.Features.Links.Commands;
     using Common.Features.Links.Queries;
-    using Common.Features.RoomItemGroups.Queries;
     using Common.Features.Rooms.Commands;
     using Common.Features.Rooms.Queries;
-    using Common.Features.Runs.Commands;
     using Common.Features.Users.Commands;
     using Common.Features.Users.Queries;
     using Common.Models;
     using Common.Models.Data;
     using MediatR;
     using Models.Responses;
-
-    public interface ISlackService
-    {
-        Task<User> GetOrCreateUser(string userId, string name);
-        Task<Room> GetOrCreateRoom(string channelId, string channelName, long userId);
-    }
 
     public class SlackService : ISlackService
     {

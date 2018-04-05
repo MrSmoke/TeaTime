@@ -5,6 +5,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Commands;
+    using Exceptions;
     using MediatR.Pipeline;
 
     public class RunPreProcessor<TCommand> : IRequestPreProcessor<TCommand>
@@ -19,10 +20,10 @@
         public Task Process(EndRunCommand request, CancellationToken cancellationToken)
         {
             if(!request.Orders.Any())
-                throw new Exception("Run cannot start without any orders"); //todo: Exception
+                throw new RunEndException("Cannot end run with no orders", RunEndException.RunEndExceptionReason.NoOrders);
 
             if(!request.Orders.Any(o => o.UserId.Equals(request.UserId)))
-                throw new Exception("Cannot end run without joining first"); //todo: Exception
+                throw new RunEndException("Cannot end run without joining first", RunEndException.RunEndExceptionReason.NotJoined);
 
             return Task.CompletedTask;
         }

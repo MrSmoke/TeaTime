@@ -1,11 +1,10 @@
 ﻿namespace TeaTime.Common.Features.Runs
 {
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
     using Commands;
-    using MediatR.Pipeline;
+    using Exceptions;
 
     public class RunLockProcessor //:
         //IRequestPreProcessor<StartRunCommand>
@@ -23,7 +22,7 @@
             //try to create the run lock
             var created = await _lockService.CreateLockAsync(request.RoomId).ConfigureAwait(false);
             if (!created)
-                throw new Exception("Room already has run"); //todo: better exception
+                throw new RunStartException("There is already an active run in this room", RunStartException.RunStartExceptionReason.ExistingActiveRun);
 
             //run lock created, so everything is ok
         }
@@ -33,7 +32,7 @@
             //delete lock
             var deleted = await _lockService.DeleteLockAsync(request.RoomId).ConfigureAwait(false);
             if (!deleted)
-                throw new Exception("No current run in room");
+                throw new RunEndException("There is no active run in this room", RunEndException.RunEndExceptionReason.NoActiveRun);
         }
     }
 }
