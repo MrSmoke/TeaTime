@@ -4,7 +4,7 @@
     {
         internal static string SlackUserId(string id)
         {
-            return $"<@{id}";
+            return $"<@{id}>";
         }
     }
 }

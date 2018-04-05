@@ -11,6 +11,6 @@
         internal static string RunUserJoined(string slackUserId) =>
             $"{StringHelpers.SlackUserId(slackUserId)} has joined this round!";
 
-        internal static string GroupAdded(string groupName) => $"*{groupName}* created!";
+        internal static string GroupAdded(string groupName) => $"Group *{groupName}* created!";
     }
 }

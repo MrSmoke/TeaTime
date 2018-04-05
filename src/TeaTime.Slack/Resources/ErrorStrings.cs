@@ -17,7 +17,7 @@
         internal static string General() => "Oops, something went wrong :disappointed:";
 
         internal static string StartRun_GroupInvalidName(string groupName) =>
-            $"Failed to start round. *{groupName}* is not a valid TeaTime group. " + CommandStrings.AddGroup(groupName);
+            $"Failed to start round. *{groupName}* is not a valid group. " + CommandStrings.AddGroup(groupName);
 
         internal static string StartRun_GroupNoOptions(string groupName) =>
             $"Cannot start round. *{groupName}* has no options. " + CommandStrings.AddOption(groupName);
@@ -26,7 +26,7 @@
             "Cannot start round. There is already an active TeaTime running in this room. " + CommandStrings.JoinRound;
 
         internal static string AddOption_GroupInvalidName(string groupName) =>
-            $"Failed to add option. *{groupName}* is not a valid TeaTime group. " + CommandStrings.AddGroup(groupName);
+            $"Failed to add option. *{groupName}* is not a valid group. " + CommandStrings.AddGroup(groupName);
 
 
         internal static string JoinRun_RunNotStarted() => "Cannot join round. There is no TeaTime running. " + CommandStrings.StartRound;
