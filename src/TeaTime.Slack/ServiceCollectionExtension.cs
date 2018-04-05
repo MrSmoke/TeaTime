@@ -19,7 +19,7 @@
 
             services.AddSingleton<ISlackService, SlackService>();
             services.AddSingleton<IRunEventListener, RunEventListener>();
-            services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedListener>();
+            services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedHandler>();
         }
     }
 }

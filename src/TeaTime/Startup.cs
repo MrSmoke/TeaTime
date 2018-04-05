@@ -4,9 +4,12 @@
     using Common;
     using Common.Abstractions;
     using Common.Features.Runs;
+    using Common.Features.Runs.Commands;
+    using Common.Permissions;
     using Common.Services;
     using Data.MySql;
     using MediatR;
+    using MediatR.Pipeline;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -43,11 +46,14 @@
             services.AddSingleton<IRoomRunLockService, RoomRunLockService>();
             services.AddSingleton<ISystemClock, DefaultSystemClock>();
             services.AddSingleton<IEventPublisher, EventPublisher>();
-
-            services.AddTransient<RunLockProcessor>();
+            services.AddSingleton<IPermissionService, PermissionService>();
 
             services.AddMediatR(typeof(ICommand));
             services.AddAutoMapper(typeof(ICommand));
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
+
+            services.AddSingleton<RunLockProcessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

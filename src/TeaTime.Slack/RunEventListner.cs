@@ -5,30 +5,11 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Common.Abstractions;
-    using Common.Features.Runs.Events;
-    using MediatR;
 
     public interface IRunEventListener
     {
         void Trigger<T>(T evt) where T : IEvent;
-        Task<TResult> WaitOnceAsync<TIn, TResult>(Func<TIn, Task<TResult>> func, TimeSpan timeout);
-    }
-
-    public class RunEndedListener : INotificationHandler<RunEndedEvent>
-    {
-        private readonly IRunEventListener _eventListener;
-
-        public RunEndedListener(IRunEventListener eventListener)
-        {
-            _eventListener = eventListener;
-        }
-
-        public Task Handle(RunEndedEvent notification, CancellationToken cancellationToken)
-        {
-            _eventListener.Trigger(notification);
-
-            return Task.CompletedTask;
-        }
+        Task<TEvent> WaitOnceAsync<TEvent>(TimeSpan timeout);
     }
 
     public class RunEventListener : IRunEventListener
@@ -36,9 +17,9 @@
         private readonly Dictionary<Type, List<TaskCompletionSource<object>>> _waitHandles = new Dictionary<Type, List<TaskCompletionSource<object>>>();
         private readonly object _lock = new object();
 
-        public async Task<TResult> WaitOnceAsync<TIn, TResult>(Func<TIn, Task<TResult>> func, TimeSpan timeout)
+        public async Task<TEvent> WaitOnceAsync<TEvent>(TimeSpan timeout)
         {
-            var evtType = typeof(TIn);
+            var evtType = typeof(TEvent);
             var handle = new TaskCompletionSource<object>();
 
             lock (_lock)
@@ -53,10 +34,10 @@
             }
 
             using (var cts = new CancellationTokenSource(timeout))
-            using (cts.Token.Register(() => handle.TrySetCanceled(), false))
+            using (cts.Token.Register(() => OnTimeout<TEvent>(handle), false))
             {
                 var result = await handle.Task.ConfigureAwait(false);
-                return (TResult)result;
+                return (TEvent) result;
             }
         }
 
@@ -78,6 +59,25 @@
             foreach (var cb in callbacks)
             {
                 cb.TrySetResult(evt);
+            }
+        }
+
+        private void OnTimeout<TEvent>(TaskCompletionSource<object> tcs)
+        {
+            if (!tcs.TrySetCanceled())
+                return;
+
+            var evtType = typeof(TEvent);
+
+            lock (_lock)
+            {
+                if (!_waitHandles.TryGetValue(evtType, out var callbacks))
+                    return;
+
+                callbacks.Remove(tcs);
+
+                if (callbacks.Count == 0)
+                    _waitHandles.Remove(evtType);
             }
         }
     }

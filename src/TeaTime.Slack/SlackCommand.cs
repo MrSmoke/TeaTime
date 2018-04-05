@@ -160,22 +160,15 @@
 
             //todo: how to return?
             //not the best but it will do for now
-            var response = await _runEventListener.WaitOnceAsync<RunEndedEvent, SlashCommandResponse>(
-                async evt =>
-                {
-                    var runner = await _mediator.Send(new GetUserQuery(evt.RunnerUserId)).ConfigureAwait(false);
-
-                    return new SlashCommandResponse
-                    {
-                        Text = "Run ended. Lucky person is @" + runner.DisplayName,
-                        Type = ResponseType.Channel
-                    };
-
-                }, TimeSpan.FromMinutes(60)).ConfigureAwait(false);
+            var responseTask = _runEventListener.WaitOnceAsync<RunEndedEvent>(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
 
             await _mediator.Send(command).ConfigureAwait(false);
 
-            return Response(response);
+            var endedEvent = await responseTask;
+
+            var runner = await _mediator.Send(new GetUserQuery(endedEvent.RunnerUserId)).ConfigureAwait(false);
+
+            return Response("Run ended. Lucky person is @" + runner.DisplayName, ResponseType.Channel);
         }
 
         private Task<User> GetOrCreateUser(SlashCommand slashCommand)

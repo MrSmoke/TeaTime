@@ -4,7 +4,7 @@
 
     public interface IRoomRunLockService
     {
-        Task<bool> CreateLockAsync(long runId, long roomId);
-        Task<bool> DeleteLockAsync(long runId, long roomId);
+        Task<bool> CreateLockAsync(long roomId);
+        Task<bool> DeleteLockAsync(long roomId);
     }
 }

@@ -19,6 +19,7 @@
             services.AddSingleton<IUserRepository, UserRepository>();
             services.AddSingleton<IOrderRepository, OrderRepository>();
             services.AddSingleton<IOptionsRepository, OptionsRepository>();
+            services.AddSingleton<ILockRepository, LockRepository>();
 
             services.AddSingleton<IIdGenerator<long>, MySqlIdGenerator>();
         }

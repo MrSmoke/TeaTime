@@ -13,19 +13,19 @@
             _lockRepository = lockRepository;
         }
 
-        public Task<bool> CreateLockAsync(long runId, long roomId)
+        public Task<bool> CreateLockAsync(long roomId)
         {
-            return _lockRepository.CreateLockAsync(GetLockKey(runId, roomId));
+            return _lockRepository.CreateLockAsync(GetLockKey(roomId));
         }
 
-        public Task<bool> DeleteLockAsync(long runId, long roomId)
+        public Task<bool> DeleteLockAsync(long roomId)
         {
-            return _lockRepository.DeleteLockAsync(GetLockKey(runId, roomId));
+            return _lockRepository.DeleteLockAsync(GetLockKey(roomId));
         }
 
-        private static string GetLockKey(long runId, long roomId)
+        private static string GetLockKey(long roomId)
         {
-            return "run:" + runId + ":room" + roomId;
+            return "room" + roomId + ":run";
         }
     }
 }

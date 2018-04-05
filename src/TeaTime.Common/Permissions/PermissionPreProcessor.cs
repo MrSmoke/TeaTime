@@ -5,7 +5,7 @@
     using Abstractions;
     using MediatR.Pipeline;
 
-    public class PermissionPreProcessor<TCommand> : IRequestPreProcessor<TCommand> where TCommand : IUserCommand
+    public class PermissionPreProcessor<TCommand> : IRequestPreProcessor<TCommand>
     {
         private readonly IPermissionService _permissionService;
 
@@ -16,7 +16,12 @@
 
         public Task Process(TCommand request, CancellationToken cancellationToken)
         {
-            return _permissionService.CheckAsync(request);
+            if (request is IUserCommand command)
+            {
+                return _permissionService.CheckAsync(command);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }
