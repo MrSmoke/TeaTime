@@ -18,7 +18,10 @@
         }
 
         public string Text { get; set; }
+
+        [JsonIgnore]
         public ResponseType Type { get; set; }
+
         public IEnumerable<Attachment> Attachments { get; set; }
 
         [JsonProperty("response_type")]

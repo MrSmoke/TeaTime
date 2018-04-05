@@ -72,7 +72,8 @@
                 RoomId = request.RoomId,
                 RunnerUserId = runResult.RunnerUserId,
                 RunId = runResult.RunId,
-                EndedTime = runResult.EndedTime
+                EndedTime = runResult.EndedTime,
+                State = request.State
             };
 
             await _eventPublisher.Publish(evt).ConfigureAwait(false);

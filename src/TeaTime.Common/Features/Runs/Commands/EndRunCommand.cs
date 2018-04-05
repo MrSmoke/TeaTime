@@ -7,7 +7,7 @@
     /// <summary>
     /// The command to end a run
     /// </summary>
-    public class EndRunCommand : IUserCommand
+    public class EndRunCommand : BaseCommand, IUserCommand
     {
         public long RunId { get; }
         public long RoomId { get; }
