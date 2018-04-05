@@ -5,8 +5,8 @@
         internal static string AddedOptionToGroup(string optionName, string groupName) =>
             $"Added option *{optionName}* to group *{groupName}*";
 
-        internal static string RunStarted(string slackUserId) =>
-            $"{StringHelpers.SlackUserId(slackUserId)} wants tea!";
+        internal static string RunStarted(string slackUserId, string groupName) =>
+            $"{StringHelpers.SlackUserId(slackUserId)} wants {groupName}!";
 
         internal static string RunUserJoined(string slackUserId) =>
             $"{StringHelpers.SlackUserId(slackUserId)} has joined this round!";

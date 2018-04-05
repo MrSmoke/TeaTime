@@ -54,7 +54,7 @@
 
             return Response(new SlashCommandResponse
             {
-                Text = ResponseStrings.RunStarted(slashCommand.UserId),
+                Text = ResponseStrings.RunStarted(slashCommand.UserId, roomItemGroup.Name),
                 Type = ResponseType.Channel,
                 Attachments = AttachmentBuilder.BuildOptions(roomItemGroup.Options)
             });
