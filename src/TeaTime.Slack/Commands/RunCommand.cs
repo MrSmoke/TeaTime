@@ -12,7 +12,6 @@
     using Common.Features.Runs.Queries;
     using MediatR;
     using Models.Responses;
-    using Newtonsoft.Json;
     using Resources;
     using Services;
 
@@ -118,10 +117,7 @@
                 orders: orders
             )
             {
-                State =
-                {
-                    {"SlashCommand", JsonConvert.SerializeObject(slashCommand)}
-                }
+                State = GetState()
             };
 
             await _mediator.Send(command).ConfigureAwait(false);

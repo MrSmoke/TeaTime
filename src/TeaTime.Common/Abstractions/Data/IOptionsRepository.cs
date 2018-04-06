@@ -12,6 +12,7 @@
 
         Task CreateAsync(Option option);
         Task<Option> GetAsync(long id);
+        Task<IEnumerable<Option>> GetManyAsync(IEnumerable<long> ids);
         Task<IEnumerable<Option>> GetOptionsByGroupIdAsync(long groupId);
     }
 }

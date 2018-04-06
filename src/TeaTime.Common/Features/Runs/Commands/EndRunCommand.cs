@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using Abstractions;
-    using Models.Data;
+    using Models.Domain;
 
     /// <summary>
     /// The command to end a run
@@ -13,9 +13,9 @@
         public long RoomId { get; }
         public long UserId { get; }
 
-        public IEnumerable<Order> Orders { get; }
+        public IEnumerable<OrderModel> Orders { get; }
 
-        public EndRunCommand(long runId, long roomId, long userId, IEnumerable<Order> orders)
+        public EndRunCommand(long runId, long roomId, long userId, IEnumerable<OrderModel> orders)
         {
             RunId = runId;
             RoomId = roomId;

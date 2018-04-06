@@ -1,27 +1,33 @@
 ﻿namespace TeaTime.Slack.Commands
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using CommandRouter.Commands;
     using CommandRouter.Results;
     using Common.Models.Data;
     using Models.Requests;
     using Models.Responses;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
     using Services;
 
     public abstract class BaseCommand : Command
     {
         private readonly ISlackService _slackService;
 
-        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        };
-
         protected BaseCommand(ISlackService slackService)
         {
             _slackService = slackService;
+        }
+
+        protected Dictionary<string, string> GetState(Dictionary<string, string> state)
+        {
+            state.Add(Constants.SlashCommand, SlackJsonSerializer.Serialize(GetCommand()));
+
+            return state;
+        }
+
+        protected Dictionary<string, string> GetState()
+        {
+            return GetState(new Dictionary<string, string>());
         }
 
         protected Task<User> GetOrCreateUser(SlashCommand slashCommand)
@@ -34,7 +40,7 @@
             return _slackService.GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, userId);
         }
 
-        protected SlashCommand GetCommand() => (SlashCommand)Context.Items["SLASHCOMMAND"];
+        protected SlashCommand GetCommand() => (SlashCommand)Context.Items[Constants.SlashCommand];
 
         protected ICommandResult Response(string text, ResponseType responseType)
         {
@@ -43,7 +49,7 @@
 
         protected ICommandResult Response(SlashCommandResponse response)
         {
-            return StringResult(JsonConvert.SerializeObject(response, JsonSettings));
+            return StringResult(SlackJsonSerializer.Serialize(response));
         }
     }
 }

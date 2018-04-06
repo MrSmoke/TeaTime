@@ -44,7 +44,7 @@
             {
                 var result = await _commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
                 {
-                    {"SLASHCOMMAND", slashCommand}
+                    {Constants.SlashCommand, slashCommand}
                 }).ConfigureAwait(false);
 
                 Response.ContentType = "application/json";

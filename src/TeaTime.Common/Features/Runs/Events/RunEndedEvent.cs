@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Abstractions;
-    using Models.Data;
+    using Models.Domain;
 
     public class RunEndedEvent : Event
     {
@@ -12,6 +12,6 @@
         public DateTimeOffset EndedTime { get; set; }
 
         public long RunnerUserId { get; set; }
-        public IEnumerable<Order> Orders { get; set; }
+        public IEnumerable<OrderModel> Orders { get; set; }
     }
 }

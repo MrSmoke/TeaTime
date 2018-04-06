@@ -2,10 +2,10 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Models.Data;
+    using Models.Domain;
 
     public interface IRunnerRandomizer
     {
-        Task<long> GetRunnerUserId(IEnumerable<Order> orders);
+        Task<long> GetRunnerUserId(IEnumerable<OrderModel> orders);
     }
 }

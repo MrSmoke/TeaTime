@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack
+﻿namespace TeaTime.Slack.EventHandlers
 {
     using System.Net.Http;
     using System.Text;
@@ -8,18 +8,16 @@
     using MediatR;
     using Models.Requests;
     using Models.Responses;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
     using Resources;
 
     public class RunEndedHandler : INotificationHandler<RunEndedEvent>
     {
         public async Task Handle(RunEndedEvent notification, CancellationToken cancellationToken)
         {
-            if (!notification.State.TryGetValue("SlashCommand", out var slashCommandJson))
+            if (!notification.State.TryGetValue(Constants.SlashCommand, out var slashCommandJson))
                 return;
 
-            var slashCommand = JsonConvert.DeserializeObject<SlashCommand>(slashCommandJson);
+            var slashCommand = SlackJsonSerializer.Deserialize<SlashCommand>(slashCommandJson);
 
             if (string.IsNullOrWhiteSpace(slashCommand.ResponseUrl))
                 return;
@@ -29,15 +27,12 @@
 
             foreach (var o in notification.Orders)
             {
-                message += $"\n{o.UserId}: {o.OptionId}";
+                message += $"\n{o.User.DisplayName}: {o.Option.Name}";
             }
 
             var data = new SlashCommandResponse(message, ResponseType.Channel);
 
-            var json = JsonConvert.SerializeObject(data, new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            });
+            var json = SlackJsonSerializer.Serialize(data);
 
             using (var client = new HttpClient())
             {

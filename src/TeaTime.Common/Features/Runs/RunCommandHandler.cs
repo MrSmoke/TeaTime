@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Common.Features.Runs
 {
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
@@ -9,6 +10,7 @@
     using Events;
     using MediatR;
     using Models.Data;
+    using Queries;
 
     public class RunCommandHandler :
         IRequestHandler<StartRunCommand>,
@@ -19,14 +21,16 @@
         private readonly IRunnerRandomizer _randomizer;
         private readonly IMapper _mapper;
         private readonly ISystemClock _clock;
+        private readonly IMediator _mediator;
 
-        public RunCommandHandler(IRunRepository runRepository, IEventPublisher eventPublisher, IRunnerRandomizer randomizer, IMapper mapper, ISystemClock clock)
+        public RunCommandHandler(IRunRepository runRepository, IEventPublisher eventPublisher, IRunnerRandomizer randomizer, IMapper mapper, ISystemClock clock, IMediator mediator)
         {
             _runRepository = runRepository;
             _eventPublisher = eventPublisher;
             _randomizer = randomizer;
             _mapper = mapper;
             _clock = clock;
+            _mediator = mediator;
         }
 
         //Start run

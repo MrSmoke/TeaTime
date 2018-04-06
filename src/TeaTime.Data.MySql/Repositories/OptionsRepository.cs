@@ -55,6 +55,13 @@
             return SingleOrDefaultAsync<Option>(sql, new {id});
         }
 
+        public Task<IEnumerable<Option>> GetManyAsync(IEnumerable<long> ids)
+        {
+            const string sql = "SELECT " + OptionSelectColumns + " FROM options WHERE id IN @ids";
+
+            return QueryAsync<Option>(sql, new { ids });
+        }
+
         public Task<IEnumerable<Option>> GetOptionsByGroupIdAsync(long groupId)
         {
             const string sql = "SELECT "+ OptionSelectColumns + " FROM options WHERE groupId = @groupId";

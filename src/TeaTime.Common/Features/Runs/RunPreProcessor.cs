@@ -22,7 +22,7 @@
             if(!request.Orders.Any())
                 throw new RunEndException("Cannot end run with no orders", RunEndException.RunEndExceptionReason.NoOrders);
 
-            if(!request.Orders.Any(o => o.UserId.Equals(request.UserId)))
+            if(!request.Orders.Any(o => o.User.Id.Equals(request.UserId)))
                 throw new RunEndException("Cannot end run without joining first", RunEndException.RunEndExceptionReason.NotJoined);
 
             return Task.CompletedTask;

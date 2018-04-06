@@ -28,7 +28,7 @@
 
             user.CreatedDate = _clock.UtcNow();
 
-            return _userRepository.Create(user);
+            return _userRepository.CreateAsync(user);
 
             //todo: create event
         }

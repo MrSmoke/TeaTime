@@ -18,7 +18,7 @@
 
         public Task<User> Handle(GetUserQuery request, CancellationToken cancellationToken)
         {
-            return _userRepository.Get(request.UserId);
+            return _userRepository.GetAsync(request.UserId);
         }
     }
 }

@@ -6,7 +6,7 @@
     /// <summary>
     /// The command to start a teatime
     /// </summary>
-    public class StartRunCommand : IUserCommand
+    public class StartRunCommand : BaseCommand, IUserCommand
     {
         /// <summary>
         /// The id of the run
