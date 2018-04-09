@@ -3,7 +3,7 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
 
-    public static class SlackJsonSerializer
+    internal static class SlackJsonSerializer
     {
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {

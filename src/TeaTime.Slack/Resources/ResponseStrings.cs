@@ -1,6 +1,6 @@
 ﻿namespace TeaTime.Slack.Resources
 {
-    public static class ResponseStrings
+    internal static class ResponseStrings
     {
         internal static string AddedOptionToGroup(string optionName, string groupName) =>
             $"Added option *{optionName}* to group *{groupName}*";

@@ -14,7 +14,7 @@
     using MediatR;
     using Models.Responses;
 
-    public class SlackService : ISlackService
+    internal class SlackService : ISlackService
     {
         private readonly IMediator _mediator;
         private readonly IIdGenerator<long> _idGenerator;

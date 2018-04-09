@@ -40,7 +40,7 @@
             var mvcBuilder = services.AddMvc();
 
             //TODO: Allow these to be loaded dynamically
-            services.AddMySql("host=localhost;port=3307;userid=root;password=password;database=teatime;");
+            services.AddMySql(Configuration.GetConnectionString("mysql"));
             services.AddSlack(mvcBuilder);
 
             services.AddSingleton<IRunnerRandomizer, DefaultRunnerRandomizer>();

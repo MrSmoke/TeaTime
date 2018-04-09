@@ -10,7 +10,7 @@
     using Models.Responses;
     using Resources;
 
-    public class RunEndedHandler : INotificationHandler<RunEndedEvent>
+    internal class RunEndedHandler : INotificationHandler<RunEndedEvent>
     {
         public async Task Handle(RunEndedEvent notification, CancellationToken cancellationToken)
         {

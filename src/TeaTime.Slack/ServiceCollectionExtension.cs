@@ -5,6 +5,7 @@
     using Common.Features.Runs.Events;
     using EventHandlers;
     using MediatR;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Services;
 
@@ -19,8 +20,10 @@
 
             services.AddCommandRouter();
 
+            services.AddSingleton(p =>
+                p.GetRequiredService<IConfiguration>().GetSection("slack").Get<SlackOptions>());
+
             services.AddSingleton<ISlackService, SlackService>();
-            services.AddSingleton<IRunEventListener, RunEventListener>();
             services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedHandler>();
         }
     }

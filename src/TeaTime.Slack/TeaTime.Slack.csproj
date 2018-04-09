@@ -16,6 +16,8 @@
     <PackageReference Include="commandrouter" Version="1.0.0-beta5" />
     <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta3" />
     <PackageReference Include="microsoft.aspnetcore.mvc" Version="2.0.3" />
+    <PackageReference Include="microsoft.extensions.configuration" Version="2.0.1" />
+    <PackageReference Include="microsoft.extensions.configuration.binder" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
     <PackageReference Include="newtonsoft.json" Version="11.0.2" />
   </ItemGroup>
