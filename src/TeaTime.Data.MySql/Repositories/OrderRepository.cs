@@ -24,7 +24,17 @@
 
         public Task UpdateAsync(Order order)
         {
-            throw new System.NotImplementedException();
+            //todo: update modified date (also add modified date)
+            const string sql = "UPDATE orders SET optionId = @optionId WHERE id = @id";
+
+            return ExecuteAsync(sql, order);
+        }
+
+        public Task<Order> GetAsync(long id)
+        {
+            const string sql = "SELECT " + SelectColumns + " FROM orders where id = @id";
+
+            return SingleOrDefaultAsync<Order>(sql, new {id});
         }
 
         public Task<IEnumerable<Order>> GetOrdersAsync(long runId)

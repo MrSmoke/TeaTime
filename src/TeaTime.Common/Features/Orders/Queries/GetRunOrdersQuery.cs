@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Runs.Queries
+﻿namespace TeaTime.Common.Features.Orders.Queries
 {
     using System.Collections.Generic;
     using Abstractions;

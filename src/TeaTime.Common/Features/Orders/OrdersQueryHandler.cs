@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Runs
+﻿namespace TeaTime.Common.Features.Orders
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -6,17 +6,21 @@
     using System.Threading.Tasks;
     using Abstractions.Data;
     using MediatR;
+    using Models.Data;
     using Models.Domain;
     using Queries;
 
-    public class OrdersQueryHandler : IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>
+    public class OrdersQueryHandler :
+        IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>
+        , IRequestHandler<GetUserOrderQuery, Order>
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IUserRepository _userRepository;
         private readonly IOptionsRepository _optionsRepository;
         private readonly IRunRepository _runRepository;
 
-        public OrdersQueryHandler(IOrderRepository orderRepository, IUserRepository userRepository, IOptionsRepository optionsRepository, IRunRepository runRepository)
+        public OrdersQueryHandler(IOrderRepository orderRepository, IUserRepository userRepository,
+            IOptionsRepository optionsRepository, IRunRepository runRepository)
         {
             _orderRepository = orderRepository;
             _userRepository = userRepository;
@@ -24,7 +28,8 @@
             _runRepository = runRepository;
         }
 
-        public async Task<IEnumerable<OrderModel>> Handle(GetRunOrdersQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<OrderModel>> Handle(GetRunOrdersQuery request,
+            CancellationToken cancellationToken)
         {
             var run = _runRepository.GetAsync(request.RunId);
 
@@ -50,6 +55,13 @@
             }
 
             return models;
+        }
+
+        public async Task<Order> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
+        {
+            var orders = await _orderRepository.GetOrdersAsync(request.RunId).ConfigureAwait(false);
+
+            return orders.FirstOrDefault(o => o.UserId == request.UserId);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace TeaTime.Slack.Commands
 {
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using CommandRouter.Commands;
     using CommandRouter.Results;
@@ -16,18 +15,6 @@
         protected BaseCommand(ISlackService slackService)
         {
             _slackService = slackService;
-        }
-
-        protected Dictionary<string, string> GetState(Dictionary<string, string> state)
-        {
-            state.Add(Constants.SlashCommand, SlackJsonSerializer.Serialize(GetCommand()));
-
-            return state;
-        }
-
-        protected Dictionary<string, string> GetState()
-        {
-            return GetState(new Dictionary<string, string>());
         }
 
         protected Task<User> GetOrCreateUser(SlashCommand slashCommand)
@@ -50,6 +37,11 @@
         protected ICommandResult Response(SlashCommandResponse response)
         {
             return StringResult(SlackJsonSerializer.Serialize(response));
+        }
+
+        protected ICommandResult Ok()
+        {
+            return new StringResult("");
         }
     }
 }

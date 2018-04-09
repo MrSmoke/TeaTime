@@ -7,12 +7,8 @@
     using CommandRouter;
     using CommandRouter.Exceptions;
     using CommandRouter.Integration.AspNetCore;
-    using Common.Abstractions;
     using Common.Exceptions;
-    using Common.Features.Options;
-    using Common.Features.Rooms.Queries;
-    using Common.Features.Runs.Commands;
-    using MediatR;
+    using Exceptions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Models.Requests;
@@ -27,17 +23,13 @@
     {
         private readonly ICommandRunner _commandRunner;
         private readonly ISlackService _slackService;
-        private readonly IMediator _mediator;
-        private readonly IIdGenerator<long> _idGenerator;
         private readonly ISlackMessageVerifier _messageVerifier;
         private readonly ILogger<SlackController> _logger;
 
-        public SlackController(ICommandRunner commandRunner, ISlackService slackService, IMediator mediator, IIdGenerator<long> idGenerator, ISlackMessageVerifier messageVerifier, ILogger<SlackController> logger)
+        public SlackController(ICommandRunner commandRunner, ISlackService slackService, ISlackMessageVerifier messageVerifier, ILogger<SlackController> logger)
         {
             _commandRunner = commandRunner;
             _slackService = slackService;
-            _mediator = mediator;
-            _idGenerator = idGenerator;
             _messageVerifier = messageVerifier;
             _logger = logger;
         }
@@ -139,32 +131,13 @@
 
             try
             {
-                var user = await _slackService.GetOrCreateUser(message.User.Id, message.User.Name)
-                    .ConfigureAwait(false);
-                var room = await _slackService.GetOrCreateRoom(message.Channel.Id, message.Channel.Name, user.Id)
-                    .ConfigureAwait(false);
+                await _slackService.JoinRunAsync(message).ConfigureAwait(false);
 
-                var firstAction = message.Actions.First();
-
-                var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
-                if (run == null)
-                    return Ok(ErrorStrings.JoinRun_RunNotStarted(), ResponseType.User);
-
-                var optionId = long.Parse(firstAction.Value);
-
-                var option = await _mediator.Send(new GetOptionQuery(optionId)).ConfigureAwait(false);
-                if (option == null)
-                    return Ok(ErrorStrings.OptionUnknown(), ResponseType.User);
-
-                var command = new JoinRunCommand(
-                    id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
-                    runId: run.Id,
-                    userId: user.Id,
-                    optionId: option.Id);
-
-                await _mediator.Send(command).ConfigureAwait(false);
-
-                return Ok(ResponseStrings.RunUserJoined(message.User.Id), ResponseType.Channel);
+                return Ok();
+            }
+            catch (SlackTeaTimeException e)
+            {
+                return Ok(e.Message, ResponseType.User);
             }
             catch(Exception e)
             {

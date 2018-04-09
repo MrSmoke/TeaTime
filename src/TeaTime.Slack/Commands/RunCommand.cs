@@ -1,15 +1,15 @@
 ﻿namespace TeaTime.Slack.Commands
 {
-    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using CommandRouter.Attributes;
     using CommandRouter.Results;
     using Common.Abstractions;
+    using Common.Features.Orders.Queries;
     using Common.Features.RoomItemGroups.Queries;
     using Common.Features.Rooms.Queries;
     using Common.Features.Runs.Commands;
-    using Common.Features.Runs.Queries;
+    using Exceptions;
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Models.Responses;
@@ -21,6 +21,7 @@
         private readonly IMediator _mediator;
         private readonly IIdGenerator<long> _idGenerator;
         private readonly ISystemClock _clock;
+        private readonly ISlackService _slackService;
         private readonly ILogger<RunCommand> _logger;
 
         public RunCommand(IMediator mediator, IIdGenerator<long> idGenerator, ISystemClock clock, ISlackService slackService, ILogger<RunCommand> logger) : base(slackService)
@@ -28,6 +29,7 @@
             _mediator = mediator;
             _idGenerator = idGenerator;
             _clock = clock;
+            _slackService = slackService;
             _logger = logger;
         }
 
@@ -68,33 +70,16 @@
         {
             var slashCommand = GetCommand();
 
-            var user = await GetOrCreateUser(slashCommand).ConfigureAwait(false);
-            var room = await GetOrCreateRoom(slashCommand, user.Id).ConfigureAwait(false);
-
-            var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
-            if (run == null)
-                return Response(ErrorStrings.JoinRun_RunNotStarted(), ResponseType.User);
-
-            var group = await _mediator.Send(new GetRoomItemGroupQuery(roomId: run.RoomId, userId: user.Id, groupId: run.GroupId)).ConfigureAwait(false);
-            if (group == null)
+            try
             {
-                _logger.LogWarning("Failed to find group {GroupId} in room {RoomId} for run {RunId}", run.GroupId, room.Id, run.Id);
-                return Response(ErrorStrings.General(), ResponseType.User);
+                await _slackService.JoinRunAsync(slashCommand, optionName).ConfigureAwait(false);
+
+                return Ok();
             }
-
-            var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.OrdinalIgnoreCase));
-            if (option == null)
-                return Response(ErrorStrings.JoinRun_OptionUnknown(optionName, group.Name), ResponseType.User);
-
-            var command = new JoinRunCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
-                runId: run.Id,
-                userId: user.Id,
-                optionId: option.Id);
-
-            await _mediator.Send(command).ConfigureAwait(false);
-
-            return Response(ResponseStrings.RunUserJoined(slashCommand.UserId), ResponseType.Channel);
+            catch (SlackTeaTimeException e)
+            {
+                return Response(e.Message, ResponseType.User);
+            }
         }
 
         [Command("end")]
@@ -113,10 +98,9 @@
                 roomId: room.Id,
                 userId: user.Id,
                 orders: orders
-            )
-            {
-                State = GetState()
-            };
+            );
+
+            command.AddCallbackState(slashCommand.ToCallbackData());
 
             await _mediator.Send(command).ConfigureAwait(false);
 

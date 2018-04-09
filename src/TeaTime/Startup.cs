@@ -4,7 +4,6 @@
     using Common;
     using Common.Abstractions;
     using Common.Features.Runs;
-    using Common.Features.Runs.Commands;
     using Common.Permissions;
     using Common.Services;
     using Data.MySql;
@@ -41,7 +40,7 @@
 
             //TODO: Allow these to be loaded dynamically
             services.AddMySql(Configuration.GetConnectionString("mysql"));
-            services.AddSlack(mvcBuilder);
+            services.AddSlack(mvcBuilder, Configuration.GetSection("slack").Get<SlackOptions>());
 
             services.AddSingleton<IRunnerRandomizer, DefaultRunnerRandomizer>();
             services.AddSingleton<IRoomRunLockService, RoomRunLockService>();

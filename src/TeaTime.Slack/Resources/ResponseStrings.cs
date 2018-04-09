@@ -11,6 +11,11 @@
         internal static string RunUserJoined(string slackUserId) =>
             $"{StringHelpers.SlackUserId(slackUserId)} has joined this round!";
 
+        internal static string RunUserOrderChanged(string slackUserId, string from, string to) =>
+            $"{StringHelpers.SlackUserId(slackUserId)} has changed their order: {from} -> {to}";
+
+
+
         internal static string GroupAdded(string groupName) => $"Group *{groupName}* created!";
     }
 }

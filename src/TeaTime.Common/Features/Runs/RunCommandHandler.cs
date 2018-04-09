@@ -10,7 +10,6 @@
     using Events;
     using MediatR;
     using Models.Data;
-    using Queries;
 
     public class RunCommandHandler :
         IRequestHandler<StartRunCommand>,

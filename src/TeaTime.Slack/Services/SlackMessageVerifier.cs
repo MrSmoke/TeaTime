@@ -2,11 +2,6 @@
 {
     using Models.Requests;
 
-    public interface ISlackMessageVerifier
-    {
-        bool IsValid(IVerifiableRequest request);
-    }
-
     public class SlackMessageVerifier : ISlackMessageVerifier
     {
         private readonly string _verificationToken;

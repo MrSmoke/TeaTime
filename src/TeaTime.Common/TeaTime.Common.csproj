@@ -17,4 +17,8 @@
     <PackageReference Include="mediatr" Version="4.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Runs\Queries\" />
+  </ItemGroup>
+
 </Project>

@@ -12,11 +12,6 @@
             CreateMap<StartRunCommand, Run>()
                 .ForMember(m => m.GroupId, o => o.MapFrom(m => m.RoomGroupId));
             CreateMap<Run, RunStartedEvent>();
-
-            CreateMap<JoinRunCommand, Order>();
-            CreateMap<Order, RunJoinedEvent>();
-
-
         }
     }
 }
