@@ -17,7 +17,7 @@ namespace TeaTime.Slack.Models.Requests
     response_url=https://hooks.slack.com/commands/1234/5678
     */
 
-    public class SlashCommand
+    public class SlashCommand : IVerifiableRequest
     {
         public string Token { get; set; }
 

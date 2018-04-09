@@ -24,6 +24,7 @@
                 p.GetRequiredService<IConfiguration>().GetSection("slack").Get<SlackOptions>());
 
             services.AddSingleton<ISlackService, SlackService>();
+            services.AddSingleton<ISlackMessageVerifier, SlackMessageVerifier>();
             services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedHandler>();
         }
     }

@@ -14,7 +14,9 @@
     using Common.Features.Runs.Commands;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
     using Models.Requests;
+    using Models.Requests.InteractiveMessages;
     using Models.Responses;
     using Newtonsoft.Json;
     using Resources;
@@ -27,19 +29,35 @@
         private readonly ISlackService _slackService;
         private readonly IMediator _mediator;
         private readonly IIdGenerator<long> _idGenerator;
+        private readonly ISlackMessageVerifier _messageVerifier;
+        private readonly ILogger<SlackController> _logger;
 
-        public SlackController(ICommandRunner commandRunner, ISlackService slackService, IMediator mediator, IIdGenerator<long> idGenerator)
+        public SlackController(ICommandRunner commandRunner, ISlackService slackService, IMediator mediator, IIdGenerator<long> idGenerator, ISlackMessageVerifier messageVerifier, ILogger<SlackController> logger)
         {
             _commandRunner = commandRunner;
             _slackService = slackService;
             _mediator = mediator;
             _idGenerator = idGenerator;
+            _messageVerifier = messageVerifier;
+            _logger = logger;
         }
 
         [HttpPost]
         [Route("slash")]
         public async Task<IActionResult> SlashCommandHook(SlashCommand slashCommand)
         {
+            if (slashCommand == null)
+            {
+                _logger.LogError("Null slash command");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
+
+            if (!_messageVerifier.IsValid(slashCommand))
+            {
+                _logger.LogError("Bad verification token");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
+
             try
             {
                 var result = await _commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
@@ -65,6 +83,8 @@
                     default:
                         break;
                 }
+
+                _logger.LogError(e, "Failed to start run");
             }
             catch (RunEndException e)
             {
@@ -83,10 +103,12 @@
                     default:
                         break;
                 }
+
+                _logger.LogError(e, "Failed to end run");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(e, "Failed to run command");
             }
 
             return Ok(ErrorStrings.CommandFailed(), ResponseType.User);
@@ -96,32 +118,59 @@
         [Route("interactive-messages")]
         public async Task<IActionResult> InteractiveMessageHook(MessageRequest request)
         {
+            if (request == null)
+            {
+                _logger.LogError("Null interactive message request");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
+
             var message = JsonConvert.DeserializeObject<MessageRequestPayload>(request.PayloadJson);
+            if (message == null)
+            {
+                _logger.LogError("Failed to deserialize interactive message request");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
 
-            var user = await _slackService.GetOrCreateUser(message.User.Id, message.User.Name).ConfigureAwait(false);
-            var room = await _slackService.GetOrCreateRoom(message.Channel.Id, message.Channel.Name, user.Id).ConfigureAwait(false);
+            if (!_messageVerifier.IsValid(message))
+            {
+                _logger.LogError("Bad verification token");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
 
-            var firstAction = message.Actions.First();
+            try
+            {
+                var user = await _slackService.GetOrCreateUser(message.User.Id, message.User.Name)
+                    .ConfigureAwait(false);
+                var room = await _slackService.GetOrCreateRoom(message.Channel.Id, message.Channel.Name, user.Id)
+                    .ConfigureAwait(false);
 
-            var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
-            if (run == null)
-                return Ok(ErrorStrings.JoinRun_RunNotStarted(), ResponseType.User);
+                var firstAction = message.Actions.First();
 
-            var optionId = long.Parse(firstAction.Value);
+                var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
+                if (run == null)
+                    return Ok(ErrorStrings.JoinRun_RunNotStarted(), ResponseType.User);
 
-            var option = await _mediator.Send(new GetOptionQuery(optionId)).ConfigureAwait(false);
-            if (option == null)
-                return Ok(ErrorStrings.OptionUnknown(), ResponseType.User);
+                var optionId = long.Parse(firstAction.Value);
 
-            var command = new JoinRunCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
-                runId: run.Id,
-                userId: user.Id,
-                optionId: option.Id);
+                var option = await _mediator.Send(new GetOptionQuery(optionId)).ConfigureAwait(false);
+                if (option == null)
+                    return Ok(ErrorStrings.OptionUnknown(), ResponseType.User);
 
-            await _mediator.Send(command).ConfigureAwait(false);
+                var command = new JoinRunCommand(
+                    id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                    runId: run.Id,
+                    userId: user.Id,
+                    optionId: option.Id);
 
-            return Ok(ResponseStrings.RunUserJoined(message.User.Id), ResponseType.Channel);
+                await _mediator.Send(command).ConfigureAwait(false);
+
+                return Ok(ResponseStrings.RunUserJoined(message.User.Id), ResponseType.Channel);
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e, "Failed to join run");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
         }
 
         private IActionResult Ok(string message, ResponseType responseType)

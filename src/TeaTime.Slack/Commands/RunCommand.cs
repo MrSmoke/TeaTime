@@ -11,6 +11,7 @@
     using Common.Features.Runs.Commands;
     using Common.Features.Runs.Queries;
     using MediatR;
+    using Microsoft.Extensions.Logging;
     using Models.Responses;
     using Resources;
     using Services;
@@ -20,12 +21,14 @@
         private readonly IMediator _mediator;
         private readonly IIdGenerator<long> _idGenerator;
         private readonly ISystemClock _clock;
+        private readonly ILogger<RunCommand> _logger;
 
-        public RunCommand(IMediator mediator, IIdGenerator<long> idGenerator, ISystemClock clock, ISlackService slackService) : base(slackService)
+        public RunCommand(IMediator mediator, IIdGenerator<long> idGenerator, ISystemClock clock, ISlackService slackService, ILogger<RunCommand> logger) : base(slackService)
         {
             _mediator = mediator;
             _idGenerator = idGenerator;
             _clock = clock;
+            _logger = logger;
         }
 
         [Command("")]
@@ -75,7 +78,7 @@
             var group = await _mediator.Send(new GetRoomItemGroupQuery(roomId: run.RoomId, userId: user.Id, groupId: run.GroupId)).ConfigureAwait(false);
             if (group == null)
             {
-                //todo: log error
+                _logger.LogWarning("Failed to find group {GroupId} in room {RoomId} for run {RunId}", run.GroupId, room.Id, run.Id);
                 return Response(ErrorStrings.General(), ResponseType.User);
             }
 
@@ -92,11 +95,6 @@
             await _mediator.Send(command).ConfigureAwait(false);
 
             return Response(ResponseStrings.RunUserJoined(slashCommand.UserId), ResponseType.Channel);
-        }
-
-        public Task IllMake()
-        {
-            throw new NotImplementedException();
         }
 
         [Command("end")]
