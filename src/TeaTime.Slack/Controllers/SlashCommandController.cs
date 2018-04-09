@@ -52,14 +52,14 @@
             }
             catch (CommandNotFoundException)
             {
-                return Ok(new SlashCommandResponse(ErrorStrings.CommandUnknown(slashCommand.Text), ResponseType.User));
+                return Ok(ErrorStrings.CommandUnknown(slashCommand.Text), ResponseType.User);
             }
             catch (RunStartException e)
             {
                 switch (e.Reason)
                 {
                     case RunStartException.RunStartExceptionReason.ExistingActiveRun:
-                        return Ok(new SlashCommandResponse(ErrorStrings.StartRun_RunAlreadyStarted(), ResponseType.User));
+                        return Ok(ErrorStrings.StartRun_RunAlreadyStarted(), ResponseType.User);
 
                     case RunStartException.RunStartExceptionReason.Unspecified:
                     default:
@@ -71,13 +71,13 @@
                 switch (e.Reason)
                 {
                     case RunEndException.RunEndExceptionReason.NoActiveRun:
-                        return Ok(new SlashCommandResponse(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User));
+                        return Ok(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User);
 
                     case RunEndException.RunEndExceptionReason.NoOrders:
-                        return Ok(new SlashCommandResponse(ErrorStrings.EndRun_NoOrders(), ResponseType.User));
+                        return Ok(ErrorStrings.EndRun_NoOrders(), ResponseType.User);
 
                     case RunEndException.RunEndExceptionReason.NotJoined:
-                        return Ok(new SlashCommandResponse(ErrorStrings.EndRun_NotJoined(), ResponseType.User));
+                        return Ok(ErrorStrings.EndRun_NotJoined(), ResponseType.User);
 
                     case RunEndException.RunEndExceptionReason.Unspecified:
                     default:
@@ -89,7 +89,7 @@
                 Console.WriteLine(e);
             }
 
-            return Ok(new SlashCommandResponse(ErrorStrings.CommandFailed(), ResponseType.User));
+            return Ok(ErrorStrings.CommandFailed(), ResponseType.User);
         }
 
         [HttpPost]
