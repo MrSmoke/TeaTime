@@ -20,7 +20,7 @@
         {
             var userIds = orders.Select(o => o.User.Id).ToList();
 
-            var random = _random.Next(userIds.Count - 1);
+            var random = _random.Next(userIds.Count);
 
             return Task.FromResult(userIds[random]);
         }
