@@ -26,6 +26,9 @@
         [Command("add")]
         public async Task<ICommandResult> AddOption(string groupName, string optionName)
         {
+            if (string.IsNullOrWhiteSpace(groupName) || string.IsNullOrWhiteSpace(optionName))
+                return Response(ErrorStrings.AddOption_BadArguments(), ResponseType.User);
+
             var slashCommand = GetCommand();
 
             var user = await GetOrCreateUser(slashCommand).ConfigureAwait(false);
@@ -47,7 +50,6 @@
                     name: optionName);
 
             await _mediator.Send(command).ConfigureAwait(false);
-
 
             return Response(ResponseStrings.AddedOptionToGroup(optionName, group.Name), ResponseType.User);
         }

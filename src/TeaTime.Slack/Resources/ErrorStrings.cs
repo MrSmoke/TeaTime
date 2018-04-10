@@ -19,6 +19,8 @@
         internal static string AddOption_GroupInvalidName(string groupName) =>
             $"Failed to add option. *{groupName}* is not a valid group. " + CommandStrings.AddGroup(groupName);
 
+        internal static string AddOption_BadArguments() =>
+            "Failed to add option. Invalid command. " + CommandStrings.AddOption();
 
         internal static string JoinRun_RunNotStarted() => "Cannot join round. There is no TeaTime running. " + CommandStrings.StartRound;
 
