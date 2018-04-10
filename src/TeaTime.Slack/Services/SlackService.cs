@@ -126,7 +126,7 @@
             if (option == null)
                 throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
-            await JoinRunInternalAsync(userId, run.Id, option.Id, callbackData).ConfigureAwait(false);
+            await JoinRunInternalAsync(userId, run, option.Id, callbackData).ConfigureAwait(false);
         }
 
         private async Task JoinRunAsync(long userId, long roomId, long optionId, CallbackData callbackData)
@@ -139,20 +139,23 @@
             if(option == null)
                 throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
-            await JoinRunInternalAsync(userId, run.Id, optionId, callbackData).ConfigureAwait(false);
+            await JoinRunInternalAsync(userId, run, optionId, callbackData).ConfigureAwait(false);
         }
 
-        private async Task JoinRunInternalAsync(long userId, long runId, long optionId, CallbackData callbackData)
+        private async Task JoinRunInternalAsync(long userId, Run run, long optionId, CallbackData callbackData)
         {
             BaseCommand command;
 
+            if (run.Ended)
+                throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded());
+
             //check if we need to join or update
-            var existingOrder = await _mediator.Send(new GetUserOrderQuery(runId, userId)).ConfigureAwait(false);
+            var existingOrder = await _mediator.Send(new GetUserOrderQuery(run.Id, userId)).ConfigureAwait(false);
             if (existingOrder == null)
             {
                 command = new CreateOrderCommand(
                     id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
-                    runId: runId,
+                    runId: run.Id,
                     userId: userId,
                     optionId: optionId);
             }

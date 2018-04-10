@@ -25,6 +25,8 @@
         internal static string JoinRun_OptionUnknown(string optionName, string groupName) =>
             $"Failed to join round. Unknown option *{optionName}*. " + CommandStrings.AddOption(groupName, optionName);
 
+        internal static string JoinRun_RunEnded() => "Failed to join round. Round has already ended";
+
         internal static string EndRun_RunNotStarted() =>
             "Cannot end round. There is no TeaTime running. " + CommandStrings.StartRound;
 
