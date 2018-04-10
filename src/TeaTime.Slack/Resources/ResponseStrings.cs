@@ -11,8 +11,8 @@
         internal static string RunUserJoined(string slackUserId) =>
             $"{StringHelpers.SlackUserId(slackUserId)} has joined this round!";
 
-        internal static string RunUserOrderChanged(string slackUserId, string from, string to) =>
-            $"{StringHelpers.SlackUserId(slackUserId)} has changed their order: {from} -> {to}";
+        internal static string RunUserOrderChanged(string from, string to) =>
+            $"You have changed your order: {from} -> {to}";
 
 
 

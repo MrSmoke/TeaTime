@@ -10,7 +10,6 @@
     using Common.Models;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using Models;
     using Models.Responses;
     using Resources;
 
@@ -37,7 +36,7 @@
             if (slackUserId == null)
                 return;
 
-            await SendMessage(notification, ResponseStrings.RunUserJoined(slackUserId)).ConfigureAwait(false);
+            await SendMessage(notification, ResponseStrings.RunUserJoined(slackUserId), ResponseType.Channel).ConfigureAwait(false);
         }
 
         public async Task Handle(OrderOptionChangedEvent notification, CancellationToken cancellationToken)
@@ -52,11 +51,10 @@
             var oDict = options.ToDictionary(o => o.Id);
 
             var message = ResponseStrings.RunUserOrderChanged(
-                slackUserId,
                 oDict[notification.PreviousOptionId].Name,
                 oDict[notification.OptionId].Name);
 
-            await SendMessage(notification, message).ConfigureAwait(false);
+            await SendMessage(notification, message, ResponseType.User).ConfigureAwait(false);
         }
 
         private async Task<string> GetSlackUserId(long userId)
@@ -67,16 +65,15 @@
 
             _logger.LogError("Could not get slack user link for: {UserId}", userId);
             return null;
-
         }
 
-        private async Task SendMessage(Event evt, string message)
+        private async Task SendMessage(Event evt, string message, ResponseType responseType)
         {
             if (!evt.TryGetCallbackState(out var callbackData))
                 return;
 
             await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl,
-                    new SlashCommandResponse(message, ResponseType.Channel))
+                    new SlashCommandResponse(message, responseType))
                 .ConfigureAwait(false);
         }
     }
