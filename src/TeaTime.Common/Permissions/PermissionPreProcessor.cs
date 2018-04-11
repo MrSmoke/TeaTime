@@ -3,6 +3,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
+    using Exceptions;
     using MediatR.Pipeline;
 
     public class PermissionPreProcessor<TCommand> : IRequestPreProcessor<TCommand>
@@ -14,14 +15,22 @@
             _permissionService = permissionService;
         }
 
-        public Task Process(TCommand request, CancellationToken cancellationToken)
+        public async Task Process(TCommand request, CancellationToken cancellationToken)
         {
             if (request is IUserCommand command)
             {
-                return _permissionService.CheckAsync(command);
-            }
+                var result = await _permissionService.CheckAsync(command).ConfigureAwait(false);
 
-            return Task.CompletedTask;
+                Handle(result);
+            }
+        }
+
+        private static void Handle(PermisionCheckResult result)
+        {
+            if (result.Success)
+                return;
+
+            throw new PermissionException(result.Message);
         }
     }
 }

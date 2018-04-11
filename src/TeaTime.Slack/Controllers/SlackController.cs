@@ -98,6 +98,10 @@
 
                 _logger.LogError(e, "Failed to end run");
             }
+            catch (PermissionException e)
+            {
+                return Ok(e.Message, ResponseType.User);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to run command");
@@ -139,7 +143,11 @@
             {
                 return Ok(e.Message, ResponseType.User);
             }
-            catch(Exception e)
+            catch (PermissionException e)
+            {
+                return Ok(e.Message, ResponseType.User);
+            }
+            catch (Exception e)
             {
                 _logger.LogError(e, "Failed to join run");
                 return Ok(ErrorStrings.General(), ResponseType.User);
