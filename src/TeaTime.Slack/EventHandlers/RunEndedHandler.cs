@@ -8,7 +8,6 @@
     using Common.Abstractions.Data;
     using Common.Features.Runs.Events;
     using Common.Models;
-    using Common.Models.Domain;
     using MediatR;
     using Models.Responses;
     using Resources;
@@ -50,20 +49,23 @@
                 .Append("Congratulations ")
                 .Append(slackRunnerIdStr)
                 .Append(" you drew the short straw :cup_with_straw:. Here's the order:")
-                .Append("\n```\n");
+                .Append("\n");
 
             var orders = notification.Orders.ToList();
 
-            foreach (var o in orders)
+            for (var i = 0; i < orders.Count; i++)
             {
+                var o = orders[i];
+
                 messageBuilder
+                    .Append("- ")
                     .Append(o.User.DisplayName)
                     .Append(": ")
-                    .Append(o.Option.Name)
-                    .Append("\n");
-            }
+                    .Append(o.Option.Name);
 
-            messageBuilder.Append("```");
+                if (i < orders.Count - 1)
+                    messageBuilder.Append("\n");
+            }
 
             var data = new SlashCommandResponse(messageBuilder.ToString(), ResponseType.Channel);
 
