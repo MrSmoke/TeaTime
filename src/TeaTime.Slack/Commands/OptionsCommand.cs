@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Slack.Commands
 {
+    using System.Linq;
     using System.Threading.Tasks;
     using CommandRouter.Attributes;
     using CommandRouter.Results;
@@ -29,14 +30,11 @@
             if (string.IsNullOrWhiteSpace(groupName) || string.IsNullOrWhiteSpace(optionName))
                 return Response(ErrorStrings.AddOption_BadArguments(), ResponseType.User);
 
-            var slashCommand = GetCommand();
-
-            var user = await GetOrCreateUser(slashCommand).ConfigureAwait(false);
-            var room = await GetOrCreateRoom(slashCommand, user.Id).ConfigureAwait(false);
+            var context = await GetContextAsync().ConfigureAwait(false);
 
             var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(
-                roomId: room.Id,
-                userId: user.Id,
+                roomId: context.Room.Id,
+                userId: context.User.Id,
                 name: groupName)).ConfigureAwait(false);
 
             if (group == null)
@@ -45,13 +43,40 @@
             var command =
                 new CreateOptionCommand(
                     id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
-                    userId: user.Id,
+                    userId: context.User.Id,
                     groupId: group.Id,
                     name: optionName);
 
             await _mediator.Send(command).ConfigureAwait(false);
 
-            return Response(ResponseStrings.AddedOptionToGroup(optionName, group.Name), ResponseType.User);
+            return Response(ResponseStrings.OptionAddedToGroup(optionName, group.Name), ResponseType.User);
+        }
+
+        [Command("remove")]
+        public async Task<ICommandResult> RemoveOption(string groupName, string optionName)
+        {
+            if (string.IsNullOrWhiteSpace(groupName) || string.IsNullOrWhiteSpace(optionName))
+                return Response(ErrorStrings.RemoveOption_BadArguments(), ResponseType.User);
+
+            var context = await GetContextAsync().ConfigureAwait(false);
+
+            var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(
+                roomId: context.Room.Id,
+                userId: context.User.Id,
+                name: groupName)).ConfigureAwait(false);
+
+            if (group == null)
+                return Response(ErrorStrings.RemoveOption_GroupInvalidName(groupName), ResponseType.User);
+
+            var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName));
+            if (option == null)
+                return Response(ErrorStrings.RemoveOption_UnknownOption(optionName), ResponseType.User);
+
+            var command = new DeleteOptionCommand(option.Id, context.User.Id);
+
+            await _mediator.Send(command).ConfigureAwait(false);
+
+            return Response(ResponseStrings.OptionRemoved(optionName, groupName), ResponseType.User);
         }
     }
 }

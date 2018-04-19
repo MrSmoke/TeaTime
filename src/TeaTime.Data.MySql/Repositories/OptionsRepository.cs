@@ -23,6 +23,20 @@
             return ExecuteAsync(sql, group);
         }
 
+        public Task UpdateGroupAsync(RoomItemGroup group)
+        {
+            const string sql = "UPDATE option_groups SET name = @name WHERE id = @id";
+
+            return ExecuteAsync(sql, group);
+        }
+
+        public Task DeleteGroupAsync(long groupId)
+        {
+            const string sql = "DELETE FROM option_groups WHERE id = @groupId";
+
+            return ExecuteAsync(sql, new { groupId });
+        }
+
         public Task<RoomItemGroup> GetGroupAsync(long groupId)
         {
             const string sql = "SELECT " + GroupSelectColumns +
@@ -48,11 +62,25 @@
             return ExecuteAsync(sql, option);
         }
 
-        public Task<Option> GetAsync(long id)
+        public Task<Option> GetAsync(long optionId)
         {
-            const string sql = "SELECT " + OptionSelectColumns + " FROM options WHERE id = @id";
+            const string sql = "SELECT " + OptionSelectColumns + " FROM options WHERE id = @optionId";
 
-            return SingleOrDefaultAsync<Option>(sql, new {id});
+            return SingleOrDefaultAsync<Option>(sql, new { optionId });
+        }
+
+        public Task UpdateAsync(Option option)
+        {
+            const string sql = "UPDATE options SET name = @name WHERE id = @id";
+
+            return ExecuteAsync(sql, option);
+        }
+
+        public Task DeleteAsync(long optionId)
+        {
+            const string sql = "DELETE FROM options WHERE id = @optionId";
+
+            return ExecuteAsync(sql, new {optionId});
         }
 
         public Task<IEnumerable<Option>> GetManyAsync(IEnumerable<long> ids)

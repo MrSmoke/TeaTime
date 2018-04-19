@@ -10,7 +10,8 @@
     using MediatR;
 
     public class RoomItemGroupCommandHandler :
-        IRequestHandler<CreateRoomItemGroupCommand>
+        IRequestHandler<CreateRoomItemGroupCommand>,
+        IRequestHandler<DeleteRoomItemGroupCommand>
     {
         private readonly IMapper _mapper;
         private readonly IEventPublisher _eventPublisher;
@@ -34,6 +35,11 @@
             return _optionsRepository.CreateGroupAsync(roomGroup);
 
             //todo: event
+        }
+
+        public Task Handle(DeleteRoomItemGroupCommand request, CancellationToken cancellationToken)
+        {
+            return _optionsRepository.DeleteGroupAsync(request.GroupId);
         }
     }
 }

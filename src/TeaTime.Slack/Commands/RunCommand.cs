@@ -36,12 +36,9 @@
         [Command("")]
         public async Task<ICommandResult> Start(string group = "tea")
         {
-            var slashCommand = GetCommand();
+            var context = await GetContextAsync().ConfigureAwait(false);
 
-            var user = await GetOrCreateUser(slashCommand).ConfigureAwait(false);
-            var room = await GetOrCreateRoom(slashCommand, user.Id).ConfigureAwait(false);
-
-            var roomItemGroup = await _mediator.Send(new GetRoomItemGroupByNameQuery(roomId: room.Id, userId: user.Id, name: group)).ConfigureAwait(false);
+            var roomItemGroup = await _mediator.Send(new GetRoomItemGroupByNameQuery(roomId: context.Room.Id, userId: context.User.Id, name: group)).ConfigureAwait(false);
             if (roomItemGroup == null)
                 return Response(ErrorStrings.StartRun_GroupInvalidName(group), ResponseType.User);
 
@@ -50,8 +47,8 @@
 
             var command = new StartRunCommand(
                 id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
-                userId: user.Id,
-                roomId: room.Id,
+                userId: context.User.Id,
+                roomId: context.Room.Id,
                 roomGroupId: roomItemGroup.Id,
                 startTime: _clock.UtcNow());
 
@@ -59,7 +56,7 @@
 
             return Response(new SlashCommandResponse
             {
-                Text = ResponseStrings.RunStarted(slashCommand.UserId, roomItemGroup.Name),
+                Text = ResponseStrings.RunStarted(context.Command.UserId, roomItemGroup.Name),
                 Type = ResponseType.Channel,
                 Attachments = AttachmentBuilder.BuildOptions(roomItemGroup.Options)
             });
@@ -85,22 +82,19 @@
         [Command("end")]
         public async Task<ICommandResult> End()
         {
-            var slashCommand = GetCommand();
+            var context = await GetContextAsync().ConfigureAwait(false);
 
-            var user = await GetOrCreateUser(slashCommand).ConfigureAwait(false);
-            var room = await GetOrCreateRoom(slashCommand, user.Id).ConfigureAwait(false);
-
-            var run = await _mediator.Send(new GetCurrentRunQuery(room.Id, user.Id)).ConfigureAwait(false);
-            var orders = await _mediator.Send(new GetRunOrdersQuery(run.Id, user.Id)).ConfigureAwait(false);
+            var run = await _mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id)).ConfigureAwait(false);
+            var orders = await _mediator.Send(new GetRunOrdersQuery(run.Id, context.User.Id)).ConfigureAwait(false);
 
             var command = new EndRunCommand(
                 runId: run.Id,
-                roomId: room.Id,
-                userId: user.Id,
+                roomId: context.Room.Id,
+                userId: context.User.Id,
                 orders: orders
             );
 
-            command.AddCallbackState(slashCommand.ToCallbackData());
+            command.AddCallbackState(context.Command.ToCallbackData());
 
             await _mediator.Send(command).ConfigureAwait(false);
 

@@ -9,7 +9,9 @@
     using MediatR;
     using Models.Data;
 
-    public class OptionsCommandHandler : IRequestHandler<CreateOptionCommand>
+    public class OptionsCommandHandler :
+        IRequestHandler<CreateOptionCommand>,
+        IRequestHandler<DeleteOptionCommand>
     {
         private readonly ISystemClock _clock;
         private readonly IOptionsRepository _optionsRepository;
@@ -29,6 +31,11 @@
             option.CreatedDate = _clock.UtcNow();
 
             return _optionsRepository.CreateAsync(option);
+        }
+
+        public Task Handle(DeleteOptionCommand request, CancellationToken cancellationToken)
+        {
+            return _optionsRepository.DeleteAsync(request.OptionId);
         }
     }
 }
