@@ -3,7 +3,6 @@
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
     using Common.Models;
-    using Dapper;
 
     public class LinkRepository : BaseRepository, ILinkRepository
     {
@@ -11,21 +10,25 @@
         {
         }
 
-        public Task<T> GetObjectId<T>(string link, LinkType linkType)
+        public Task<long> GetObjectId(string link, LinkType linkType)
         {
-            const string sql = "SELECT objectId FROM links WHERE linkType = @linkType AND link = @link LIMIT 1";
+            const string sql = "SELECT objectId FROM links WHERE linkType = @linkType AND link = @link";
 
-            return GetConnection(conn => conn.QuerySingleOrDefaultAsync<T>(sql, new {linkType, link}));
+            return SingleOrDefaultAsync<long>(sql, new {linkType, link});
         }
 
-        public async Task<bool> Add<T>(T objectId, LinkType linkType, string link)
+        public Task Add(long objectId, LinkType linkType, string link)
         {
             const string sql = "INSERT INTO links (link, linkType, objectId) VALUES (@link, @linkType, @objectId)";
 
-            var rows = await GetConnection(conn =>
-                conn.ExecuteAsync(sql, new {link, linkType, objectId})).ConfigureAwait(false);
+            return ExecuteAsync(sql, new {link, linkType, objectId});
+        }
 
-            return rows == 1;
+        public Task<string> GetLinkAsync(long objectId, LinkType linkType)
+        {
+            const string sql = "SELECT link FROM links WHERE linkType = @linkType AND objectId = @objectId";
+
+            return SingleOrDefaultAsync<string>(sql, new { linkType, objectId });
         }
     }
 }

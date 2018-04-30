@@ -5,7 +5,9 @@
 
     public interface ILinkRepository
     {
-        Task<T> GetObjectId<T>(string link, LinkType linkType);
-        Task<bool> Add<T>(T objectId, LinkType linkType, string link);
+        Task<long> GetObjectId(string link, LinkType linkType);
+        Task Add(long objectId, LinkType linkType, string link);
+
+        Task<string> GetLinkAsync(long objectId, LinkType linkType);
     }
 }

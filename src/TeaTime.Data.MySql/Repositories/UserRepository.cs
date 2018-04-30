@@ -1,10 +1,9 @@
 ﻿namespace TeaTime.Data.MySql.Repositories
 {
-    using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
-    using Common.Models;
-    using Dapper;
+    using Common.Models.Data;
 
     public class UserRepository : BaseRepository, IUserRepository
     {
@@ -12,20 +11,25 @@
         {
         }
 
-        public async Task<bool> Create(User user)
+        public Task CreateAsync(User user)
         {
-            const string sql = "INSERT INTO users (id, name, date_created) VALUES (@id, @name, @dateCreated)";
+            const string sql = "INSERT INTO users (id, username, displayName, createdDate) VALUES (@id, @username, @displayName, @createdDate)";
 
-            var rows = await GetConnection(conn => conn.ExecuteAsync(sql, user)).ConfigureAwait(false);
-
-            return rows == 1;
+            return ExecuteAsync(sql, user);
         }
 
-        public Task<User> Get(Guid id)
+        public Task<User> GetAsync(long id)
         {
-            const string sql = "SELECT id, name, date_created as DateCreated FROM users WHERE id = @id LIMIT 1";
+            const string sql = "SELECT id, username, displayName, createdDate FROM users WHERE id = @id";
 
-            return GetConnection(conn => conn.QuerySingleOrDefaultAsync<User>(sql, new { id }));
+            return SingleOrDefaultAsync<User>(sql, new {id});
+        }
+
+        public Task<IEnumerable<User>> GetManyAsync(IEnumerable<long> ids)
+        {
+            const string sql = "SELECT id, username, displayName, createdDate FROM users WHERE id IN @ids";
+
+            return QueryAsync<User>(sql, new { ids });
         }
     }
 }

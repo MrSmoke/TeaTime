@@ -4,12 +4,22 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="commandrouter" Version="1.0.0-beta3" />
-    <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta2" />
-    <PackageReference Include="microsoft.aspnetcore.mvc" Version="2.0.0" />
+    <PackageReference Include="commandrouter" Version="1.0.0-beta5" />
+    <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta3" />
+    <PackageReference Include="microsoft.aspnetcore.mvc" Version="2.0.3" />
+    <PackageReference Include="microsoft.extensions.configuration" Version="2.0.1" />
+    <PackageReference Include="microsoft.extensions.configuration.binder" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
-    <PackageReference Include="newtonsoft.json" Version="10.0.3" />
+    <PackageReference Include="newtonsoft.json" Version="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>

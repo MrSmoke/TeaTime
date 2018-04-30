@@ -18,7 +18,13 @@
         }
 
         public string Text { get; set; }
+
+        [JsonProperty("replace_original")]
+        public bool ReplaceOriginal { get; set; }
+
+        [JsonIgnore]
         public ResponseType Type { get; set; }
+
         public IEnumerable<Attachment> Attachments { get; set; }
 
         [JsonProperty("response_type")]
