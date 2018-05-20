@@ -34,6 +34,8 @@
             var run = _runRepository.GetAsync(request.RunId);
 
             var orders = (await _orderRepository.GetOrdersAsync(request.RunId).ConfigureAwait(false)).ToList();
+            if (orders.Count == 0)
+                return new List<OrderModel>();
 
             var users = _userRepository.GetManyAsync(orders.Select(o => o.UserId)).ConfigureAwait(false);
             var options = _optionsRepository.GetManyAsync(orders.Select(o => o.OptionId)).ConfigureAwait(false);
