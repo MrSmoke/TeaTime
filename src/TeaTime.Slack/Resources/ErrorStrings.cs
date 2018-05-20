@@ -64,6 +64,10 @@
             "Cannot end round. You must join this round before ending it! " + CommandStrings.JoinRound;
 
 
+        //Ill Make
+        internal static string IllMake_RunNotStarted() =>
+            "Cannot run illmake. There is no TeaTime running. " + CommandStrings.StartRound;
+
         //Misc
         internal static string OptionUnknown() => "Unknown option";
 

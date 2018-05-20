@@ -20,5 +20,8 @@
         internal static string GroupAdded(string groupName) => $"Group *{groupName}* created!";
 
         internal static string GroupRemoved(string groupName) => $"Group *{groupName}* has been removed.";
+
+        internal static string IllMake(string slackUserId) =>
+            $"{StringHelpers.SlackUserId(slackUserId)} has volunteered to make this round!";
     }
 }
