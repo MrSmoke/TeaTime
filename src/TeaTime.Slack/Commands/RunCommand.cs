@@ -85,6 +85,9 @@
             var context = await GetContextAsync().ConfigureAwait(false);
 
             var run = await _mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id)).ConfigureAwait(false);
+            if (run == null)
+                return Response(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User);
+
             var orders = await _mediator.Send(new GetRunOrdersQuery(run.Id, context.User.Id)).ConfigureAwait(false);
 
             var command = new EndRunCommand(
