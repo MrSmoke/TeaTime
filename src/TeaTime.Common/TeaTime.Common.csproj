@@ -1,20 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <LangVersion>7.1</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="automapper" Version="6.2.2" />
-    <PackageReference Include="mediatr" Version="4.1.0" />
+    <PackageReference Include="automapper" Version="8.0.0" />
+    <PackageReference Include="mediatr" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

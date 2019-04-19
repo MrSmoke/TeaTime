@@ -25,7 +25,7 @@
             _clock = clock;
         }
 
-        public async Task Handle(CreateRoomCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CreateRoomCommand request, CancellationToken cancellationToken)
         {
             var room = _mapper.Map<CreateRoomCommand, Room>(request);
 
@@ -36,6 +36,8 @@
             var evt = _mapper.Map<CreateRoomCommand, RoomCreatedEvent>(request);
 
             await _eventPublisher.Publish(evt).ConfigureAwait(false);
+
+            return Unit.Value;
         }
     }
 }

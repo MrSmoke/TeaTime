@@ -15,9 +15,11 @@
             _linkRepository = linkRepository;
         }
 
-        public Task Handle(CreateLinkCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CreateLinkCommand request, CancellationToken cancellationToken)
         {
-            return _linkRepository.Add(request.ObjectId, request.LinkType, request.Value);
+            await _linkRepository.Add(request.ObjectId, request.LinkType, request.Value);
+
+            return Unit.Value;
         }
     }
 }

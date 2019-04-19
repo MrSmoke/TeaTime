@@ -27,7 +27,7 @@
             _eventPublisher = eventPublisher;
         }
 
-        public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             var order = _mapper.Map<CreateOrderCommand, Order>(request);
             order.CreatedDate = _clock.UtcNow();
@@ -38,14 +38,16 @@
             evt.State = request.State;
 
             await _eventPublisher.Publish(evt).ConfigureAwait(false);
+
+            return Unit.Value;
         }
 
-        public async  Task Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
         {
             var existing = await _orderRepository.GetAsync(request.OrderId).ConfigureAwait(false);
 
             if (existing.OptionId == request.OptionId)
-                return;
+                return Unit.Value;
 
             //store the previous id for the event
             var previousOptionId = existing.OptionId;
@@ -59,6 +61,8 @@
             evt.PreviousOptionId = previousOptionId;
 
             await _eventPublisher.Publish(evt).ConfigureAwait(false);
+
+            return Unit.Value;
         }
     }
 }

@@ -2,20 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <LangVersion>7.1</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="dapper" Version="1.50.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
-    <PackageReference Include="mysqlconnector" Version="0.38.0" />
+    <PackageReference Include="dapper" Version="1.60.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+    <PackageReference Include="mysqlconnector" Version="0.52.0" />
   </ItemGroup>
 
   <ItemGroup>

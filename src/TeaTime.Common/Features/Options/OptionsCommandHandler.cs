@@ -24,18 +24,22 @@
             _mapper = mapper;
         }
 
-        public Task Handle(CreateOptionCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CreateOptionCommand request, CancellationToken cancellationToken)
         {
             var option = _mapper.Map<CreateOptionCommand, Option>(request);
 
             option.CreatedDate = _clock.UtcNow();
 
-            return _optionsRepository.CreateAsync(option);
+            await _optionsRepository.CreateAsync(option);
+
+            return Unit.Value;
         }
 
-        public Task Handle(DeleteOptionCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(DeleteOptionCommand request, CancellationToken cancellationToken)
         {
-            return _optionsRepository.DeleteAsync(request.OptionId);
+            await _optionsRepository.DeleteAsync(request.OptionId);
+
+            return Unit.Value;
         }
     }
 }
