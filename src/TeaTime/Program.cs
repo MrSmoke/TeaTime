@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
+    using Serilog;
 
     public static class Program
     {
@@ -12,6 +13,10 @@
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseSerilog((context, loggerConfig) =>
+                {
+                    loggerConfig.ReadFrom.Configuration(context.Configuration);
+                });
     }
 }
