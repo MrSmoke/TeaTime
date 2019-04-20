@@ -4,11 +4,11 @@
     using Common;
     using Common.Abstractions;
     using Common.Features.Runs;
+    using Common.Features.Runs.Commands;
     using Common.Permissions;
     using Common.Services;
     using Data.MySql;
     using MediatR;
-    using MediatR.Pipeline;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.HttpOverrides;
@@ -43,10 +43,18 @@
             services.AddSingleton<IEventPublisher, EventPublisher>();
             services.AddSingleton<IPermissionService, PermissionService>();
 
-            services.AddMediatR(typeof(ICommand));
             services.AddAutoMapper(typeof(ICommand));
 
-            services.AddSingleton<RunLockProcessor>();
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandPreProcessorBehavior<,>));
+
+            // Register manually so we can define order
+            services.AddSingleton(typeof(ICommandPreProcessor<>), typeof(PermissionPreProcessor<>));
+            services.AddSingleton<ICommandPreProcessor<EndRunCommand>, RunPreProcessor>();
+
+            services.AddSingleton<ICommandPreProcessor<StartRunCommand>, RunLockPreProcessor>();
+            services.AddSingleton<ICommandPreProcessor<EndRunCommand>, RunLockPreProcessor>();
+
+            services.AddMediatR(typeof(ICommand));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

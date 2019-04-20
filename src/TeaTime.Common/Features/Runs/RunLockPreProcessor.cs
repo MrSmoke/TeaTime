@@ -6,18 +6,18 @@
     using Commands;
     using Exceptions;
 
-    public class RunLockProcessor //:
-        //IRequestPreProcessor<StartRunCommand>
-        //IRequestPreProcessor<EndRunCommand>
+    public class RunLockPreProcessor :
+        ICommandPreProcessor<StartRunCommand>,
+        ICommandPreProcessor<EndRunCommand>
     {
         private readonly IRoomRunLockService _lockService;
 
-        public RunLockProcessor(IRoomRunLockService lockService)
+        public RunLockPreProcessor(IRoomRunLockService lockService)
         {
             _lockService = lockService;
         }
 
-        public async Task Process(StartRunCommand request, CancellationToken cancellationToken)
+        public async Task ProcessAsync(StartRunCommand request, CancellationToken cancellationToken)
         {
             //try to create the run lock
             var created = await _lockService.CreateLockAsync(request.RoomId).ConfigureAwait(false);
@@ -27,7 +27,7 @@
             //run lock created, so everything is ok
         }
 
-        public async Task Process(EndRunCommand request, CancellationToken cancellationToken)
+        public async Task ProcessAsync(EndRunCommand request, CancellationToken cancellationToken)
         {
             //delete lock
             var deleted = await _lockService.DeleteLockAsync(request.RoomId).ConfigureAwait(false);
