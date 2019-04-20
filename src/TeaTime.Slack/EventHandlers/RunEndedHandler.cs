@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Slack.EventHandlers
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading;
@@ -30,28 +31,21 @@
             if (!notification.TryGetCallbackState(out var callbackData))
                 return;
 
-            var runnerSlackId = await _linkRepository.GetLinkAsync(notification.RunnerUserId, LinkType.User).ConfigureAwait(false);
+            var orders = notification.Orders.ToList();
 
-            string slackRunnerIdStr;
-            if (string.IsNullOrWhiteSpace(runnerSlackId))
-            {
-                var runner = await _userRepository.GetAsync(notification.RunnerUserId).ConfigureAwait(false);
-                slackRunnerIdStr = runner.DisplayName;
-            }
-            else
-            {
-                slackRunnerIdStr = StringHelpers.SlackUserId(runnerSlackId);
-            }
+            // Create a dictionary of all usernames in the current order (including the runner)
+            var userIds = new HashSet<long>(orders.Select(o => o.User.Id)) {notification.RunnerUserId};
+
+            var usernames = (await Task.WhenAll(userIds.Select(async uid =>
+                    new KeyValuePair<long, string>(uid, await GetSlackUsername(uid)))))
+                .ToDictionary(k => k.Key, v => v.Value);
 
             var messageBuilder = new StringBuilder();
 
             messageBuilder
                 .Append("Congratulations ")
-                .Append(slackRunnerIdStr)
-                .Append(" you drew the short straw :cup_with_straw:. Here's the order:")
-                .Append("\n");
-
-            var orders = notification.Orders.ToList();
+                .Append(usernames[notification.RunnerUserId])
+                .Append(" you drew the short straw :cup_with_straw:. \n\nHere's the order:\n");
 
             for (var i = 0; i < orders.Count; i++)
             {
@@ -59,7 +53,7 @@
 
                 messageBuilder
                     .Append("- ")
-                    .Append(o.User.DisplayName)
+                    .Append(usernames[o.User.Id])
                     .Append(": ")
                     .Append(o.Option.Name);
 
@@ -70,6 +64,18 @@
             var data = new SlashCommandResponse(messageBuilder.ToString(), ResponseType.Channel);
 
             await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl, data).ConfigureAwait(false);
+        }
+
+        private async Task<string> GetSlackUsername(long userId)
+        {
+            var runnerSlackId = await _linkRepository.GetLinkAsync(userId, LinkType.User).ConfigureAwait(false);
+
+            if (!string.IsNullOrWhiteSpace(runnerSlackId))
+                return StringHelpers.SlackUserId(runnerSlackId);
+
+            var runner = await _userRepository.GetAsync(userId).ConfigureAwait(false);
+
+            return runner?.DisplayName ?? "Unknown";
         }
     }
 }

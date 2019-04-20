@@ -2,9 +2,6 @@
 {
     internal static class StringHelpers
     {
-        internal static string SlackUserId(string id)
-        {
-            return $"<@{id}>";
-        }
+        internal static string SlackUserId(string id) => $"<@{id}>";
     }
 }
