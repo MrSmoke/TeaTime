@@ -46,8 +46,6 @@
             services.AddMediatR(typeof(ICommand));
             services.AddAutoMapper(typeof(ICommand));
 
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
-
             services.AddSingleton<RunLockProcessor>();
         }
 
