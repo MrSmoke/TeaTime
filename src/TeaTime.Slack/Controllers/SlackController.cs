@@ -49,6 +49,8 @@
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
+            _logger.LogInformation("Received slash command {Text} {@Command}", slashCommand.Text, slashCommand);
+
             try
             {
                 var result = await _commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
@@ -131,6 +133,8 @@
                 _logger.LogError("Bad verification token");
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
+
+            _logger.LogInformation("Received interactive message {@Request}", message);
 
             try
             {
