@@ -4,20 +4,21 @@
     using System.Threading.Tasks;
     using Abstractions;
     using Exceptions;
+    using MediatR;
     using Microsoft.Extensions.Logging;
 
-    public class PermissionPreProcessor<TCommand> : ICommandPreProcessor<TCommand>
+    public class PermissionBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse>
     {
         private readonly IPermissionService _permissionService;
-        private readonly ILogger<PermissionPreProcessor<TCommand>> _logger;
+        private readonly ILogger<PermissionBehavior<TCommand, TResponse>> _logger;
 
-        public PermissionPreProcessor(IPermissionService permissionService, ILogger<PermissionPreProcessor<TCommand>> logger)
+        public PermissionBehavior(IPermissionService permissionService, ILogger<PermissionBehavior<TCommand, TResponse>> logger)
         {
             _permissionService = permissionService;
             _logger = logger;
         }
 
-        public async Task ProcessAsync(TCommand request, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(TCommand request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             if (request is IUserCommand command)
             {
@@ -31,6 +32,8 @@
             {
                 _logger.LogDebug("Skipping permission check for command {Command}", CommandTypeName);
             }
+
+            return await next();
         }
 
         private void Handle(PermisionCheckResult result)

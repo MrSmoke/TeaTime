@@ -20,7 +20,7 @@
 
     public class Startup
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
         {
@@ -37,24 +37,28 @@
             services.AddMySql(Configuration.GetConnectionString("mysql"));
             services.AddSlack(mvcBuilder, Configuration.GetSection("slack").Get<SlackOptions>());
 
+            services.AddScoped<IEventPublisher, EventPublisher>();
+
             services.AddSingleton<IRunnerRandomizer, DefaultRunnerRandomizer>();
             services.AddSingleton<IRoomRunLockService, RoomRunLockService>();
             services.AddSingleton<ISystemClock, DefaultSystemClock>();
-            services.AddSingleton<IEventPublisher, EventPublisher>();
             services.AddSingleton<IPermissionService, PermissionService>();
 
             services.AddAutoMapper(typeof(ICommand));
 
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandPreProcessorBehavior<,>));
-
             // Register manually so we can define order
-            services.AddSingleton(typeof(ICommandPreProcessor<>), typeof(PermissionPreProcessor<>));
+
+            // - Check permissions first
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(PermissionBehavior<,>));
+
+            // - Run pre processors
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandPreProcessorBehavior<,>));
             services.AddSingleton<ICommandPreProcessor<EndRunCommand>, RunPreProcessor>();
 
-            services.AddSingleton<ICommandPreProcessor<StartRunCommand>, RunLockPreProcessor>();
-            services.AddSingleton<ICommandPreProcessor<EndRunCommand>, RunLockPreProcessor>();
-
             services.AddMediatR(typeof(ICommand));
+
+            // Run Lock should be last behavior to run
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(RunLockBehavior<,>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,12 +74,7 @@
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvc();
         }
     }
 }

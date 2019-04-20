@@ -24,7 +24,7 @@
             services.AddSingleton(options);
 
             services.AddSingleton<ISlackApiClient, SlackApiClient>();
-            services.AddSingleton<ISlackService, SlackService>();
+            services.AddScoped<ISlackService, SlackService>();
             services.AddSingleton<ISlackMessageVerifier, SlackMessageVerifier>();
 
             services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedHandler>();

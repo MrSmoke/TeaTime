@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="commandrouter" Version="1.0.0-beta5" />
+    <PackageReference Include="commandrouter" Version="1.0.0-beta6" />
     <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta3" />
     <PackageReference Include="microsoft.aspnetcore.mvc" Version="2.2.0" />
     <PackageReference Include="microsoft.extensions.configuration" Version="2.2.0" />
