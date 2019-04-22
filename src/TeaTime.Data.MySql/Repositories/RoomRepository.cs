@@ -7,7 +7,7 @@
 
     public class RoomRepository : BaseRepository, IRoomRepository
     {
-        public RoomRepository(ConnectionFactory factory) : base(factory)
+        public RoomRepository(IMySqlConnectionFactory factory) : base(factory)
         {
         }
 

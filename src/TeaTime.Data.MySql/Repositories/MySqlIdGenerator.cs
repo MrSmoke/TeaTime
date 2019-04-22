@@ -5,7 +5,7 @@
 
     public class MySqlIdGenerator : BaseRepository, IIdGenerator<long>
     {
-        public MySqlIdGenerator(ConnectionFactory factory) : base(factory)
+        public MySqlIdGenerator(IMySqlConnectionFactory factory) : base(factory)
         {
         }
 

@@ -9,7 +9,7 @@
     {
         private const string SelectColumns = "id, runId, userId, optionId, createdDate";
 
-        public OrderRepository(ConnectionFactory factory) : base(factory)
+        public OrderRepository(IMySqlConnectionFactory factory) : base(factory)
         {
         }
 

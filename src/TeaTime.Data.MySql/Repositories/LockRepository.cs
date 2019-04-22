@@ -5,7 +5,7 @@
 
     public class LockRepository : BaseRepository, ILockRepository
     {
-        public LockRepository(ConnectionFactory factory) : base(factory)
+        public LockRepository(IMySqlConnectionFactory factory) : base(factory)
         {
         }
 

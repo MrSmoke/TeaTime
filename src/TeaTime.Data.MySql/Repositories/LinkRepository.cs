@@ -6,7 +6,7 @@
 
     public class LinkRepository : BaseRepository, ILinkRepository
     {
-        public LinkRepository(ConnectionFactory factory) : base(factory)
+        public LinkRepository(IMySqlConnectionFactory factory) : base(factory)
         {
         }
 

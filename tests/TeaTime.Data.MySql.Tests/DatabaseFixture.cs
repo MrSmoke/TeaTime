@@ -4,15 +4,15 @@
     using Dapper;
     using global::MySql.Data.MySqlClient;
 
-    public class DatabaseFixture :IDisposable
+    public class DatabaseFixture : IDisposable
     {
-        public ConnectionFactory ConnectionFactory;
+        public readonly IMySqlConnectionFactory ConnectionFactory;
 
         public DatabaseFixture()
         {
-            ConnectionFactory = new ConnectionFactory(TestConfig.ConnectionString);
+            ConnectionFactory = new MySqlConnectionFactory(TestConfig.ConnectionOptions);
 
-            using (var conn = new MySqlConnection(TestConfig.ConnectionString))
+            using (var conn = ConnectionFactory.GetConnection())
             {
                 conn.Execute($"create schema if not exits {TestConfig.Schema}");
             }

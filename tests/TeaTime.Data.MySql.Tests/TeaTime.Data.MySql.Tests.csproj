@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="dapper" Version="1.60.6" />
+    <PackageReference Include="microsoft.extensions.configuration.binder" Version="2.2.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="mysqlconnector" Version="0.52.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />

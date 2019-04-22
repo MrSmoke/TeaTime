@@ -8,9 +8,9 @@
 
     public abstract class BaseRepository
     {
-        private readonly ConnectionFactory _factory;
+        private readonly IMySqlConnectionFactory _factory;
 
-        protected BaseRepository(ConnectionFactory factory)
+        protected BaseRepository(IMySqlConnectionFactory factory)
         {
             _factory = factory;
         }
@@ -35,7 +35,7 @@
             return GetConnection(conn => conn.QueryAsync<T>(sql, obj));
         }
 
-        protected async Task<T> GetConnection<T>(Func<MySqlConnection, Task<T>> func)
+        private async Task<T> GetConnection<T>(Func<MySqlConnection, Task<T>> func)
         {
             using (var conn = _factory.GetConnection())
             {

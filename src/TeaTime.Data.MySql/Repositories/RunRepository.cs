@@ -8,7 +8,7 @@
     {
         private const string Columns = "id, roomId, userId, groupId, startTime, endTime, ended, createdDate";
 
-        public RunRepository(ConnectionFactory factory) : base(factory)
+        public RunRepository(IMySqlConnectionFactory factory) : base(factory)
         {
         }
 

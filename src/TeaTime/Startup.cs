@@ -34,7 +34,7 @@
             var mvcBuilder = services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             //TODO: Allow these to be loaded dynamically
-            services.AddMySql(Configuration.GetConnectionString("mysql"));
+            services.AddMySql(Configuration.GetSection("mysql").Get<MySqlConnectionOptions>());
             services.AddSlack(mvcBuilder, Configuration.GetSection("slack").Get<SlackOptions>());
 
             services.AddScoped<IEventPublisher, EventPublisher>();

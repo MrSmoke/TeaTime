@@ -7,7 +7,7 @@
 
     public class UserRepository : BaseRepository, IUserRepository
     {
-        public UserRepository(ConnectionFactory factory) : base(factory)
+        public UserRepository(IMySqlConnectionFactory factory) : base(factory)
         {
         }
 

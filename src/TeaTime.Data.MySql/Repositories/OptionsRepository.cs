@@ -10,7 +10,7 @@
         private const string GroupSelectColumns = "id, name, roomId, createdBy, createdDate";
         private const string OptionSelectColumns = "id, name, groupId, createdBy, createdDate";
 
-        public OptionsRepository(ConnectionFactory factory) : base(factory)
+        public OptionsRepository(IMySqlConnectionFactory factory) : base(factory)
         {
         }
 

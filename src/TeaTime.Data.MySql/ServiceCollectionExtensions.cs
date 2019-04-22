@@ -7,11 +7,9 @@
 
     public static class ServiceCollectionExtensions
     {
-        public static void AddMySql(this IServiceCollection services, string connectionString)
+        public static void AddMySql(this IServiceCollection services, MySqlConnectionOptions options)
         {
-            var factory = new ConnectionFactory(connectionString);
-
-            services.AddSingleton(factory);
+            services.AddSingleton<IMySqlConnectionFactory>(new MySqlConnectionFactory(options));
 
             services.AddSingleton<ILinkRepository, LinkRepository>();
             services.AddSingleton<IRoomRepository, RoomRepository>();

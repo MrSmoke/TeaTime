@@ -6,7 +6,8 @@
 
     public static class TestConfig
     {
-        public static string ConnectionString => ConfigBuilder.Value["connectionString"];
+        public static MySqlConnectionOptions ConnectionOptions =>
+            ConfigBuilder.Value.GetSection("mysql").Get<MySqlConnectionOptions>();
 
         public static string Schema => ConfigBuilder.Value["schema"];
 

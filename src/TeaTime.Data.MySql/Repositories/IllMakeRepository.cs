@@ -7,7 +7,7 @@
 
     public class IllMakeRepository : BaseRepository, IIllMakeRepository
     {
-        public IllMakeRepository(ConnectionFactory factory) : base(factory)
+        public IllMakeRepository(IMySqlConnectionFactory factory) : base(factory)
         {
         }
 
