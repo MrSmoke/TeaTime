@@ -45,7 +45,7 @@
             messageBuilder
                 .Append("Congratulations ")
                 .Append(usernames[notification.RunnerUserId])
-                .Append(" you drew the short straw :cup_with_straw:. \n\nHere's the order:\n");
+                .Append(" you drew the short straw :cup_with_straw: \n\nHere's the order:\n");
 
             for (var i = 0; i < orders.Count; i++)
             {
