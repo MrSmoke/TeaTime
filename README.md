@@ -10,7 +10,7 @@ TeaTime is the Russian Roulette of tea making *(although not strictly limited to
 
 ## Overview
 
-TeaTime allows your teams to 
+TeaTime allows your teams to start a round of tea, join with their choice of tea, and (on round end) randomly select someone to make the round of tea.
 
 
 ## Slack
@@ -55,6 +55,7 @@ TeaTime allows your teams to
 ```
 /teatime tea
 ```
+![image](https://user-images.githubusercontent.com/709976/56972165-d810ba80-6bad-11e9-9b63-fdc50abeb068.png)
 
 4. Wait for everyone to join...
 
@@ -62,6 +63,8 @@ TeaTime allows your teams to
 ```
 /teatime join "Earl Grey"
 ```
+![image](https://user-images.githubusercontent.com/709976/56972122-c4655400-6bad-11e9-8478-e1f15d4e9403.png)
+
 
 5. _(optional)_ Be a good sport and volunteer to make the round
 ```
@@ -74,6 +77,8 @@ TeaTime allows your teams to
 ```
 
 7. Congratulations?
+
+![image](https://user-images.githubusercontent.com/709976/56972300-19a16580-6bae-11e9-9a59-d9f277388414.png)
 
 
 ## License
