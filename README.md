@@ -76,7 +76,7 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 ```
 /teatime end
 ```
-![image](https://user-images.githubusercontent.com/709976/56973194-b87a9180-6baf-11e9-8f15-8f03089f8ad6.png)
+![image](https://user-images.githubusercontent.com/709976/56973263-d9db7d80-6baf-11e9-8b3c-e0ff1fe3c2f3.png)
 
 7. Congratulations?
 
