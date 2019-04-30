@@ -1,4 +1,4 @@
-# TeaTime 🍵
+# TeaTime ☕
 
 ![AppVeyor](https://img.shields.io/appveyor/ci/mrsmoke/teatime.svg)
 ![AppVeyor tests](https://img.shields.io/appveyor/tests/mrsmoke/teatime.svg)
