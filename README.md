@@ -19,6 +19,7 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 
 | Description | Command | 
 | ---- | ------- |
+| Show a list of available commands | `/teatime help` |
 | Start a new round | `/teatime {group}` |
 | Join a round | `/teatime join {option}` |
 | End a round | `/teatime end` |
