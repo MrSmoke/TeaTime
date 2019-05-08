@@ -17,6 +17,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Slack;
+    using Slack.Configuration;
 
     public class Startup
     {
@@ -35,7 +36,7 @@
 
             //TODO: Allow these to be loaded dynamically
             services.AddMySql(Configuration.GetSection("mysql").Get<MySqlConnectionOptions>());
-            services.AddSlack(mvcBuilder, Configuration.GetSection("slack").Get<SlackOptions>());
+            services.AddSlack(mvcBuilder, Configuration.GetSection("slack"));
 
             services.AddScoped<IEventPublisher, EventPublisher>();
 

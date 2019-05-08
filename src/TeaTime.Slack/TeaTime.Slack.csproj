@@ -12,6 +12,7 @@
     <PackageReference Include="microsoft.extensions.configuration" Version="2.2.0" />
     <PackageReference Include="microsoft.extensions.configuration.binder" Version="2.2.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
     <PackageReference Include="newtonsoft.json" Version="12.0.2" />
   </ItemGroup>
 

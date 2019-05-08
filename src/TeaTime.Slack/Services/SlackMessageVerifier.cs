@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Slack.Services
 {
+    using Configuration;
     using Models.Requests;
 
     public class SlackMessageVerifier : ISlackMessageVerifier
