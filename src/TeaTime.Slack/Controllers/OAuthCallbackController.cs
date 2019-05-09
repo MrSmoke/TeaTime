@@ -26,8 +26,6 @@
         [Route("slack/callback")]
         public async Task<IActionResult> Callback(string code)
         {
-            return View(OAuthCallbackViewModel.Ok("ClickView"));
-
             if (string.IsNullOrWhiteSpace(code))
                 return NotFound();
 
