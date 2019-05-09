@@ -17,7 +17,6 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Slack;
-    using Slack.Configuration;
 
     public class Startup
     {
@@ -32,7 +31,8 @@
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            var mvcBuilder = services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            var mvcBuilder = services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             //TODO: Allow these to be loaded dynamically
             services.AddMySql(Configuration.GetSection("mysql").Get<MySqlConnectionOptions>());
@@ -75,6 +75,8 @@
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
+            app.UseSlack();
+            app.UseStaticFiles();
             app.UseMvc();
         }
     }
