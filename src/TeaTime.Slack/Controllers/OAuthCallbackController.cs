@@ -52,6 +52,8 @@
                     _logger.LogInformation("TeaTime installed in team {TeamId} ({TeamName}) with scope {Scope}",
                         response.TeamId, response.TeamName, response.Scope);
 
+                    // todo: save in db
+
                     return Content("Installed!");
                 }
 
