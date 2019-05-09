@@ -1,0 +1,49 @@
+﻿@model TeaTime.Slack.Models.ViewModels.OAuthCallbackViewModel
+
+<section class="section has-text-centered">
+    <div class="container">
+
+        @if (Model.Success)
+        {
+            <div class="columns">
+                <div class="column">
+                    <h1 class="title is-1">Success ✔️</h1>
+                    <p>TeaTime has successfully been installed in your slack workspace <strong>@Model.TeamName</strong> 🎉</p>
+                </div>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <p>Its time to drink some tea ☕</p>
+
+                    <div class="level">
+                        <div class="level-item">
+                            <figure class="image" style="width: 532px; height: 52px">
+                                <img src="/slack/assets/images/slack_tea_command.jpg" alt="/teatime tea"/>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="columns">
+                <div class="column">
+                    <h1 class="title is-1">Uh-oh 😢</h1>
+                    <p>Looks like we couldn't install TeaTime right now. Maybe try again?</p>
+                    <p>If that doesn't work drop us a line over at <a href="https://github.com/MrSmoke/TeaTime/issues">GitHub</a> 😊</p>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.ErrorCode))
+             {
+                 <div class="columns">
+                     <div class="column">
+                         <p class="has-text-grey-light">ErrorCode: @(Model.ErrorCode)</p>
+                     </div>
+                 </div>
+             }
+        }
+
+    </div>
+</section>

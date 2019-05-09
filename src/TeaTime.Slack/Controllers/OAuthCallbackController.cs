@@ -8,6 +8,7 @@
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using Models.Requests;
+    using Models.ViewModels;
 
     public class OAuthCallbackController : Controller
     {
@@ -25,6 +26,11 @@
         [Route("slack/callback")]
         public async Task<IActionResult> Callback(string code)
         {
+            return View(OAuthCallbackViewModel.Ok("ClickView"));
+
+            if (string.IsNullOrWhiteSpace(code))
+                return NotFound();
+
             _logger.LogInformation("OAuth callback called with code {Code}", code);
 
             var options = _optionsAccessor.CurrentValue.OAuth;
@@ -33,8 +39,10 @@
             {
                 _logger.LogWarning("Ignoring OAuth callback. No OAuth settings set");
 
-                return Content("Cannot install. No OAuth settings set");
+                return View(OAuthCallbackViewModel.Error("not_configured"));
             }
+
+            var errorCode = "unknown";
 
             try
             {
@@ -54,17 +62,20 @@
 
                     // todo: save in db
 
-                    return Content("Installed!");
+                    return View(OAuthCallbackViewModel.Ok(response.TeamName));
                 }
 
                 _logger.LogError("Failed to install into slack channel. Error: {ErrorCode}", response.Error);
+
+                // set the error code for the view
+                errorCode = "slack:" + response.Error;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to get OAuth token");
             }
 
-            return Content("Failed to install :(");
+            return View(OAuthCallbackViewModel.Error(errorCode));
         }
     }
 }
