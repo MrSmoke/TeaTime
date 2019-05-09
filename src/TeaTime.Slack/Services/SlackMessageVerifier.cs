@@ -1,20 +1,21 @@
 ﻿namespace TeaTime.Slack.Services
 {
     using Configuration;
+    using Microsoft.Extensions.Options;
     using Models.Requests;
 
     public class SlackMessageVerifier : ISlackMessageVerifier
     {
-        private readonly string _verificationToken;
+        private readonly IOptionsMonitor<SlackOptions> _optionsMonitor;
 
-        public SlackMessageVerifier(SlackOptions options)
+        public SlackMessageVerifier(IOptionsMonitor<SlackOptions> optionsMonitor)
         {
-            _verificationToken = options.VerificationToken;
+            _optionsMonitor = optionsMonitor;
         }
 
         public bool IsValid(IVerifiableRequest request)
         {
-            return request.Token.Equals(_verificationToken);
+            return request.Token.Equals(_optionsMonitor.CurrentValue.VerificationToken);
         }
     }
 }
