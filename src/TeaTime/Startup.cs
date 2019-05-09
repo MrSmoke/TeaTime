@@ -69,6 +69,11 @@
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseStatusCodePages();
+                app.UseStatusCodePagesWithReExecute("/ErrorStatusCode", "?code={0}");
+            }
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
