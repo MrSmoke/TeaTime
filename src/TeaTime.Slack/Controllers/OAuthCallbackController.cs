@@ -47,16 +47,22 @@
                     Code = code
                 });
 
-                _logger.LogInformation("OAuth callback complete. OAuth token retrieved");
+                if (response.IsSuccess)
+                {
+                    _logger.LogInformation("TeaTime installed in team {TeamId} ({TeamName}) with scope {Scope}",
+                        response.TeamId, response.TeamName, response.Scope);
 
-                return Content("Installed!");
+                    return Content("Installed!");
+                }
+
+                _logger.LogError("Failed to install into slack channel. Error: {ErrorCode}", response.Error);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to get OAuth token");
-
-                return Content("Failed to install :(");
             }
+
+            return Content("Failed to install :(");
         }
     }
 }

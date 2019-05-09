@@ -30,8 +30,8 @@
             using (var content = new FormUrlEncodedContent(formData))
             using (var response = await _httpClient.PostAsync("https://slack.com/api/oauth.access", content))
             {
-                //todo: log errors
-                return Deserialize<OAuthTokenResponse>(await response.Content.ReadAsStringAsync());
+                var json = await response.Content.ReadAsStringAsync();
+                return Deserialize<OAuthTokenResponse>(json);
             }
         }
 
