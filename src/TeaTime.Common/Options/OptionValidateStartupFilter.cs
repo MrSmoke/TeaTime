@@ -1,15 +1,10 @@
-﻿namespace TeaTime.Slack
+﻿namespace TeaTime.Common.Options
 {
-    //TODO: Move to better location
-
-    using System;
     using System.Linq;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
 
-    public class OptionValidateStartupFilter<T> : IStartupFilter where T : class, new()
+    public class OptionValidateStartupFilter<T> : IStartupAction where T : class, new()
     {
         private readonly IOptions<T> _options;
         private readonly ILogger<OptionValidateStartupFilter<T>> _logger;
@@ -20,7 +15,9 @@
             _logger = logger;
         }
 
-        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+        public string Name => "OptionValidateStartupFilter<" + typeof(T).Name + ">";
+
+        public void Execute()
         {
             try
             {
@@ -35,8 +32,6 @@
 
                 throw;
             }
-
-            return next;
         }
     }
 }

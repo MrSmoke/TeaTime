@@ -1,10 +1,12 @@
 ﻿namespace TeaTime
 {
+    using System;
     using AutoMapper;
     using Common;
     using Common.Abstractions;
     using Common.Features.Runs;
     using Common.Features.Runs.Commands;
+    using Common.Options;
     using Common.Permissions;
     using Common.Services;
     using Data.MySql;
@@ -20,11 +22,39 @@
 
     public class Startup
     {
-        private IConfiguration Configuration { get; }
+        private readonly IConfiguration _configuration;
+        private readonly ILogger _logger;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
-            Configuration = configuration;
+            _configuration = configuration;
+            _logger = loggerFactory.CreateLogger("Startup");
+        }
+
+        private void RegisterDataLayer(IServiceCollection services)
+        {
+            var mysqlOptions = _configuration.GetSection("mysql").Get<MySqlConnectionOptions>();
+            if (mysqlOptions != null)
+            {
+                try
+                {
+                    mysqlOptions.Validate();
+                }
+                catch (InvalidOptionException ex)
+                {
+                    _logger.LogError(ex.Message);
+
+                    throw;
+                }
+
+                services.AddMySql(mysqlOptions);
+
+                return;
+            }
+
+            _logger.LogCritical("No database has been configured");
+
+            throw new Exception("No database has been configured");
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -34,9 +64,11 @@
             var mvcBuilder = services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            //TODO: Allow these to be loaded dynamically
-            services.AddMySql(Configuration.GetSection("mysql").Get<MySqlConnectionOptions>());
-            services.AddSlack(mvcBuilder, Configuration.GetSection("slack"));
+            services.AddTransient<IStartupFilter, StartupActionFilter>();
+
+            RegisterDataLayer(services);
+
+            services.AddSlack(mvcBuilder, _configuration.GetSection("slack"));
 
             services.AddScoped<IEventPublisher, EventPublisher>();
 

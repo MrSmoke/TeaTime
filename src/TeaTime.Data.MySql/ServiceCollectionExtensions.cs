@@ -1,5 +1,7 @@
 ﻿namespace TeaTime.Data.MySql
 {
+    using System;
+    using Common;
     using Common.Abstractions;
     using Common.Abstractions.Data;
     using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +11,11 @@
     {
         public static void AddMySql(this IServiceCollection services, MySqlConnectionOptions options)
         {
+            if(options == null)
+                throw new ArgumentNullException(nameof(options));
+
+            options.Validate();
+
             services.AddSingleton<IMySqlConnectionFactory>(new MySqlConnectionFactory(options));
 
             services.AddSingleton<ILinkRepository, LinkRepository>();
@@ -21,6 +28,8 @@
             services.AddSingleton<IIllMakeRepository, IllMakeRepository>();
 
             services.AddSingleton<IIdGenerator<long>, MySqlIdGenerator>();
+
+            services.AddTransient<IStartupAction, MySqlServerTestStartupAction>();
         }
     }
 }
