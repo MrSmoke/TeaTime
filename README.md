@@ -63,6 +63,7 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 4. Wait for everyone to join...
 
     > (for those who link commands)
+
     ```
     /teatime join "Earl Grey"
     ```
@@ -78,6 +79,7 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
     ![image](https://user-images.githubusercontent.com/709976/56972594-9cc2bb80-6bae-11e9-916b-2c6c6e40bae4.png)
 
 6. End the round
+
     ```
     /teatime end
     ```
@@ -85,6 +87,45 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
     ![image](https://user-images.githubusercontent.com/709976/56973263-d9db7d80-6baf-11e9-8b3c-e0ff1fe3c2f3.png)
 
 7. Congratulations?
+
+## Running
+
+### Docker
+
+The TeaTime docker image can be found on [Docker Hub](https://hub.docker.com/r/dockdockcontainer/teatime).
+
+An example `docker-compose.yml`
+
+```yml
+version: '3'
+services:
+  web:
+    image: "dockdockcontainer/teatime:latest"
+    restart: always
+    ports:
+     - "80:80"
+    environment:
+      SLACK__VERIFICATIONTOKEN: helloworld
+      MYSQL__HOST: localhost
+      MYSQL__USERNAME: username
+      MYSQL__PASSWORD: password
+```
+
+#### Supported tags
+
+- latest
+- dev
+
+#### Environment Variables
+
+| Variable | Required |  Description |
+| ---- | ---- | ---- |
+| SLACK__VERIFICATIONTOKEN | **true** | The verification token used to verify slack messages |
+| MYSQL__HOST | **true** | The mysql server host |
+| MYSQL__PORT | *false* (default `3306`) | The mysql server port |
+| MYSQL__USERNAME | **true** | The mysql users username |
+| MYSQL__PASSWORD | **true** | The mysql users password |
+| MYSQL__DATABASE | *false* (default `teatime`) | The mysql database |
 
 ## License
 
