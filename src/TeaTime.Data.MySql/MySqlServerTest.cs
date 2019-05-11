@@ -21,7 +21,8 @@
         {
             try
             {
-                _connectionFactory.GetConnection().Open();
+                using (var conn = _connectionFactory.GetConnection())
+                    conn.Open();
             }
             catch(Exception ex)
             {
