@@ -112,7 +112,6 @@
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            app.UseSlack();
             app.UseStaticFiles();
             app.UseMvc();
         }

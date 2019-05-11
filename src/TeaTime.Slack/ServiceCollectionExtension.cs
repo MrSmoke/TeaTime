@@ -10,16 +10,15 @@
     using Configuration;
     using EventHandlers;
     using MediatR;
-    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Options;
     using Services;
 
     public static class ServiceCollectionExtension
     {
-        private static readonly Assembly Assembly = typeof(ServiceCollectionExtension).GetTypeInfo().Assembly;
+        internal static readonly Assembly Assembly = typeof(ServiceCollectionExtension).GetTypeInfo().Assembly;
 
         public static void AddSlack(this IServiceCollection services, IMvcBuilder mvcBuilder, IConfiguration configuration)
         {
@@ -27,6 +26,8 @@
             mvcBuilder.AddApplicationPart(Assembly);
 
             services.AddCommandRouter();
+
+            services.AddTransient<IStartupFilter, SlackStartupFilter>();
 
             // Register our options and the options startup validator
             services.Configure<SlackOptions>(configuration);
@@ -40,15 +41,6 @@
             services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedHandler>();
             services.AddTransient<INotificationHandler<OrderPlacedEvent>, OrderEventHandler>();
             services.AddTransient<INotificationHandler<OrderOptionChangedEvent>, OrderEventHandler>();
-        }
-
-        public static void UseSlack(this IApplicationBuilder app)
-        {
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new ManifestEmbeddedFileProvider(Assembly),
-                RequestPath = "/slack",
-            });
         }
     }
 }
