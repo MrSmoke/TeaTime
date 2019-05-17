@@ -62,7 +62,7 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 
 4. Wait for everyone to join...
 
-    > (for those who link commands)
+    > (for those who like commands)
 
     ```
     /teatime join "Earl Grey"
