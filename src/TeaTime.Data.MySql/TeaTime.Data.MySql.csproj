@@ -7,12 +7,23 @@
 
   <ItemGroup>
     <PackageReference Include="dapper" Version="1.60.6" />
+    <PackageReference Include="Evolve" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
     <PackageReference Include="mysqlconnector" Version="0.53.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TeaTime.Common\TeaTime.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Sql\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\sql\V0_1_0__Create_tables.sql" Link="Sql\V0_1_0__Create_tables.sql" />
+    <EmbeddedResource Include="..\..\sql\V0_2_0__Add_illmake.sql" Link="Sql\V0_2_0__Add_illmake.sql" />
+    <EmbeddedResource Include="..\..\sql\V0_3_0__Add_hashes_table.sql" Link="Sql\V0_3_0__Add_hashes_table.sql" />
   </ItemGroup>
 
 </Project>

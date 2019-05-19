@@ -2,7 +2,7 @@ create table links (
 	`link` varchar(100) not null,
 	`linkType` smallint not null,
 	`objectId` bigint not null,
-	
+
 	primary key (link, linkType)
 );
 
@@ -55,7 +55,7 @@ create table options (
 	`groupId` bigint not null,
 	`createdBy` bigint not null,
 	`createdDate` datetime not null,
-	
+
 	unique `idx_options_name` (`groupId`, `name`)
 );
 
@@ -65,7 +65,7 @@ create table option_groups (
 	`roomId` bigint not null,
 	`createdBy` bigint not null,
 	`createdDate` datetime not null,
-	
+
 	unique `idx_optiongroups_name` (`roomId`, `name`)
 );
 

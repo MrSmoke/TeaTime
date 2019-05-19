@@ -31,7 +31,7 @@
             services.AddSingleton<IDistributedHash, MySqlDistributedHash>();
 
 
-            services.AddTransient<IStartupAction, MySqlServerTestStartupAction>();
+            services.AddTransient<IStartupAction, MySqlServerVerificationStartupAction>();
         }
     }
 }
