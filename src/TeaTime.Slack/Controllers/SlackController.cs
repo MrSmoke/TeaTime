@@ -25,7 +25,8 @@
         private readonly ISlackMessageVerifier _messageVerifier;
         private readonly ILogger<SlackController> _logger;
 
-        public SlackController(ICommandRunner commandRunner, ISlackService slackService, ISlackMessageVerifier messageVerifier, ILogger<SlackController> logger)
+        public SlackController(ICommandRunner commandRunner, ISlackService slackService,
+            ISlackMessageVerifier messageVerifier, ILogger<SlackController> logger)
         {
             _commandRunner = commandRunner;
             _slackService = slackService;

@@ -1,8 +1,11 @@
 ﻿namespace TeaTime.Slack.Controllers
 {
     using System;
+    using System.Collections.Generic;
+    using System.Globalization;
     using System.Threading.Tasks;
     using Client;
+    using Common;
     using Configuration;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
@@ -15,12 +18,15 @@
         private readonly ISlackApiClient _slackApiClient;
         private readonly IOptionsMonitor<SlackOptions> _optionsAccessor;
         private readonly ILogger<OAuthCallbackController> _logger;
+        private readonly IDistributedHash _hash;
 
-        public OAuthCallbackController(ISlackApiClient slackApiClient, IOptionsMonitor<SlackOptions> optionsAccessor, ILogger<OAuthCallbackController> logger)
+        public OAuthCallbackController(ISlackApiClient slackApiClient, IOptionsMonitor<SlackOptions> optionsAccessor,
+            ILogger<OAuthCallbackController> logger, IDistributedHash hash)
         {
             _slackApiClient = slackApiClient;
             _optionsAccessor = optionsAccessor;
             _logger = logger;
+            _hash = hash;
         }
 
         [Route("slack/callback")]
@@ -58,7 +64,20 @@
                     _logger.LogInformation("TeaTime installed in team {TeamId} ({TeamName}) with scope {Scope}",
                         response.TeamId, response.TeamName, response.Scope);
 
-                    // todo: save in db
+                    var fields = new List<HashEntry>
+                    {
+                        new HashEntry("access_token", response.AccessToken),
+                        new HashEntry("install_time", DateTime.UtcNow.ToString("O"))
+                    };
+
+                    // Add config for webhook if available
+                    if (response.IncomingWebhook != null)
+                    {
+                        fields.Add(new HashEntry($"webhook:{response.IncomingWebhook.ChannelId}:url",
+                            response.IncomingWebhook.Url));
+                    }
+
+                    await _hash.SetAsync("slack:" + response.TeamId, fields);
 
                     return View(OAuthCallbackViewModel.Ok(response.TeamName));
                 }

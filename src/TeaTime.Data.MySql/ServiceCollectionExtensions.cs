@@ -28,6 +28,8 @@
             services.AddSingleton<IIllMakeRepository, IllMakeRepository>();
 
             services.AddSingleton<IIdGenerator<long>, MySqlIdGenerator>();
+            services.AddSingleton<IDistributedHash, MySqlDistributedHash>();
+
 
             services.AddTransient<IStartupAction, MySqlServerTestStartupAction>();
         }

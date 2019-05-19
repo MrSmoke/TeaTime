@@ -35,7 +35,7 @@
             return GetConnection(conn => conn.QueryAsync<T>(sql, obj));
         }
 
-        private async Task<T> GetConnection<T>(Func<MySqlConnection, Task<T>> func)
+        protected async Task<T> GetConnection<T>(Func<MySqlConnection, Task<T>> func)
         {
             using (var conn = _factory.GetConnection())
             {
