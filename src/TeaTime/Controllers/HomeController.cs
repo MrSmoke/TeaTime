@@ -11,6 +11,12 @@
             return View();
         }
 
+        [Route("privacy")]
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
         [Route("ErrorStatusCode")]
         public IActionResult ErrorStatusCode(int code)
         {
