@@ -25,10 +25,55 @@
               crossorigin="anonymous"
               integrity="sha256-8B1OaG0zT7uYA572S2xOxWACq9NXYPQ+U5kHPV1bJN4=" />
     </environment>
+
+    <style>
+        html, body
+        {
+            height: 100%;
+        }
+
+        body
+        {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-content
+        {
+            flex: 1 0 auto;
+        }
+
+        .footer
+        {
+            flex-shrink: 0;
+        }
+
+        /*
+         Bulma overrides
+         */
+        .footer
+        {
+            padding: 1.5rem;
+        }
+    </style>
 </head>
 <body>
+<div class="site-content">
+    @RenderBody()
+</div>
 
-@RenderBody()
+<footer class="footer">
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <p><a href="/">Home</a> | <a href="/privacy">Privacy</a></p>
+            </div>
+            <div class="column has-text-right">
+                <p class="has-text-grey-light">v@(Program.Version)</p>
+            </div>
+        </div>
+    </div>
+</footer>
 
 @RenderSection("Scripts", required: false)
 </body>

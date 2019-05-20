@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>7.1</LangVersion>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <Version>0.3.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />

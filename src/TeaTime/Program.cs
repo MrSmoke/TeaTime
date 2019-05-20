@@ -1,5 +1,6 @@
 ﻿namespace TeaTime
 {
+    using System.Reflection;
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -7,6 +8,15 @@
 
     public static class Program
     {
+        public static string Version;
+
+        static Program()
+        {
+            Version = typeof(Program).Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                .InformationalVersion;
+        }
+
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Build().Run();
