@@ -29,6 +29,8 @@
         {
             _configuration = configuration;
             _logger = loggerFactory.CreateLogger("Startup");
+
+            _logger.LogInformation("TeaTime - {Version}", Program.Version);
         }
 
         private void RegisterDataLayer(IServiceCollection services)

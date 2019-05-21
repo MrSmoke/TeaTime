@@ -17,6 +17,12 @@
             return View();
         }
 
+        [Route("contact")]
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
         [Route("ErrorStatusCode")]
         public IActionResult ErrorStatusCode(int code)
         {

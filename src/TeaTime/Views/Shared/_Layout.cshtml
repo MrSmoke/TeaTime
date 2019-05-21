@@ -55,6 +55,12 @@
         {
             padding: 1.5rem;
         }
+
+        .navbar.is-transparent
+        {
+             background-color: transparent;
+             background-image: none;
+        }
     </style>
 </head>
 <body>
@@ -64,11 +70,16 @@
 
 <footer class="footer">
     <div class="container">
-        <div class="columns">
-            <div class="column">
-                <p><a href="/">Home</a> | <a href="/privacy">Privacy</a></p>
+        <div class="level">
+            <div class="level-left">
+                <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
+                    <a class="navbar-item" href="/">Home</a>
+                    <a class="navbar-item" href="/privacy">Privacy</a>
+                    <a class="navbar-item" href="/contact">Contact</a>
+                    <a class="navbar-item" href="https://github.com/MrSmoke/TeaTime">GitHub</a>
+                </nav>
             </div>
-            <div class="column has-text-right">
+            <div class="level-right has-text-right">
                 <p class="has-text-grey-light">v@(Program.Version)</p>
             </div>
         </div>
