@@ -1,0 +1,91 @@
+﻿@{
+    var pageTitle = "TeaTime";
+    var viewDataTitle = ViewData["Title"] as string;
+
+    if (!string.IsNullOrWhiteSpace(viewDataTitle))
+    {
+        pageTitle = viewDataTitle + " - " + pageTitle;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@pageTitle</title>
+    <link rel="icon" type="image/png" href="/images/firetruck.png" />
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/libs/bulma/bulma.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css"
+              crossorigin="anonymous"
+              integrity="sha256-8B1OaG0zT7uYA572S2xOxWACq9NXYPQ+U5kHPV1bJN4=" />
+    </environment>
+
+    <style>
+        html, body
+        {
+            height: 100%;
+        }
+
+        body
+        {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-content
+        {
+            flex: 1 0 auto;
+        }
+
+        .footer
+        {
+            flex-shrink: 0;
+        }
+
+        /*
+         Bulma overrides
+         */
+        .footer
+        {
+            padding: 1.5rem;
+        }
+
+        .navbar.is-transparent
+        {
+             background-color: transparent;
+             background-image: none;
+        }
+    </style>
+</head>
+<body>
+<div class="site-content">
+    @RenderBody()
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-left">
+                <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
+                    <a class="navbar-item" href="/">Home</a>
+                    <a class="navbar-item" href="/privacy">Privacy</a>
+                    <a class="navbar-item" href="/contact">Contact</a>
+                    <a class="navbar-item" href="https://github.com/MrSmoke/TeaTime">GitHub</a>
+                </nav>
+            </div>
+            <div class="level-right has-text-right">
+                <p class="has-text-grey-light">v@(Program.Version)</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+@RenderSection("Scripts", required: false)
+</body>
+</html>

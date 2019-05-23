@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<partial name="_Header" />
+
+@RenderBody()
+
+@section Scripts
+{
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    @RenderSection("Scripts", required: false)
+}

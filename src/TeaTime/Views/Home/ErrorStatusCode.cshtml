@@ -1,0 +1,9 @@
+﻿@using Microsoft.AspNetCore.WebUtilities
+@model TeaTime.ViewModels.ErrorViewModel
+
+<section class="section has-text-centered">
+    <div class="container">
+        <h1 class="title is-1">@Model.StatusCode</h1>
+        <p class="subtitle">@ReasonPhrases.GetReasonPhrase(Model.StatusCode)</p>
+    </div>
+</section>
