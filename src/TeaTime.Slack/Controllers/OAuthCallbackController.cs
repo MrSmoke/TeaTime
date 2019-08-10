@@ -66,6 +66,7 @@
 
                     var fields = new List<HashEntry>
                     {
+                        new HashEntry("team_name", response.TeamName),
                         new HashEntry("access_token", response.AccessToken),
                         new HashEntry("install_time", DateTime.UtcNow.ToString("O"))
                     };
