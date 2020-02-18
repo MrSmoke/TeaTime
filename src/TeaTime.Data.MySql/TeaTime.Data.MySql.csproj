@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.1</LangVersion>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="dapper" Version="1.60.6" />
-    <PackageReference Include="Evolve" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
-    <PackageReference Include="mysqlconnector" Version="0.53.0" />
+    <PackageReference Include="dapper" Version="2.0.30" />
+    <PackageReference Include="Evolve" Version="2.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.1" />
+    <PackageReference Include="mysqlconnector" Version="0.61.0" />
   </ItemGroup>
 
   <ItemGroup>
