@@ -24,27 +24,26 @@
                 {"client_id", request.ClientId},
                 {"client_secret", request.ClientSecret},
                 {"code", request.Code},
-                {"redirect_uri", request.RedirectUri.ToString()},
+                {"redirect_uri", request.RedirectUri},
             };
 
-            using (var content = new FormUrlEncodedContent(formData))
-            using (var response = await _httpClient.PostAsync("https://slack.com/api/oauth.access", content))
-            {
-                var json = await response.Content.ReadAsStringAsync();
-                return Deserialize<OAuthTokenResponse>(json);
-            }
+            using var content = new FormUrlEncodedContent(formData);
+            using var response = await _httpClient.PostAsync("https://slack.com/api/oauth.access", content);
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            return Deserialize<OAuthTokenResponse>(json);
         }
 
         internal async Task<HttpStatusCode> PostAsync(string url, object body)
         {
             var json = Serialize(body);
 
-            using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
-            using (var response = await _httpClient.PostAsync(url, content).ConfigureAwait(false))
-            {
-                //todo: log errors
-                return response.StatusCode;
-            }
+            using var content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var response = await _httpClient.PostAsync(url, content).ConfigureAwait(false);
+
+            //todo: log errors
+            return response.StatusCode;
         }
 
         private static string Serialize(object data)

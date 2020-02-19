@@ -1,6 +1,5 @@
 ﻿namespace TeaTime.Data.MySql.Repositories
 {
-    using System;
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
     using Common.Models.Data;

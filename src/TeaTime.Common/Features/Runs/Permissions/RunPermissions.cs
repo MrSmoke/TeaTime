@@ -15,17 +15,17 @@
             _runRepository = runRepository;
         }
 
-        public async Task<PermisionCheckResult> CheckAsync(EndRunCommand request)
+        public async Task<PermissionCheckResult> CheckAsync(EndRunCommand request)
         {
             var run = await _runRepository.GetAsync(request.RunId).ConfigureAwait(false);
             if (run == null)
-                return PermisionCheckResult.Ok();
+                return PermissionCheckResult.Ok();
 
             //only allow person who started the run to end it
             if (run.UserId != request.UserId)
-                return PermisionCheckResult.NotOk("Only the person who started the round can end it");
+                return PermissionCheckResult.NotOk("Only the person who started the round can end it");
 
-            return PermisionCheckResult.Ok();
+            return PermissionCheckResult.Ok();
         }
     }
 }

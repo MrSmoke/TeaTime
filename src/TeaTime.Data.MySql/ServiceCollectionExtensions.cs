@@ -4,6 +4,7 @@
     using Common;
     using Common.Abstractions;
     using Common.Abstractions.Data;
+    using Common.Collections;
     using Microsoft.Extensions.DependencyInjection;
     using Repositories;
 
@@ -29,7 +30,6 @@
 
             services.AddSingleton<IIdGenerator<long>, MySqlIdGenerator>();
             services.AddSingleton<IDistributedHash, MySqlDistributedHash>();
-
 
             services.AddTransient<IStartupAction, MySqlServerVerificationStartupAction>();
         }

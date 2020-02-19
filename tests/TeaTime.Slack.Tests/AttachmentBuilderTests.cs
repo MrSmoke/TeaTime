@@ -1,9 +1,7 @@
 ﻿namespace TeaTime.Slack.Tests
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Common.Models;
     using Common.Models.Data;
     using Xunit;
 
@@ -58,6 +56,5 @@
 
             Assert.Equal(options[5].Id.ToString(), attachment2.Actions[0].Value);
         }
-
     }
 }
