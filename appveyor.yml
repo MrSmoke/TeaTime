@@ -5,5 +5,4 @@ before_build:
 before_test:
 - cmd: dotnet restore
 test_script:
-- cmd: dotnet test tests\TeaTime.Common.Tests\TeaTime.Common.Tests.csproj
-- cmd: dotnet test tests\TeaTime.Slack.Tests\TeaTime.Slack.Tests.csproj
+- cmd: dotnet test
