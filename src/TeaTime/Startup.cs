@@ -14,9 +14,9 @@
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.HttpOverrides;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Slack;
 
@@ -33,38 +33,11 @@
             _logger.LogInformation("TeaTime - {Version}", Program.Version);
         }
 
-        private void RegisterDataLayer(IServiceCollection services)
-        {
-            var mysqlOptions = _configuration.GetSection("mysql").Get<MySqlConnectionOptions>();
-            if (mysqlOptions != null)
-            {
-                try
-                {
-                    mysqlOptions.Validate();
-                }
-                catch (InvalidOptionException ex)
-                {
-                    _logger.LogError(ex.Message);
-
-                    throw;
-                }
-
-                services.AddMySql(mysqlOptions);
-
-                return;
-            }
-
-            _logger.LogCritical("No database has been configured");
-
-            throw new Exception("No database has been configured");
-        }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            var mvcBuilder = services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            var mvcBuilder = services.AddControllersWithViews();
 
             services.AddTransient<IStartupFilter, StartupActionFilter>();
 
@@ -97,7 +70,7 @@
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -115,7 +88,36 @@
             });
 
             app.UseStaticFiles();
-            app.UseMvc();
+
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
+        }
+
+        private void RegisterDataLayer(IServiceCollection services)
+        {
+            var mysqlOptions = _configuration.GetSection("mysql").Get<MySqlConnectionOptions>();
+            if (mysqlOptions != null)
+            {
+                try
+                {
+                    mysqlOptions.Validate();
+                }
+                catch (InvalidOptionException ex)
+                {
+                    _logger.LogError(ex.Message);
+
+                    throw;
+                }
+
+                services.AddMySql(mysqlOptions);
+
+                return;
+            }
+
+            _logger.LogCritical("No database has been configured");
+
+            throw new Exception("No database has been configured");
         }
     }
 }
