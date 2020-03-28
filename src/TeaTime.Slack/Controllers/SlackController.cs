@@ -44,6 +44,12 @@
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
+            if (string.IsNullOrWhiteSpace(slashCommand.Command))
+            {
+                _logger.LogError("Slash command contains no command");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
+
             if (!_messageVerifier.IsValid(slashCommand))
             {
                 _logger.LogError("Bad verification token");
@@ -119,6 +125,12 @@
             if (request == null)
             {
                 _logger.LogError("Null interactive message request");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
+
+            if (string.IsNullOrWhiteSpace(request.PayloadJson))
+            {
+                _logger.LogError("PayloadJson is empty");
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
