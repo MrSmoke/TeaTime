@@ -25,15 +25,12 @@
 
         private Task ProcessAsync(TCommand request, CancellationToken cancellationToken)
         {
-            switch (request)
+            return request switch
             {
-                case StartRunCommand startRunCommand:
-                    return ProcessAsync(startRunCommand, cancellationToken);
-                case EndRunCommand endRunCommand:
-                    return ProcessAsync(endRunCommand, cancellationToken);
-            }
-
-            return Task.CompletedTask;
+                StartRunCommand startRunCommand => ProcessAsync(startRunCommand, cancellationToken),
+                EndRunCommand endRunCommand => ProcessAsync(endRunCommand, cancellationToken),
+                _ => Task.CompletedTask
+            };
         }
 
         private async Task ProcessAsync(StartRunCommand request, CancellationToken cancellationToken)

@@ -36,7 +36,7 @@
             return await next();
         }
 
-        private void Handle(PermisionCheckResult result)
+        private void Handle(PermissionCheckResult result)
         {
             if (result.Success)
             {

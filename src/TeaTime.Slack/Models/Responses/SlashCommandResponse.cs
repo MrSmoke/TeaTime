@@ -32,15 +32,12 @@
         {
             get
             {
-                switch (Type)
+                return Type switch
                 {
-                    case Responses.ResponseType.Channel:
-                        return "in_channel";
-                    case Responses.ResponseType.User:
-                        return "ephemeral";
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    Responses.ResponseType.Channel => "in_channel",
+                    Responses.ResponseType.User => "ephemeral",
+                    _ => throw new ArgumentOutOfRangeException()
+                };
             }
         }
     }

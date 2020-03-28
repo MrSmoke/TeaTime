@@ -11,7 +11,7 @@ namespace TeaTime.Common.Tests
     public class DefaultRunnerRandomizerTests
     {
         /// <summary>
-        /// Test to see if the DefaultRunnerRandomizer will evetually select all users from the given list over 200 iterations
+        /// Test to see if the DefaultRunnerRandomizer will eventually select all users from the given list over 200 iterations
         /// </summary>
         /// <returns></returns>
         [Fact]

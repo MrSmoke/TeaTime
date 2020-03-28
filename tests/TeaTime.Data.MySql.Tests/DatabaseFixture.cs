@@ -2,7 +2,6 @@
 {
     using System;
     using Dapper;
-    using global::MySql.Data.MySqlClient;
 
     public class DatabaseFixture : IDisposable
     {
@@ -12,10 +11,9 @@
         {
             ConnectionFactory = new MySqlConnectionFactory(TestConfig.ConnectionOptions);
 
-            using (var conn = ConnectionFactory.GetConnection())
-            {
-                conn.Execute($"create schema if not exits {TestConfig.Schema}");
-            }
+            using var conn = ConnectionFactory.GetConnection();
+
+            conn.Execute($"create schema if not exits {TestConfig.Schema}");
         }
 
         public void Dispose()

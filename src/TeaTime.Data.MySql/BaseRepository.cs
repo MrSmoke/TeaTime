@@ -37,10 +37,9 @@
 
         protected async Task<T> GetConnection<T>(Func<MySqlConnection, Task<T>> func)
         {
-            using (var conn = _factory.GetConnection())
-            {
-                return await func(conn).ConfigureAwait(false);
-            }
+            await using var conn = _factory.GetConnection();
+
+            return await func(conn).ConfigureAwait(false);
         }
     }
 }
