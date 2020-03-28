@@ -37,7 +37,7 @@
             var evt = _mapper.Map<Order, OrderPlacedEvent>(order);
             evt.State = request.State;
 
-            await _eventPublisher.Publish(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
 
             return Unit.Value;
         }
@@ -60,7 +60,7 @@
             var evt = _mapper.Map<UpdateOrderOptionCommand, OrderOptionChangedEvent>(request);
             evt.PreviousOptionId = previousOptionId;
 
-            await _eventPublisher.Publish(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
 
             return Unit.Value;
         }

@@ -35,7 +35,7 @@
 
             var evt = _mapper.Map<CreateRoomCommand, RoomCreatedEvent>(request);
 
-            await _eventPublisher.Publish(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
 
             return Unit.Value;
         }

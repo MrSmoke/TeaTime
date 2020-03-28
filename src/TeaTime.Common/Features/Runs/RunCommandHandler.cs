@@ -43,7 +43,7 @@
 
             var evt = _mapper.Map<Run, RunStartedEvent>(run);
 
-            await _eventPublisher.Publish(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
 
             return Unit.Value;
         }
@@ -80,7 +80,7 @@
                 State = request.State
             };
 
-            await _eventPublisher.Publish(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
 
             return Unit.Value;
         }
