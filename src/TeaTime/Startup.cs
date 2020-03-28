@@ -33,37 +33,11 @@
             _logger.LogInformation("TeaTime - {Version}", Program.Version);
         }
 
-        private void RegisterDataLayer(IServiceCollection services)
-        {
-            var mysqlOptions = _configuration.GetSection("mysql").Get<MySqlConnectionOptions>();
-            if (mysqlOptions != null)
-            {
-                try
-                {
-                    mysqlOptions.Validate();
-                }
-                catch (InvalidOptionException ex)
-                {
-                    _logger.LogError(ex.Message);
-
-                    throw;
-                }
-
-                services.AddMySql(mysqlOptions);
-
-                return;
-            }
-
-            _logger.LogCritical("No database has been configured");
-
-            throw new Exception("No database has been configured");
-        }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            var mvcBuilder = services.AddRazorPages();
+            var mvcBuilder = services.AddControllersWithViews();
 
             services.AddTransient<IStartupFilter, StartupActionFilter>();
 
@@ -117,7 +91,33 @@
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints => endpoints.MapRazorPages());
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
+        }
+
+        private void RegisterDataLayer(IServiceCollection services)
+        {
+            var mysqlOptions = _configuration.GetSection("mysql").Get<MySqlConnectionOptions>();
+            if (mysqlOptions != null)
+            {
+                try
+                {
+                    mysqlOptions.Validate();
+                }
+                catch (InvalidOptionException ex)
+                {
+                    _logger.LogError(ex.Message);
+
+                    throw;
+                }
+
+                services.AddMySql(mysqlOptions);
+
+                return;
+            }
+
+            _logger.LogCritical("No database has been configured");
+
+            throw new Exception("No database has been configured");
         }
     }
 }
