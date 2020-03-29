@@ -16,14 +16,14 @@
             _serializer = serializer;
         }
 
-        public async Task<CacheItem<T>> GetAsync<T>(string key, CancellationToken token = default)
+        public async Task<CacheValue<T>> GetAsync<T>(string key, CancellationToken token = default)
         {
             var bytes = await _distributedCache.GetAsync(key, token);
             if (bytes == null)
                 return null;
 
             var value = _serializer.Deserialize<T>(bytes);
-            return new CacheItem<T>(value);
+            return new CacheValue<T>(value);
         }
 
         public Task SetAsync(string key, object value, CacheEntryOptions options, CancellationToken token = default)

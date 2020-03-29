@@ -5,7 +5,7 @@
 
     public interface ICache
     {
-        Task<CacheItem<T>> GetAsync<T>(string key, CancellationToken token = default);
+        Task<CacheValue<T>> GetAsync<T>(string key, CancellationToken token = default);
         Task SetAsync(string key, object value, CacheEntryOptions options, CancellationToken token = default);
     }
 }

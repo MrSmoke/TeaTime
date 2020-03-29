@@ -1,8 +1,8 @@
 ﻿namespace TeaTime.Common.Cache
 {
-    public class CacheItem<T>
+    public class CacheValue<T>
     {
-        public CacheItem(T value)
+        public CacheValue(T value)
         {
             Value = value;
         }
