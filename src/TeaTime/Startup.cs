@@ -4,6 +4,7 @@
     using AutoMapper;
     using Common;
     using Common.Abstractions;
+    using Common.Cache;
     using Common.Features.Runs;
     using Common.Features.Runs.Commands;
     using Common.Options;
@@ -43,6 +44,12 @@
 
             RegisterDataLayer(services);
 
+            // add caching
+            // if using more than one instance, replace this with redis or something similar
+            services.AddDistributedMemoryCache();
+            services.AddSingleton<ICache, Cache>();
+            services.AddSingleton<ICacheSerializer, SystemTextJsonCacheSerializer>();
+
             services.AddSlack(mvcBuilder, _configuration.GetSection("slack"));
 
             services.AddScoped<IEventPublisher, EventPublisher>();
@@ -54,19 +61,23 @@
 
             services.AddAutoMapper(typeof(ICommand));
 
-            // Register manually so we can define order
-
+            // Register the pipelines manually so we can define order
             // - Check permissions first
+            // - Then run PreProcessors
+            // - run the lock behaviour, this should be the last behaviour aside from caching
+            // - finally run the cache behaviour. Im putting this last for now just so everything else runs all the time
             services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(PermissionBehavior<,>));
-
-            // - Run pre processors
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandPreProcessorBehavior<,>));
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(CacheBehaviour<,>));
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(RunLockBehavior<,>));
+
+            // Register all PreProcessors
             services.AddSingleton<ICommandPreProcessor<EndRunCommand>, RunPreProcessor>();
 
             services.AddMediatR(typeof(ICommand));
 
             // Run Lock should be last behavior to run
-            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(RunLockBehavior<,>));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
