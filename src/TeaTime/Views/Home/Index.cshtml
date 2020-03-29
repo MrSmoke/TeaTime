@@ -1,7 +1,28 @@
-﻿@{
+﻿@model TeaTime.ViewModels.IndexViewModel
+
+@{
     Layout = "_PageLayout";
 }
 
 <section class="section has-text-centered">
     <partial name="_Slack" />
+</section>
+
+<section class="section has-text-centered">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-one-fifth">
+                <div class="notification is-primary has-text-centered">
+                    <p class="title">@Model.TotalOrdersMade</p>
+                    <p class="subtitle is-6">Thirsts quenched</p>
+                </div>
+            </div>
+            <div class="column is-one-fifth">
+                <div class="notification is-primary has-text-centered">
+                    <p class="title">@Model.TotalEndedRuns</p>
+                    <p class="subtitle is-6">Rounds lost</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
