@@ -27,6 +27,7 @@
             services.AddSingleton<IOptionsRepository, OptionsRepository>();
             services.AddSingleton<ILockRepository, LockRepository>();
             services.AddSingleton<IIllMakeRepository, IllMakeRepository>();
+            services.AddSingleton<IStatisticsRepository, StatisticsRepository>();
 
             services.AddSingleton<IIdGenerator<long>, MySqlIdGenerator>();
             services.AddSingleton<IDistributedHash, MySqlDistributedHash>();

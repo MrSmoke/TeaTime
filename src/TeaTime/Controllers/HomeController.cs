@@ -1,14 +1,32 @@
 ﻿namespace TeaTime.Controllers
 {
+    using System.Threading.Tasks;
+    using Common.Features.Statistics.Queries;
+    using MediatR;
     using Microsoft.AspNetCore.Mvc;
     using ViewModels;
 
     public class HomeController : Controller
     {
-        [Route("")]
-        public IActionResult Index()
+        private readonly IMediator _mediator;
+
+        public HomeController(IMediator mediator)
         {
-            return View();
+            _mediator = mediator;
+        }
+
+        [Route("")]
+        public async Task<IActionResult> Index()
+        {
+            var totals = await _mediator.Send(new GetGlobalTotalsQuery());
+
+            var viewModel = new IndexViewModel
+            {
+                TotalOrdersMade = totals.OrdersMade,
+                TotalEndedRuns = totals.RunsEnded
+            };
+
+            return View(viewModel);
         }
 
         [Route("privacy")]
