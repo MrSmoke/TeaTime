@@ -47,6 +47,7 @@
             // add caching
             // if using more than one instance, replace this with redis or something similar
             services.AddDistributedMemoryCache();
+            services.AddSingleton<ICache, Cache>();
             services.AddSingleton<ICacheSerializer, SystemTextJsonCacheSerializer>();
 
             services.AddSlack(mvcBuilder, _configuration.GetSection("slack"));
