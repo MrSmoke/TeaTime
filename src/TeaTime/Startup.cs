@@ -1,7 +1,6 @@
 ﻿namespace TeaTime
 {
     using System;
-    using AutoMapper;
     using Common;
     using Common.Abstractions;
     using Common.Cache;
@@ -18,23 +17,17 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
     using Slack;
 
     public class Startup
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger _logger;
 
-        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
+        public Startup(IConfiguration configuration)
         {
             _configuration = configuration;
-            _logger = loggerFactory.CreateLogger("Startup");
-
-            _logger.LogInformation("TeaTime - {Version}", Program.Version);
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
@@ -80,7 +73,6 @@
 
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -110,23 +102,12 @@
             var mysqlOptions = _configuration.GetSection("mysql").Get<MySqlConnectionOptions>();
             if (mysqlOptions != null)
             {
-                try
-                {
-                    mysqlOptions.Validate();
-                }
-                catch (InvalidOptionException ex)
-                {
-                    _logger.LogError(ex.Message);
-
-                    throw;
-                }
+                mysqlOptions.Validate();
 
                 services.AddMySql(mysqlOptions);
 
                 return;
             }
-
-            _logger.LogCritical("No database has been configured");
 
             throw new Exception("No database has been configured");
         }
