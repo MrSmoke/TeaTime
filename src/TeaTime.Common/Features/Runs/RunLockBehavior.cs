@@ -8,6 +8,7 @@
     using MediatR;
 
     public class RunLockBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse>
+        where TCommand : IRequest<TResponse>
     {
         private readonly IRoomRunLockService _lockService;
 
@@ -16,7 +17,8 @@
             _lockService = lockService;
         }
 
-        public async Task<TResponse> Handle(TCommand request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TCommand request, CancellationToken cancellationToken,
+            RequestHandlerDelegate<TResponse> next)
         {
             await ProcessAsync(request, cancellationToken);
 
@@ -38,7 +40,8 @@
             //try to create the run lock
             var created = await _lockService.CreateLockAsync(request.RoomId).ConfigureAwait(false);
             if (!created)
-                throw new RunStartException("There is already an active run in this room", RunStartException.RunStartExceptionReason.ExistingActiveRun);
+                throw new RunStartException("There is already an active run in this room",
+                    RunStartException.RunStartExceptionReason.ExistingActiveRun);
 
             //run lock created, so everything is ok
         }
@@ -48,7 +51,8 @@
             //delete lock
             var deleted = await _lockService.DeleteLockAsync(request.RoomId).ConfigureAwait(false);
             if (!deleted)
-                throw new RunEndException("There is no active run in this room", RunEndException.RunEndExceptionReason.NoActiveRun);
+                throw new RunEndException("There is no active run in this room",
+                    RunEndException.RunEndExceptionReason.NoActiveRun);
         }
     }
 }

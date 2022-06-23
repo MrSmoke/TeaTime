@@ -21,7 +21,7 @@
         {
             var currentAssembly = typeof(TestConfig).GetTypeInfo().Assembly;
 
-            var directory = new Uri(currentAssembly.CodeBase).LocalPath;
+            var directory = new Uri(currentAssembly.Location).LocalPath;
 
             return directory;
         }

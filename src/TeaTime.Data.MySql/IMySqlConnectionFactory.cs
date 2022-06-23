@@ -1,6 +1,6 @@
 namespace TeaTime.Data.MySql
 {
-    using global::MySql.Data.MySqlClient;
+    using MySqlConnector;
 
     public interface IMySqlConnectionFactory
     {

@@ -8,17 +8,20 @@
     using Microsoft.Extensions.Logging;
 
     public class PermissionBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse>
+        where TCommand : IRequest<TResponse>
     {
         private readonly IPermissionService _permissionService;
         private readonly ILogger<PermissionBehavior<TCommand, TResponse>> _logger;
 
-        public PermissionBehavior(IPermissionService permissionService, ILogger<PermissionBehavior<TCommand, TResponse>> logger)
+        public PermissionBehavior(IPermissionService permissionService,
+            ILogger<PermissionBehavior<TCommand, TResponse>> logger)
         {
             _permissionService = permissionService;
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TCommand request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TCommand request, CancellationToken cancellationToken,
+            RequestHandlerDelegate<TResponse> next)
         {
             if (request is IUserCommand command)
             {

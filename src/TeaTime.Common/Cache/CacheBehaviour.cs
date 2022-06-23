@@ -6,6 +6,7 @@
     using MediatR;
 
     public class CacheBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
     {
         private readonly ICache _cache;
 
@@ -14,7 +15,8 @@
             _cache = cache;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
+            RequestHandlerDelegate<TResponse> next)
         {
             if (!(request is ICacheableQuery cacheQuery))
                 return await next();

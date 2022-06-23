@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Dapper;
-    using global::MySql.Data.MySqlClient;
+    using MySqlConnector;
 
     public abstract class BaseRepository
     {
@@ -35,7 +35,7 @@
             return GetConnection(conn => conn.QueryAsync<T>(sql, obj));
         }
 
-        protected async Task<T> GetConnection<T>(Func<MySqlConnection, Task<T>> func)
+        private async Task<T> GetConnection<T>(Func<MySqlConnection, Task<T>> func)
         {
             await using var conn = _factory.GetConnection();
 
