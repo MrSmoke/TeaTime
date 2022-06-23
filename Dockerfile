@@ -27,7 +27,6 @@ WORKDIR /build/
 RUN dotnet build --no-restore -c Release
 
 # Test
-WORKDIR /build
 RUN dotnet test -c Release --no-build
 
 # Publish
