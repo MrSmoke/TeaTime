@@ -19,7 +19,7 @@
             return ExecuteAsync(sql, room);
         }
 
-        public Task<Room> GetAsync(long id)
+        public Task<Room?> GetAsync(long id)
         {
             const string sql = "SELECT id, name, createdBy, createdDate FROM rooms WHERE id = @id";
 

@@ -22,7 +22,7 @@
             var value = await cache.GetAsync<bool>(nameof(SetAsync_GetAsync_Bool_Returns));
 
             Assert.NotNull(value);
-            Assert.True(value.Value);
+            Assert.True(value!.Value);
         }
 
         [Fact]
@@ -42,7 +42,7 @@
 
             await Assert.ThrowsAsync<ArgumentNullException>(() => cache.SetAsync(
                 nameof(SetAsync_NullValue_ThrowsArgumentNullException),
-                null,
+                null!,
                 new CacheEntryOptions(),
                 CancellationToken.None));
         }
@@ -53,7 +53,7 @@
             var cache = new Cache(GetDistributedCache(), new SystemTextJsonCacheSerializer());
 
             await Assert.ThrowsAsync<ArgumentNullException>(() => cache.SetAsync(
-                null,
+                null!,
                 "",
                 new CacheEntryOptions(),
                 CancellationToken.None));
@@ -64,7 +64,7 @@
         {
             var cache = new Cache(GetDistributedCache(), new SystemTextJsonCacheSerializer());
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() => cache.GetAsync<string>(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => cache.GetAsync<string>(null!));
         }
 
         [Fact]

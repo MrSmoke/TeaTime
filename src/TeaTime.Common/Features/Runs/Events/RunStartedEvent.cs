@@ -1,20 +1,17 @@
-﻿namespace TeaTime.Common.Features.Runs.Events
-{
-    using System;
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.Runs.Events;
 
-    public class RunStartedEvent : Event
-    {
-        public long RunId { get; set; }
+using System;
+using Abstractions;
 
-        /// <summary>
-        /// The id of the user who started the run
-        /// </summary>
-        public long UserId { get; set; }
-
-        public long RoomId { get; set; }
-
-        public DateTimeOffset StartTime { get; set; }
-        public DateTimeOffset? EndTime { get; set; }
-    }
-}
+/// <param name="RunId"></param>
+/// <param name="UserId">The id of the user who started the run</param>
+/// <param name="RoomId"></param>
+/// <param name="StartTime"></param>
+/// <param name="EndTime"></param>
+public record RunStartedEvent(
+    long RunId,
+    long UserId,
+    long RoomId,
+    DateTimeOffset StartTime,
+    DateTimeOffset? EndTime
+) : Event;

@@ -57,7 +57,7 @@
             await SendMessage(notification, message, ResponseType.User);
         }
 
-        private async Task<string> GetSlackUserId(long userId)
+        private async Task<string?> GetSlackUserId(long userId)
         {
             var slackUserId = await _linkRepository.GetLinkAsync(userId, LinkType.User);
             if (!string.IsNullOrWhiteSpace(slackUserId))

@@ -16,23 +16,23 @@
             _serializer = serializer;
         }
 
-        public async Task<CacheValue<T>> GetAsync<T>(string key, CancellationToken token = default)
+        public async Task<CacheValue<T>?> GetAsync<T>(string key, CancellationToken token = default)
         {
             var bytes = await _distributedCache.GetAsync(key, token);
             if (bytes == null)
                 return null;
 
             var value = _serializer.Deserialize<T>(bytes);
+            if (value is null)
+                return null;
+
             return new CacheValue<T>(value);
         }
 
-        public Task SetAsync(string key, object value, CacheEntryOptions options, CancellationToken token = default)
+        public Task SetAsync(string key, object value, CacheEntryOptions? options, CancellationToken token = default)
         {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
+            ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(value);
 
             options ??= new CacheEntryOptions();
 

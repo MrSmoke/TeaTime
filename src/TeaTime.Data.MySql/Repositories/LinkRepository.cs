@@ -24,7 +24,7 @@
             return ExecuteAsync(sql, new {link, linkType, objectId});
         }
 
-        public Task<string> GetLinkAsync(long objectId, LinkType linkType)
+        public Task<string?> GetLinkAsync(long objectId, LinkType linkType)
         {
             const string sql = "SELECT link FROM links WHERE linkType = @linkType AND objectId = @objectId";
 

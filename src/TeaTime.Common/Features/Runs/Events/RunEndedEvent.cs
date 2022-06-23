@@ -1,17 +1,15 @@
-﻿namespace TeaTime.Common.Features.Runs.Events
-{
-    using System;
-    using System.Collections.Generic;
-    using Abstractions;
-    using Models.Domain;
+﻿namespace TeaTime.Common.Features.Runs.Events;
 
-    public class RunEndedEvent : Event
-    {
-        public long RunId { get; set; }
-        public long RoomId { get; set; }
-        public DateTimeOffset EndedTime { get; set; }
+using System;
+using System.Collections.Generic;
+using Abstractions;
+using Models.Domain;
 
-        public long RunnerUserId { get; set; }
-        public IEnumerable<OrderModel> Orders { get; set; }
-    }
-}
+public record RunEndedEvent
+(
+    long RunId,
+    long RoomId,
+    DateTimeOffset EndedTime,
+    long RunnerUserId,
+    IEnumerable<OrderModel> Orders
+) : Event;

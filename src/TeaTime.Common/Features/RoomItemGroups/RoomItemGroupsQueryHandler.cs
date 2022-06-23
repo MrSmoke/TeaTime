@@ -11,8 +11,8 @@
     using Queries;
 
     public class RoomItemGroupQueryHandler :
-        IRequestHandler<GetRoomItemGroupByNameQuery, RoomItemGroupModel>,
-        IRequestHandler<GetRoomItemGroupQuery, RoomItemGroupModel>
+        IRequestHandler<GetRoomItemGroupByNameQuery, RoomItemGroupModel?>,
+        IRequestHandler<GetRoomItemGroupQuery, RoomItemGroupModel?>
     {
         private readonly IOptionsRepository _optionsRepository;
         private readonly IMapper _mapper;
@@ -23,7 +23,7 @@
             _mapper = mapper;
         }
 
-        public async Task<RoomItemGroupModel> Handle(GetRoomItemGroupByNameQuery request, CancellationToken cancellationToken)
+        public async Task<RoomItemGroupModel?> Handle(GetRoomItemGroupByNameQuery request, CancellationToken cancellationToken)
         {
             var group = await _optionsRepository.GetGroupByNameAsync(request.RoomId, request.Name);
             if (group == null)
@@ -36,7 +36,7 @@
             return model;
         }
 
-        public async Task<RoomItemGroupModel> Handle(GetRoomItemGroupQuery request, CancellationToken cancellationToken)
+        public async Task<RoomItemGroupModel?> Handle(GetRoomItemGroupQuery request, CancellationToken cancellationToken)
         {
             var group = await _optionsRepository.GetGroupAsync(request.GroupId);
             if (group == null)

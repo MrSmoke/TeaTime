@@ -7,7 +7,7 @@
     {
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-        private static readonly JsonSerializerOptions DefaultOptions = new JsonSerializerOptions();
+        private static readonly JsonSerializerOptions DefaultOptions = new();
 
         public SystemTextJsonCacheSerializer() : this(DefaultOptions)
         {
@@ -26,7 +26,7 @@
             return JsonSerializer.SerializeToUtf8Bytes(value, _jsonSerializerOptions);
         }
 
-        public T Deserialize<T>(byte[] bytes)
+        public T? Deserialize<T>(byte[] bytes)
         {
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));

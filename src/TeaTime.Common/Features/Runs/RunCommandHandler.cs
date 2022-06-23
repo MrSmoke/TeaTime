@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Runs
+namespace TeaTime.Common.Features.Runs
 {
     using System.Linq;
     using System.Threading;
@@ -9,6 +9,7 @@
     using Commands;
     using Events;
     using MediatR;
+    using Microsoft.Extensions.Logging;
     using Models.Data;
 
     public class RunCommandHandler :
@@ -21,8 +22,15 @@
         private readonly IMapper _mapper;
         private readonly ISystemClock _clock;
         private readonly IIllMakeRepository _illMakeRepository;
+        private readonly ILogger<RunCommandHandler> _logger;
 
-        public RunCommandHandler(IRunRepository runRepository, IEventPublisher eventPublisher, IRunnerRandomizer randomizer, IMapper mapper, ISystemClock clock, IIllMakeRepository illMakeRepository)
+        public RunCommandHandler(IRunRepository runRepository,
+            IEventPublisher eventPublisher,
+            IRunnerRandomizer randomizer,
+            IMapper mapper,
+            ISystemClock clock,
+            IIllMakeRepository illMakeRepository,
+            ILogger<RunCommandHandler> logger)
         {
             _runRepository = runRepository;
             _eventPublisher = eventPublisher;
@@ -30,6 +38,7 @@
             _mapper = mapper;
             _clock = clock;
             _illMakeRepository = illMakeRepository;
+            _logger = logger;
         }
 
         //Start run
@@ -51,9 +60,16 @@
         //End run
         public async Task<Unit> Handle(EndRunCommand request, CancellationToken cancellationToken)
         {
-            var run = await _runRepository.GetAsync(request.RunId);
-
+            var runTask = _runRepository.GetAsync(request.RunId);
             var runnerUserId = await GetRunner(request);
+
+            var run = await runTask;
+
+            if (run is null)
+            {
+                _logger.LogWarning("Failed to get run {RunId}", request.RunId);
+                return Unit.Value;
+            }
 
             //update run
             run.Ended = true;
@@ -71,12 +87,14 @@
 
             //publish event
             var evt = new RunEndedEvent
+            (
+                Orders: request.Orders,
+                RoomId: request.RoomId,
+                RunnerUserId: runResult.RunnerUserId,
+                RunId: runResult.RunId,
+                EndedTime: runResult.EndedTime
+            )
             {
-                Orders = request.Orders,
-                RoomId = request.RoomId,
-                RunnerUserId = runResult.RunnerUserId,
-                RunId = runResult.RunId,
-                EndedTime = runResult.EndedTime,
                 State = request.State
             };
 
@@ -90,8 +108,10 @@
             //todo: dont tie illmake in with this handler directly...kinda gross
             var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.RunId);
 
-            if (illMakeResults.Any())
-                return illMakeResults.OrderByDescending(o => o.CreatedDate).First().UserId;
+            var illMakeUser = illMakeResults.MaxBy(o => o.CreatedDate);
+
+            if (illMakeUser is not null)
+                return illMakeUser.Id;
 
             //random runner
             return await _randomizer.GetRunnerUserId(command.Orders);

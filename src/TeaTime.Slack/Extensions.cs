@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Slack
 {
+    using System.Diagnostics.CodeAnalysis;
     using Common.Abstractions;
     using Models;
     using Models.Requests;
@@ -12,7 +13,7 @@
             command.State[Constants.CallbackData] = SlackJsonSerializer.Serialize(callbackData);
         }
 
-        internal static bool TryGetCallbackState(this Event command, out CallbackData callbackData)
+        internal static bool TryGetCallbackState(this Event command, [NotNullWhen(true)] out CallbackData? callbackData)
         {
             if (!command.State.TryGetValue(Constants.CallbackData, out var json))
             {

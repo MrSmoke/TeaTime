@@ -8,6 +8,6 @@
         Task<long> GetObjectId(string link, LinkType linkType);
         Task Add(long objectId, LinkType linkType, string link);
 
-        Task<string> GetLinkAsync(long objectId, LinkType linkType);
+        Task<string?> GetLinkAsync(long objectId, LinkType linkType);
     }
 }

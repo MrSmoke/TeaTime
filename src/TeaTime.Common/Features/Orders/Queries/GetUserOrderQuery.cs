@@ -3,7 +3,7 @@
     using Abstractions;
     using Models.Data;
 
-    public class GetUserOrderQuery : IUserQuery<Order>
+    public class GetUserOrderQuery : IUserQuery<Order?>
     {
         public long UserId { get; }
         public long RunId { get; }

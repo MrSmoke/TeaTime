@@ -8,7 +8,7 @@
     {
         Task CreateAsync(Order order);
         Task UpdateAsync(Order order);
-        Task<Order> GetAsync(long id);
+        Task<Order?> GetAsync(long id);
 
         Task<IEnumerable<Order>> GetOrdersAsync(long runId);
     }

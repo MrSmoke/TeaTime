@@ -30,7 +30,7 @@
             return ExecuteAsync(sql, order);
         }
 
-        public Task<Order> GetAsync(long id)
+        public Task<Order?> GetAsync(long id)
         {
             const string sql = "SELECT " + SelectColumns + " FROM orders where id = @id";
 

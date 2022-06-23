@@ -3,7 +3,7 @@
     using Abstractions;
     using Models;
 
-    public class GetRoomItemGroupByNameQuery : IUserQuery<RoomItemGroupModel>
+    public class GetRoomItemGroupByNameQuery : IUserQuery<RoomItemGroupModel?>
     {
         public long RoomId { get; }
         public string Name { get; }
