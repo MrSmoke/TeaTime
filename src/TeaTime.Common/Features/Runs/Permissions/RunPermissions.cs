@@ -17,7 +17,7 @@
 
         public async Task<PermissionCheckResult> CheckAsync(EndRunCommand request)
         {
-            var run = await _runRepository.GetAsync(request.RunId).ConfigureAwait(false);
+            var run = await _runRepository.GetAsync(request.RunId);
             if (run == null)
                 return PermissionCheckResult.Ok();
 

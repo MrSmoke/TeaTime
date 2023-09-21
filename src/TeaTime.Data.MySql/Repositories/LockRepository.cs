@@ -13,7 +13,7 @@
         {
             const string sql = "INSERT IGNORE INTO locks VALUES (@key)";
 
-            var rows = await ExecuteAsync(sql, new {key}).ConfigureAwait(false);
+            var rows = await ExecuteAsync(sql, new {key});
 
             return rows == 1;
         }
@@ -22,7 +22,7 @@
         {
             const string sql = "DELETE FROM locks WHERE lockKey = @key";
 
-            var rows = await ExecuteAsync(sql, new { key }).ConfigureAwait(false);
+            var rows = await ExecuteAsync(sql, new { key });
 
             return rows == 1;
         }

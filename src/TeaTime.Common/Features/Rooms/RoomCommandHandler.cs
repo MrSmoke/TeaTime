@@ -31,11 +31,11 @@
 
             room.CreatedDate = _clock.UtcNow();
 
-            await _roomRepository.CreateAsync(room).ConfigureAwait(false);
+            await _roomRepository.CreateAsync(room);
 
             var evt = _mapper.Map<CreateRoomCommand, RoomCreatedEvent>(request);
 
-            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt);
 
             return Unit.Value;
         }

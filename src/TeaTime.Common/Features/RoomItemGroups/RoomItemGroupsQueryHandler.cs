@@ -25,26 +25,26 @@
 
         public async Task<RoomItemGroupModel> Handle(GetRoomItemGroupByNameQuery request, CancellationToken cancellationToken)
         {
-            var group = await _optionsRepository.GetGroupByNameAsync(request.RoomId, request.Name).ConfigureAwait(false);
+            var group = await _optionsRepository.GetGroupByNameAsync(request.RoomId, request.Name);
             if (group == null)
                 return null;
 
             var model = _mapper.Map<RoomItemGroup, RoomItemGroupModel>(group);
 
-            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id).ConfigureAwait(false)).ToList();
+            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id)).ToList();
 
             return model;
         }
 
         public async Task<RoomItemGroupModel> Handle(GetRoomItemGroupQuery request, CancellationToken cancellationToken)
         {
-            var group = await _optionsRepository.GetGroupAsync(request.GroupId).ConfigureAwait(false);
+            var group = await _optionsRepository.GetGroupAsync(request.GroupId);
             if (group == null)
                 return null;
 
             var model = _mapper.Map<RoomItemGroup, RoomItemGroupModel>(group);
 
-            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id).ConfigureAwait(false)).ToList();
+            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id)).ToList();
 
             return model;
         }

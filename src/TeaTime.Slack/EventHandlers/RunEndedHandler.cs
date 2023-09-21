@@ -63,17 +63,17 @@
 
             var data = new SlashCommandResponse(messageBuilder.ToString(), ResponseType.Channel);
 
-            await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl, data).ConfigureAwait(false);
+            await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl, data);
         }
 
         private async Task<string> GetSlackUsername(long userId)
         {
-            var runnerSlackId = await _linkRepository.GetLinkAsync(userId, LinkType.User).ConfigureAwait(false);
+            var runnerSlackId = await _linkRepository.GetLinkAsync(userId, LinkType.User);
 
             if (!string.IsNullOrWhiteSpace(runnerSlackId))
                 return StringHelpers.SlackUserId(runnerSlackId);
 
-            var runner = await _userRepository.GetAsync(userId).ConfigureAwait(false);
+            var runner = await _userRepository.GetAsync(userId);
 
             return runner?.DisplayName ?? "Unknown";
         }

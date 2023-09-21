@@ -24,19 +24,19 @@
         [Command("illmake")]
         public async Task<ICommandResult> IllMake()
         {
-            var context = await GetContextAsync().ConfigureAwait(false);
+            var context = await GetContextAsync();
 
-            var run = await _mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id)).ConfigureAwait(false);
+            var run = await _mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
             if(run == null)
                 return Response(ErrorStrings.IllMake_RunNotStarted(), ResponseType.User);
 
             var command = new Common.Features.IllMake.Commands.IllMakeCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                id: await _idGenerator.GenerateAsync(),
                 runId: run.Id,
                 userId: context.User.Id
             );
 
-            await _mediator.Send(command).ConfigureAwait(false);
+            await _mediator.Send(command);
 
             return Response(new SlashCommandResponse
             {

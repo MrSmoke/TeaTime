@@ -32,19 +32,19 @@
             var order = _mapper.Map<CreateOrderCommand, Order>(request);
             order.CreatedDate = _clock.UtcNow();
 
-            await _orderRepository.CreateAsync(order).ConfigureAwait(false);
+            await _orderRepository.CreateAsync(order);
 
             var evt = _mapper.Map<Order, OrderPlacedEvent>(order);
             evt.State = request.State;
 
-            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt);
 
             return Unit.Value;
         }
 
         public async Task<Unit> Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
         {
-            var existing = await _orderRepository.GetAsync(request.OrderId).ConfigureAwait(false);
+            var existing = await _orderRepository.GetAsync(request.OrderId);
 
             if (existing.OptionId == request.OptionId)
                 return Unit.Value;
@@ -54,13 +54,13 @@
 
             //update
             existing.OptionId = request.OptionId;
-            await _orderRepository.UpdateAsync(existing).ConfigureAwait(false);
+            await _orderRepository.UpdateAsync(existing);
 
             //create event
             var evt = _mapper.Map<UpdateOrderOptionCommand, OrderOptionChangedEvent>(request);
             evt.PreviousOptionId = previousOptionId;
 
-            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt);
 
             return Unit.Value;
         }

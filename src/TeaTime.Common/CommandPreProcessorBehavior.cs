@@ -32,10 +32,10 @@ namespace TeaTime.Common
             {
                 _logger.LogDebug("Running ICommandPreProcessor for command {Command}", typeof(TRequest).Name);
 
-                await processor.ProcessAsync(request, cancellationToken).ConfigureAwait(false);
+                await processor.ProcessAsync(request, cancellationToken);
             }
 
-            return await next().ConfigureAwait(false);
+            return await next();
         }
     }
 }

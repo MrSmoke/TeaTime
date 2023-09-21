@@ -21,8 +21,8 @@
         protected async Task<CommandContext> GetContextAsync()
         {
             var command = GetCommand();
-            var user = await GetOrCreateUser(command).ConfigureAwait(false);
-            var room = await GetOrCreateRoom(command, user.Id).ConfigureAwait(false);
+            var user = await GetOrCreateUser(command);
+            var room = await GetOrCreateRoom(command, user.Id);
 
             return new CommandContext
             {

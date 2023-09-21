@@ -39,7 +39,7 @@
         {
             await using var conn = _factory.GetConnection();
 
-            return await func(conn).ConfigureAwait(false);
+            return await func(conn);
         }
     }
 }

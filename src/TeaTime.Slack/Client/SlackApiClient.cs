@@ -40,7 +40,7 @@
             var json = Serialize(body);
 
             using var content = new StringContent(json, Encoding.UTF8, "application/json");
-            using var response = await _httpClient.PostAsync(url, content).ConfigureAwait(false);
+            using var response = await _httpClient.PostAsync(url, content);
 
             //todo: log errors
             return response.StatusCode;

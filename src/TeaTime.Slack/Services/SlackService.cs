@@ -39,20 +39,20 @@
 
         public async Task<User> GetOrCreateUser(string userId, string name)
         {
-            var id = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, userId)).ConfigureAwait(false);
+            var id = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, userId));
             if (id > 0)
-                return await _mediator.Send(new GetUserQuery(id)).ConfigureAwait(false);
+                return await _mediator.Send(new GetUserQuery(id));
 
             //we need to create a new user
             var command = new CreateUserCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                id: await _idGenerator.GenerateAsync(),
                 username: "slack_" + userId,
                 displayName: name
             );
-            await _mediator.Send(command).ConfigureAwait(false);
+            await _mediator.Send(command);
 
             //add link
-            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, userId)).ConfigureAwait(false);
+            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, userId));
 
             //this is not great because its not really a proper entity model, but it will do for now
             //we shouldn't query here because the command COULD eventually be eventual consistency
@@ -67,20 +67,20 @@
 
         public async Task<Room> GetOrCreateRoom(string channelId, string channelName, long userId)
         {
-            var roomId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, channelId)).ConfigureAwait(false);
+            var roomId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, channelId));
             if (roomId > 0)
-                return await _mediator.Send(new GetRoomQuery(roomId)).ConfigureAwait(false);
+                return await _mediator.Send(new GetRoomQuery(roomId));
 
             var command = new CreateRoomCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                id: await _idGenerator.GenerateAsync(),
                 name: channelName,
                 userId: userId
             );
 
-            await _mediator.Send(command).ConfigureAwait(false);
+            await _mediator.Send(command);
 
             //add link
-            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.Room, channelId)).ConfigureAwait(false);
+            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.Room, channelId));
 
             return new Room
             {
@@ -92,30 +92,30 @@
 
         public async Task JoinRunAsync(SlashCommand slashCommand, string optionName)
         {
-            var user = await GetOrCreateUser(slashCommand.UserId, slashCommand.UserName).ConfigureAwait(false);
-            var room = await GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, user.Id).ConfigureAwait(false);
+            var user = await GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
+            var room = await GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, user.Id);
 
-            await JoinRunAsync(user.Id, room.Id, optionName, slashCommand.ToCallbackData()).ConfigureAwait(false);
+            await JoinRunAsync(user.Id, room.Id, optionName, slashCommand.ToCallbackData());
         }
 
         public async Task JoinRunAsync(MessageRequestPayload requestPayload)
         {
-            var user = await GetOrCreateUser(requestPayload.User.Id, requestPayload.User.Name).ConfigureAwait(false);
-            var room = await GetOrCreateRoom(requestPayload.Channel.Id, requestPayload.Channel.Name, user.Id).ConfigureAwait(false);
+            var user = await GetOrCreateUser(requestPayload.User.Id, requestPayload.User.Name);
+            var room = await GetOrCreateRoom(requestPayload.Channel.Id, requestPayload.Channel.Name, user.Id);
 
             var firstAction = requestPayload.Actions.First();
             var optionId = long.Parse(firstAction.Value);
 
-            await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData()).ConfigureAwait(false);
+            await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData());
         }
 
         private async Task JoinRunAsync(long userId, long roomId, string optionName, CallbackData callbackData)
         {
-            var run = await _mediator.Send(new GetCurrentRunQuery(roomId, userId)).ConfigureAwait(false);
+            var run = await _mediator.Send(new GetCurrentRunQuery(roomId, userId));
             if (run == null)
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
-            var group = await _mediator.Send(new GetRoomItemGroupQuery(roomId: run.RoomId, userId: userId, groupId: run.GroupId)).ConfigureAwait(false);
+            var group = await _mediator.Send(new GetRoomItemGroupQuery(roomId: run.RoomId, userId: userId, groupId: run.GroupId));
             if (group == null)
             {
                 _logger.LogWarning("Failed to find group {GroupId} in room {RoomId} for run {RunId}", run.GroupId, roomId, run.Id);
@@ -126,20 +126,20 @@
             if (option == null)
                 throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
-            await JoinRunInternalAsync(userId, run, option.Id, callbackData).ConfigureAwait(false);
+            await JoinRunInternalAsync(userId, run, option.Id, callbackData);
         }
 
         private async Task JoinRunAsync(long userId, long roomId, long optionId, CallbackData callbackData)
         {
-            var run = await _mediator.Send(new GetCurrentRunQuery(roomId, userId)).ConfigureAwait(false);
+            var run = await _mediator.Send(new GetCurrentRunQuery(roomId, userId));
             if(run == null)
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
-            var option = await _mediator.Send(new GetOptionQuery(optionId)).ConfigureAwait(false);
+            var option = await _mediator.Send(new GetOptionQuery(optionId));
             if(option == null)
                 throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
-            await JoinRunInternalAsync(userId, run, optionId, callbackData).ConfigureAwait(false);
+            await JoinRunInternalAsync(userId, run, optionId, callbackData);
         }
 
         private async Task JoinRunInternalAsync(long userId, Run run, long optionId, CallbackData callbackData)
@@ -150,11 +150,11 @@
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded());
 
             //check if we need to join or update
-            var existingOrder = await _mediator.Send(new GetUserOrderQuery(run.Id, userId)).ConfigureAwait(false);
+            var existingOrder = await _mediator.Send(new GetUserOrderQuery(run.Id, userId));
             if (existingOrder == null)
             {
                 command = new CreateOrderCommand(
-                    id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                    id: await _idGenerator.GenerateAsync(),
                     runId: run.Id,
                     userId: userId,
                     optionId: optionId);
@@ -167,7 +167,7 @@
 
             command.AddCallbackState(callbackData);
 
-            await _mediator.Send(command).ConfigureAwait(false);
+            await _mediator.Send(command);
         }
     }
 }

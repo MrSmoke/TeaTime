@@ -39,11 +39,11 @@
 
             run.CreatedDate = _clock.UtcNow();
 
-            await _runRepository.CreateAsync(run).ConfigureAwait(false);
+            await _runRepository.CreateAsync(run);
 
             var evt = _mapper.Map<Run, RunStartedEvent>(run);
 
-            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt);
 
             return Unit.Value;
         }
@@ -51,13 +51,13 @@
         //End run
         public async Task<Unit> Handle(EndRunCommand request, CancellationToken cancellationToken)
         {
-            var run = await _runRepository.GetAsync(request.RunId).ConfigureAwait(false);
+            var run = await _runRepository.GetAsync(request.RunId);
 
-            var runnerUserId = await GetRunner(request).ConfigureAwait(false);
+            var runnerUserId = await GetRunner(request);
 
             //update run
             run.Ended = true;
-            await _runRepository.UpdateAsync(run).ConfigureAwait(false);
+            await _runRepository.UpdateAsync(run);
 
             //store result
             var runResult = new RunResult
@@ -67,7 +67,7 @@
                 EndedTime = _clock.UtcNow()
             };
 
-            await _runRepository.CreateResultAsync(runResult).ConfigureAwait(false);
+            await _runRepository.CreateResultAsync(runResult);
 
             //publish event
             var evt = new RunEndedEvent
@@ -80,7 +80,7 @@
                 State = request.State
             };
 
-            await _eventPublisher.PublishAsync(evt).ConfigureAwait(false);
+            await _eventPublisher.PublishAsync(evt);
 
             return Unit.Value;
         }
@@ -88,13 +88,13 @@
         private async Task<long> GetRunner(EndRunCommand command)
         {
             //todo: dont tie illmake in with this handler directly...kinda gross
-            var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.RunId).ConfigureAwait(false);
+            var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.RunId);
 
             if (illMakeResults.Any())
                 return illMakeResults.OrderByDescending(o => o.CreatedDate).First().UserId;
 
             //random runner
-            return await _randomizer.GetRunnerUserId(command.Orders).ConfigureAwait(false);
+            return await _randomizer.GetRunnerUserId(command.Orders);
         }
     }
 }

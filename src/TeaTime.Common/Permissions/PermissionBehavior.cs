@@ -27,7 +27,7 @@
             {
                 _logger.LogDebug("Checking permission for command {Command}", CommandTypeName);
 
-                var result = await _permissionService.CheckAsync(command).ConfigureAwait(false);
+                var result = await _permissionService.CheckAsync(command);
 
                 Handle(result);
             }

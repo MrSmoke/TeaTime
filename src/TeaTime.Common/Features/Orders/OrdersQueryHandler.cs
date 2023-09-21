@@ -33,12 +33,12 @@
         {
             var run = _runRepository.GetAsync(request.RunId);
 
-            var orders = (await _orderRepository.GetOrdersAsync(request.RunId).ConfigureAwait(false)).ToList();
+            var orders = (await _orderRepository.GetOrdersAsync(request.RunId)).ToList();
             if (orders.Count == 0)
                 return new List<OrderModel>();
 
-            var users = _userRepository.GetManyAsync(orders.Select(o => o.UserId)).ConfigureAwait(false);
-            var options = _optionsRepository.GetManyAsync(orders.Select(o => o.OptionId)).ConfigureAwait(false);
+            var users = _userRepository.GetManyAsync(orders.Select(o => o.UserId));
+            var options = _optionsRepository.GetManyAsync(orders.Select(o => o.OptionId));
 
             var userDict = (await users).ToDictionary(k => k.Id);
             var optionsDict = (await options).ToDictionary(k => k.Id);
@@ -50,7 +50,7 @@
                 {
                     Id = order.Id,
                     CreatedDate = order.CreatedDate,
-                    Run = await run.ConfigureAwait(false),
+                    Run = await run,
                     User = userDict[order.UserId],
                     Option = optionsDict[order.OptionId]
                 });
@@ -61,7 +61,7 @@
 
         public async Task<Order> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
         {
-            var orders = await _orderRepository.GetOrdersAsync(request.RunId).ConfigureAwait(false);
+            var orders = await _orderRepository.GetOrdersAsync(request.RunId);
 
             return orders.FirstOrDefault(o => o.UserId == request.UserId);
         }

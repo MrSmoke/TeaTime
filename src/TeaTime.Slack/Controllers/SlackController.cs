@@ -63,7 +63,7 @@
                 var result = await _commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
                 {
                     {Constants.SlashCommand, slashCommand}
-                }).ConfigureAwait(false);
+                });
 
                 Response.ContentType = "application/json";
                 return new CommandRouterResult(result);
@@ -151,7 +151,7 @@
 
             try
             {
-                await _slackService.JoinRunAsync(message).ConfigureAwait(false);
+                await _slackService.JoinRunAsync(message);
 
                 return Ok();
             }

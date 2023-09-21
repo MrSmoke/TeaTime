@@ -38,7 +38,7 @@
         private async Task ProcessAsync(StartRunCommand request, CancellationToken cancellationToken)
         {
             //try to create the run lock
-            var created = await _lockService.CreateLockAsync(request.RoomId).ConfigureAwait(false);
+            var created = await _lockService.CreateLockAsync(request.RoomId);
             if (!created)
                 throw new RunStartException("There is already an active run in this room",
                     RunStartException.RunStartExceptionReason.ExistingActiveRun);
@@ -49,7 +49,7 @@
         private async Task ProcessAsync(EndRunCommand request, CancellationToken cancellationToken)
         {
             //delete lock
-            var deleted = await _lockService.DeleteLockAsync(request.RoomId).ConfigureAwait(false);
+            var deleted = await _lockService.DeleteLockAsync(request.RoomId);
             if (!deleted)
                 throw new RunEndException("There is no active run in this room",
                     RunEndException.RunEndExceptionReason.NoActiveRun);
