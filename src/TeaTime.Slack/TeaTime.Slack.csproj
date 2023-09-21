@@ -15,7 +15,6 @@
     <PackageReference Include="commandrouter" Version="1.0.0-beta6" />
     <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta3" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.6" />
-    <PackageReference Include="newtonsoft.json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
