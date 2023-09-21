@@ -2,7 +2,7 @@
 {
     public class SlackOptions
     {
-        public string VerificationToken { get; set; }
-        public SlackOAuthOptions OAuth { get; set; }
+        public string? VerificationToken { get; set; }
+        public SlackOAuthOptions? OAuth { get; set; }
     }
 }

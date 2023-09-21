@@ -1,13 +1,10 @@
-﻿namespace TeaTime.Common.Features.Orders.Events
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.Orders.Events;
 
-    public class OrderOptionChangedEvent : Event
-    {
-        public long OrderId { get; set; }
-        public long UserId { get; set; }
+using Abstractions;
 
-        public long PreviousOptionId { get; set; }
-        public long OptionId { get; set; }
-    }
-}
+public record OrderOptionChangedEvent(
+    long OrderId,
+    long UserId,
+    long PreviousOptionId,
+    long OptionId
+) : Event;

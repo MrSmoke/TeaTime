@@ -18,7 +18,7 @@
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
             RequestHandlerDelegate<TResponse> next)
         {
-            if (!(request is ICacheableQuery cacheQuery))
+            if (request is not ICacheableQuery cacheQuery)
                 return await next();
 
             var cacheKey = cacheQuery.CacheKey;
@@ -33,7 +33,7 @@
 
             // dont cache null values
             if (response == null)
-                return default;
+                return response;
 
             // serialize and store in the cache
             await _cache.SetAsync(cacheKey, response, new CacheEntryOptions

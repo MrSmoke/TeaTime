@@ -3,7 +3,7 @@
     using Abstractions;
     using Models.Data;
 
-    public class GetUserQuery : IQuery<User>
+    public class GetUserQuery : IQuery<User?>
     {
         public long UserId { get; }
 

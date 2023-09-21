@@ -24,12 +24,7 @@
             var user = await GetOrCreateUser(command);
             var room = await GetOrCreateRoom(command, user.Id);
 
-            return new CommandContext
-            {
-                Room = room,
-                Command = command,
-                User = user
-            };
+            return new CommandContext(command, user, room);
         }
 
         private Task<User> GetOrCreateUser(SlashCommand slashCommand)
@@ -44,7 +39,7 @@
 
         protected SlashCommand GetCommand() => (SlashCommand)Context.Items[Constants.SlashCommand];
 
-        protected ICommandResult Response(string text, ResponseType responseType)
+        protected ICommandResult Response(string? text, ResponseType responseType)
         {
             return Response(new SlashCommandResponse(text, responseType));
         }
@@ -54,7 +49,7 @@
             return StringResult(SlackJsonSerializer.Serialize(response));
         }
 
-        protected ICommandResult Ok()
+        protected static ICommandResult Ok()
         {
             return new StringResult("");
         }

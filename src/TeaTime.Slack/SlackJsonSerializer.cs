@@ -5,7 +5,7 @@
 
     internal static class SlackJsonSerializer
     {
-        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new()
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
@@ -15,7 +15,7 @@
             return JsonConvert.SerializeObject(obj, JsonSerializerSettings);
         }
 
-        internal static T Deserialize<T>(string json)
+        internal static T? Deserialize<T>(string json)
         {
             return JsonConvert.DeserializeObject<T>(json, JsonSerializerSettings);
         }

@@ -17,6 +17,6 @@
         public string TeamId { get; set; }
 
         [JsonProperty("incoming_webhook")]
-        public OAuthTokenResponseIncomingWebhook IncomingWebhook { get; set; }
+        public OAuthTokenResponseIncomingWebhook? IncomingWebhook { get; set; }
     }
 }

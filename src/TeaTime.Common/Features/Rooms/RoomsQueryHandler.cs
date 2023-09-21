@@ -7,7 +7,7 @@
     using Models.Data;
     using Queries;
 
-    public class RoomsQueryHandler : IRequestHandler<GetRoomQuery, Room>
+    public class RoomsQueryHandler : IRequestHandler<GetRoomQuery, Room?>
     {
         private readonly IRoomRepository _roomRepository;
 
@@ -16,7 +16,7 @@
             _roomRepository = roomRepository;
         }
 
-        public Task<Room> Handle(GetRoomQuery request, CancellationToken cancellationToken)
+        public Task<Room?> Handle(GetRoomQuery request, CancellationToken cancellationToken)
         {
             return _roomRepository.GetAsync(request.RoomId);
         }

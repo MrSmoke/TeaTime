@@ -7,7 +7,7 @@
     using Models.Data;
     using Rooms.Queries;
 
-    public class RunQueryHandler : IRequestHandler<GetCurrentRunQuery, Run>
+    public class RunQueryHandler : IRequestHandler<GetCurrentRunQuery, Run?>
     {
         private readonly IRunRepository _runRepository;
 
@@ -16,7 +16,7 @@
             _runRepository = runRepository;
         }
 
-        public Task<Run> Handle(GetCurrentRunQuery request, CancellationToken cancellationToken)
+        public Task<Run?> Handle(GetCurrentRunQuery request, CancellationToken cancellationToken)
         {
             return _runRepository.GetCurrentRunAsync(request.RoomId);
         }

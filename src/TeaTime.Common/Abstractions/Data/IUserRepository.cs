@@ -7,7 +7,7 @@
     public interface IUserRepository
     {
         Task CreateAsync(User user);
-        Task<User> GetAsync(long id);
+        Task<User?> GetAsync(long id);
         Task<IEnumerable<User>> GetManyAsync(IEnumerable<long> ids);
     }
 }

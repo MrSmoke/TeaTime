@@ -45,7 +45,7 @@
             return QueryAsync<HashEntry>(sql, new {key});
         }
 
-        public Task<string> GetValueAsync(string key, string field)
+        public Task<string?> GetValueAsync(string key, string field)
         {
             const string sql = "SELECT Value FROM hashes WHERE `Key` = @key AND Field = @field";
 

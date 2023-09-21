@@ -41,10 +41,14 @@
         {
             var id = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, userId));
             if (id > 0)
-                return await _mediator.Send(new GetUserQuery(id));
+            {
+                return await _mediator.Send(new GetUserQuery(id.Value)) ??
+                       throw new InvalidOperationException($"Failed to get user {id.Value}");
+            }
 
             //we need to create a new user
-            var command = new CreateUserCommand(
+            var command = new CreateUserCommand
+            (
                 id: await _idGenerator.GenerateAsync(),
                 username: "slack_" + userId,
                 displayName: name
@@ -69,9 +73,13 @@
         {
             var roomId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, channelId));
             if (roomId > 0)
-                return await _mediator.Send(new GetRoomQuery(roomId));
+            {
+                return await _mediator.Send(new GetRoomQuery(roomId.Value)) ??
+                       throw new InvalidOperationException($"Failed to get room {roomId.Value}");
+            }
 
-            var command = new CreateRoomCommand(
+            var command = new CreateRoomCommand
+            (
                 id: await _idGenerator.GenerateAsync(),
                 name: channelName,
                 userId: userId
@@ -153,11 +161,13 @@
             var existingOrder = await _mediator.Send(new GetUserOrderQuery(run.Id, userId));
             if (existingOrder == null)
             {
-                command = new CreateOrderCommand(
+                command = new CreateOrderCommand
+                (
                     id: await _idGenerator.GenerateAsync(),
                     runId: run.Id,
                     userId: userId,
-                    optionId: optionId);
+                    optionId: optionId
+                );
             }
             else
             {

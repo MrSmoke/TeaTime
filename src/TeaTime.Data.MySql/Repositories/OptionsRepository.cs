@@ -37,7 +37,7 @@
             return ExecuteAsync(sql, new { groupId });
         }
 
-        public Task<RoomItemGroup> GetGroupAsync(long groupId)
+        public Task<RoomItemGroup?> GetGroupAsync(long groupId)
         {
             const string sql = "SELECT " + GroupSelectColumns +
                                " FROM option_groups WHERE id = @groupId";
@@ -45,7 +45,7 @@
             return SingleOrDefaultAsync<RoomItemGroup>(sql, new {groupId});
         }
 
-        public Task<RoomItemGroup> GetGroupByNameAsync(long roomId, string name)
+        public Task<RoomItemGroup?> GetGroupByNameAsync(long roomId, string name)
         {
             const string sql = "SELECT " + GroupSelectColumns +
                                " FROM option_groups WHERE roomId = @roomId AND name = @name";
@@ -62,7 +62,7 @@
             return ExecuteAsync(sql, option);
         }
 
-        public Task<Option> GetAsync(long optionId)
+        public Task<Option?> GetAsync(long optionId)
         {
             const string sql = "SELECT " + OptionSelectColumns + " FROM options WHERE id = @optionId";
 

@@ -3,9 +3,9 @@
     public sealed class PermissionCheckResult
     {
         public bool Success { get; }
-        public string Message { get; }
+        public string? Message { get; }
 
-        private PermissionCheckResult(bool success, string message)
+        private PermissionCheckResult(bool success, string? message)
         {
             Success = success;
             Message = message;

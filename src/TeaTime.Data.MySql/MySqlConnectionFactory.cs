@@ -22,7 +22,7 @@
 
         private static string GetConnectionString(MySqlConnectionOptions options)
         {
-            static string GetOption(string key, string value)
+            static string GetOption(string key, string? value)
                 => string.IsNullOrWhiteSpace(value) ? string.Empty : key + "=" + value + ";";
 
             return string.Concat(

@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using Client;
     using Common.Abstractions.Data;
+    using Common.Extensions;
     using Common.Features.Runs.Events;
     using Common.Models;
     using MediatR;
@@ -34,7 +35,10 @@
             var orders = notification.Orders.ToList();
 
             // Create a dictionary of all usernames in the current order (including the runner)
-            var userIds = new HashSet<long>(orders.Select(o => o.User.Id)) {notification.RunnerUserId};
+            var userIds = new HashSet<long>(orders.WhereNotNull(o => o.User).Select(o => o.Id))
+            {
+                notification.RunnerUserId
+            };
 
             var usernames = (await Task.WhenAll(userIds.Select(async uid =>
                     new KeyValuePair<long, string>(uid, await GetSlackUsername(uid)))))
@@ -51,14 +55,17 @@
             {
                 var o = orders[i];
 
+                if (o.User is null || !usernames.TryGetValue(o.User.Id, out var username))
+                    username = "unknown";
+
                 messageBuilder
                     .Append("- ")
-                    .Append(usernames[o.User.Id])
+                    .Append(username)
                     .Append(": ")
-                    .Append(o.Option.Name);
+                    .Append(o.Option?.Name ?? "unknown");
 
                 if (i < orders.Count - 1)
-                    messageBuilder.Append("\n");
+                    messageBuilder.Append('\n');
             }
 
             var data = new SlashCommandResponse(messageBuilder.ToString(), ResponseType.Channel);

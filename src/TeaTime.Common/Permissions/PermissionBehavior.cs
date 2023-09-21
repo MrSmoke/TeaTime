@@ -51,7 +51,7 @@
             _logger.LogDebug("Permission check failed for command {Command} with message {Message}",
                 CommandTypeName, result.Message);
 
-            throw new PermissionException(result.Message);
+            throw new PermissionException(result.Message!);
         }
 
         private static string CommandTypeName => typeof(TCommand).Name;

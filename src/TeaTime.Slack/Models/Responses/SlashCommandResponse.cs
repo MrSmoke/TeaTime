@@ -11,13 +11,13 @@
             Type = Responses.ResponseType.Channel;
         }
 
-        public SlashCommandResponse(string text, ResponseType responseType)
+        public SlashCommandResponse(string? text, ResponseType responseType)
         {
             Type = responseType;
             Text = text;
         }
 
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         [JsonProperty("replace_original")]
         public bool ReplaceOriginal { get; set; }
@@ -25,7 +25,7 @@
         [JsonIgnore]
         public ResponseType Type { get; set; }
 
-        public IEnumerable<Attachment> Attachments { get; set; }
+        public IEnumerable<Attachment>? Attachments { get; set; }
 
         [JsonProperty("response_type")]
         public string ResponseType

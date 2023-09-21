@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Orders
+namespace TeaTime.Common.Features.Orders
 {
     using System.Threading;
     using System.Threading.Tasks;
@@ -8,6 +8,7 @@
     using Commands;
     using Events;
     using MediatR;
+    using Microsoft.Extensions.Logging;
     using Models.Data;
 
     public class OrderCommandHandler :
@@ -18,13 +19,19 @@
         private readonly ISystemClock _clock;
         private readonly IMapper _mapper;
         private readonly IEventPublisher _eventPublisher;
+        private readonly ILogger<OrderCommandHandler> _logger;
 
-        public OrderCommandHandler(IOrderRepository orderRepository, ISystemClock clock, IMapper mapper, IEventPublisher eventPublisher)
+        public OrderCommandHandler(IOrderRepository orderRepository,
+            ISystemClock clock,
+            IMapper mapper,
+            IEventPublisher eventPublisher,
+            ILogger<OrderCommandHandler> logger)
         {
             _orderRepository = orderRepository;
             _clock = clock;
             _mapper = mapper;
             _eventPublisher = eventPublisher;
+            _logger = logger;
         }
 
         public async Task<Unit> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -46,6 +53,12 @@
         {
             var existing = await _orderRepository.GetAsync(request.OrderId);
 
+            if (existing is null)
+            {
+                _logger.LogWarning("Failed to get existing order {OrderId}", request.OrderId);
+                return Unit.Value;
+            }
+
             if (existing.OptionId == request.OptionId)
                 return Unit.Value;
 
@@ -57,8 +70,12 @@
             await _orderRepository.UpdateAsync(existing);
 
             //create event
-            var evt = _mapper.Map<UpdateOrderOptionCommand, OrderOptionChangedEvent>(request);
-            evt.PreviousOptionId = previousOptionId;
+            var evt = new OrderOptionChangedEvent(
+                OrderId: request.OrderId,
+                UserId: request.UserId,
+                PreviousOptionId: previousOptionId,
+                OptionId: request.OptionId
+            );
 
             await _eventPublisher.PublishAsync(evt);
 

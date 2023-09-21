@@ -6,7 +6,7 @@
     using MediatR;
     using Queries;
 
-    public class LinkQueryHandler : IRequestHandler<GetObjectIdByLinkValueQuery, long>
+    public class LinkQueryHandler : IRequestHandler<GetObjectIdByLinkValueQuery, long?>
     {
         private readonly ILinkRepository _linkRepository;
 
@@ -15,7 +15,7 @@
             _linkRepository = linkRepository;
         }
 
-        public Task<long> Handle(GetObjectIdByLinkValueQuery request, CancellationToken cancellationToken)
+        public Task<long?> Handle(GetObjectIdByLinkValueQuery request, CancellationToken cancellationToken)
         {
             return _linkRepository.GetObjectId(request.Value, request.LinkType);
         }

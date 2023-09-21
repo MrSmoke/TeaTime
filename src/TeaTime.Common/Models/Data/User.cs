@@ -2,7 +2,7 @@
 {
     public class User : BaseDataObject
     {
-        public string DisplayName { get; set; }
-        public string Username { get; set; }
+        public string DisplayName { get; init; } = null!;
+        public string Username { get; init; } = null!;
     }
 }

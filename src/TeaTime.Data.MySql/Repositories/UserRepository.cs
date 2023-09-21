@@ -18,7 +18,7 @@
             return ExecuteAsync(sql, user);
         }
 
-        public Task<User> GetAsync(long id)
+        public Task<User?> GetAsync(long id)
         {
             const string sql = "SELECT id, username, displayName, createdDate FROM users WHERE id = @id";
 

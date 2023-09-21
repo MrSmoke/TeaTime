@@ -12,8 +12,6 @@
             CreateMap<CreateOrderCommand, Order>();
             CreateMap<Order, OrderPlacedEvent>()
                 .ForMember(x => x.OrderId, o => o.MapFrom(x => x.Id));
-
-            CreateMap<UpdateOrderOptionCommand, OrderOptionChangedEvent>();
         }
     }
 }

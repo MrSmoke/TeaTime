@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Orders
+namespace TeaTime.Common.Features.Orders
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -11,8 +11,8 @@
     using Queries;
 
     public class OrdersQueryHandler :
-        IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>
-        , IRequestHandler<GetUserOrderQuery, Order>
+        IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>,
+        IRequestHandler<GetUserOrderQuery, Order?>
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IUserRepository _userRepository;
@@ -31,7 +31,7 @@
         public async Task<IEnumerable<OrderModel>> Handle(GetRunOrdersQuery request,
             CancellationToken cancellationToken)
         {
-            var run = _runRepository.GetAsync(request.RunId);
+            var runTask = _runRepository.GetAsync(request.RunId);
 
             var orders = (await _orderRepository.GetOrdersAsync(request.RunId)).ToList();
             if (orders.Count == 0)
@@ -50,7 +50,7 @@
                 {
                     Id = order.Id,
                     CreatedDate = order.CreatedDate,
-                    Run = await run,
+                    Run = await runTask,
                     User = userDict[order.UserId],
                     Option = optionsDict[order.OptionId]
                 });
@@ -59,7 +59,7 @@
             return models;
         }
 
-        public async Task<Order> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
+        public async Task<Order?> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
         {
             var orders = await _orderRepository.GetOrdersAsync(request.RunId);
 

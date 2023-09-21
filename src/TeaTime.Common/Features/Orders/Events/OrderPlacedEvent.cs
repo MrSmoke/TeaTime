@@ -1,13 +1,10 @@
-﻿namespace TeaTime.Common.Features.Orders.Events
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.Orders.Events;
 
-    public class OrderPlacedEvent : Event
-    {
-        public long OrderId { get; set; }
-        public long RunId { get; set; }
+using Abstractions;
 
-        public long UserId { get; set; }
-        public long OptionId { get; set; }
-    }
-}
+public record OrderPlacedEvent(
+    long OrderId,
+    long RunId,
+    long UserId,
+    long OptionId
+) : Event;

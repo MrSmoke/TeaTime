@@ -3,7 +3,7 @@
     using Abstractions;
     using Models.Data;
 
-    public class GetOptionQuery : IQuery<Option>
+    public class GetOptionQuery : IQuery<Option?>
     {
         public long Id { get; }
 

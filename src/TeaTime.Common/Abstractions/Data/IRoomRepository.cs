@@ -6,6 +6,6 @@
     public interface IRoomRepository
     {
         Task CreateAsync(Room room);
-        Task<Room> GetAsync(long id);
+        Task<Room?> GetAsync(long id);
     }
 }
