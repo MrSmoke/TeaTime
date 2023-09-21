@@ -31,4 +31,14 @@ public static class EnumerableExtensions
                 yield return t;
         }
     }
+
+    public static IReadOnlyList<T> AsReadOnlyList<T>(this IEnumerable<T> source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        if (source is IReadOnlyList<T> list)
+            return list;
+
+        return source.ToList();
+    }
 }

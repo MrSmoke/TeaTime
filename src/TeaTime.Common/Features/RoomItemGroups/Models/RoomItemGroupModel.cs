@@ -5,6 +5,6 @@
 
     public class RoomItemGroupModel : RoomItemGroup
     {
-        public ICollection<Option> Options { get; set; } = new List<Option>();
+        public IReadOnlyList<Option> Options { get; set; } = new List<Option>();
     }
 }

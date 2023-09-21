@@ -1,11 +1,11 @@
 ﻿namespace TeaTime.Common.Features.RoomItemGroups
 {
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Data;
     using AutoMapper;
     using Common.Models.Data;
+    using Extensions;
     using MediatR;
     using Models;
     using Queries;
@@ -31,7 +31,7 @@
 
             var model = _mapper.Map<RoomItemGroup, RoomItemGroupModel>(group);
 
-            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id)).ToList();
+            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id)).AsReadOnlyList();
 
             return model;
         }
@@ -44,7 +44,7 @@
 
             var model = _mapper.Map<RoomItemGroup, RoomItemGroupModel>(group);
 
-            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id)).ToList();
+            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id)).AsReadOnlyList();
 
             return model;
         }
