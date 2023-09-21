@@ -1,5 +1,6 @@
 namespace TeaTime;
 
+using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,7 @@ public static class Program
     {
         Version = typeof(Program).Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            ?.InformationalVersion;
+            ?.InformationalVersion ?? throw new InvalidOperationException("Failed to get version info");
     }
 
     public static void Main(string[] args)
