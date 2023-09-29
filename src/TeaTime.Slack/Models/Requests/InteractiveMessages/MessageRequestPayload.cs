@@ -10,7 +10,7 @@
         public MessageTeam Team { get; set; }
         public MessageChannel Channel { get; set; }
         public MessageUser User { get; set; }
-        public string Token { get; set; }
+        public string? Token { get; set; }
 
         [JsonPropertyName("response_url")]
         public string ResponseUrl { get; set; }

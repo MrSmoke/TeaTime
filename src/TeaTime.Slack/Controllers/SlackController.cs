@@ -134,7 +134,7 @@
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
-            var message = JsonSerializer.Deserialize<MessageRequestPayload>(request.PayloadJson);
+            var message = SlackJsonSerializer.Deserialize<MessageRequestPayload>(request.PayloadJson);
             if (message == null)
             {
                 _logger.LogError("Failed to deserialize interactive message request");
