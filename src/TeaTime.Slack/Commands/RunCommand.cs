@@ -11,7 +11,6 @@
     using Common.Features.Runs.Commands;
     using Exceptions;
     using MediatR;
-    using Microsoft.Extensions.Logging;
     using Models.Responses;
     using Resources;
     using Services;
@@ -22,15 +21,16 @@
         private readonly IIdGenerator<long> _idGenerator;
         private readonly ISystemClock _clock;
         private readonly ISlackService _slackService;
-        private readonly ILogger<RunCommand> _logger;
 
-        public RunCommand(IMediator mediator, IIdGenerator<long> idGenerator, ISystemClock clock, ISlackService slackService, ILogger<RunCommand> logger) : base(slackService)
+        public RunCommand(IMediator mediator,
+            IIdGenerator<long> idGenerator,
+            ISystemClock clock,
+            ISlackService slackService) : base(slackService)
         {
             _mediator = mediator;
             _idGenerator = idGenerator;
             _clock = clock;
             _slackService = slackService;
-            _logger = logger;
         }
 
         [Command("")]

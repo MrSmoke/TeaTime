@@ -23,7 +23,7 @@
 
         public Task CheckAsync<TQuery, TResponse>(TQuery query) where TQuery : IUserQuery<TResponse>
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

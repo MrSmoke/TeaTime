@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Common;
     using Common.Collections;
 
     public class MySqlDistributedHash : BaseRepository, IDistributedHash
