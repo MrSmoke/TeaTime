@@ -5,7 +5,6 @@
     /// <summary>
     /// Defines a query which can be cached
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public interface ICacheableQuery
     {
         string CacheKey { get; }

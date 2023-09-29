@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using Newtonsoft.Json;
+    using System.Text.Json.Serialization;
 
     public class SlashCommandResponse
     {
@@ -19,7 +19,7 @@
 
         public string? Text { get; set; }
 
-        [JsonProperty("replace_original")]
+        [JsonPropertyName("replace_original")]
         public bool ReplaceOriginal { get; set; }
 
         [JsonIgnore]
@@ -27,7 +27,7 @@
 
         public IEnumerable<Attachment>? Attachments { get; set; }
 
-        [JsonProperty("response_type")]
+        [JsonPropertyName("response_type")]
         public string ResponseType
         {
             get

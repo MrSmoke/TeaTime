@@ -34,33 +34,39 @@ namespace TeaTime.Common.Features.Orders
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             var order = _mapper.Map<CreateOrderCommand, Order>(request);
             order.CreatedDate = _clock.UtcNow();
 
             await _orderRepository.CreateAsync(order);
 
-            var evt = _mapper.Map<Order, OrderPlacedEvent>(order);
-            evt.State = request.State;
+            var evt = new OrderPlacedEvent
+            (
+                OrderId: order.Id,
+                RunId: order.RunId,
+                UserId: order.UserId,
+                OptionId: order.OptionId
+            )
+            {
+                State = request.State
+            };
 
             await _eventPublisher.PublishAsync(evt);
-
-            return Unit.Value;
         }
 
-        public async Task<Unit> Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
         {
             var existing = await _orderRepository.GetAsync(request.OrderId);
 
             if (existing is null)
             {
                 _logger.LogWarning("Failed to get existing order {OrderId}", request.OrderId);
-                return Unit.Value;
+                return;
             }
 
             if (existing.OptionId == request.OptionId)
-                return Unit.Value;
+                return;
 
             //store the previous id for the event
             var previousOptionId = existing.OptionId;
@@ -70,7 +76,8 @@ namespace TeaTime.Common.Features.Orders
             await _orderRepository.UpdateAsync(existing);
 
             //create event
-            var evt = new OrderOptionChangedEvent(
+            var evt = new OrderOptionChangedEvent
+            (
                 OrderId: request.OrderId,
                 UserId: request.UserId,
                 PreviousOptionId: previousOptionId,
@@ -78,8 +85,6 @@ namespace TeaTime.Common.Features.Orders
             );
 
             await _eventPublisher.PublishAsync(evt);
-
-            return Unit.Value;
         }
     }
 }

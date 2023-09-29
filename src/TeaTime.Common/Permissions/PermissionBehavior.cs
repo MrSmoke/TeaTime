@@ -7,8 +7,7 @@
     using MediatR;
     using Microsoft.Extensions.Logging;
 
-    public class PermissionBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse>
-        where TCommand : IRequest<TResponse>
+    public class PermissionBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse> where TCommand : notnull
     {
         private readonly IPermissionService _permissionService;
         private readonly ILogger<PermissionBehavior<TCommand, TResponse>> _logger;
@@ -20,8 +19,8 @@
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TCommand request, CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TCommand request, RequestHandlerDelegate<TResponse> next,
+            CancellationToken cancellationToken)
         {
             if (request is IUserCommand command)
             {

@@ -2,7 +2,8 @@
 
 using Abstractions;
 
-public record OrderOptionChangedEvent(
+public record OrderOptionChangedEvent
+(
     long OrderId,
     long UserId,
     long PreviousOptionId,

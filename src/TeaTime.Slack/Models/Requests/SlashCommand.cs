@@ -19,7 +19,7 @@ namespace TeaTime.Slack.Models.Requests
 
     public class SlashCommand : IVerifiableRequest
     {
-        public string Token { get; set; }
+        public string? Token { get; set; }
 
         [FromForm(Name = "team_id")]
         public string TeamId { get; set; }

@@ -10,7 +10,12 @@ namespace TeaTime.Slack.Client
 
     internal class SlackApiClient : ISlackApiClient
     {
-        private readonly HttpClient _httpClient = new();
+        private readonly HttpClient _httpClient;
+
+        public SlackApiClient(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
 
         public Task PostResponseAsync(string callbackUrl, SlashCommandResponse response)
         {

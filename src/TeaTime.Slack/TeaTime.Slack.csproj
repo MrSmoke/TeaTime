@@ -1,10 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,9 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="commandrouter" Version="1.0.0-beta6" />
+    <PackageReference Include="CommandRouter" Version="1.0.0-beta6" />
     <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta3" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.6" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="7.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
   </ItemGroup>
 
   <ItemGroup>

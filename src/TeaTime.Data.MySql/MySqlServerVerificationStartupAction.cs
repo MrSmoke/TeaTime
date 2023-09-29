@@ -2,7 +2,7 @@
 {
     using System;
     using Common;
-    using Evolve;
+    using EvolveDb;
     using Microsoft.Extensions.Logging;
 
     public class MySqlServerVerificationStartupAction : IStartupAction
@@ -12,7 +12,8 @@
 
         public string Name => "MySQL Server Verification";
 
-        public MySqlServerVerificationStartupAction(IMySqlConnectionFactory connectionFactory, ILogger<MySqlServerVerificationStartupAction> logger)
+        public MySqlServerVerificationStartupAction(IMySqlConnectionFactory connectionFactory,
+            ILogger<MySqlServerVerificationStartupAction> logger)
         {
             _connectionFactory = connectionFactory;
             _logger = logger;
@@ -30,13 +31,13 @@
 
                 var evolve = new Evolve(conn, msg => _logger.LogInformation(msg))
                 {
-                    EmbeddedResourceAssemblies = new[] {typeof(MySqlServerVerificationStartupAction).Assembly},
+                    EmbeddedResourceAssemblies = new[] { typeof(MySqlServerVerificationStartupAction).Assembly },
                     IsEraseDisabled = true
                 };
 
                 evolve.Migrate();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to connect to MySQL");
 

@@ -42,7 +42,7 @@ namespace TeaTime.Common.Features.Runs
         }
 
         //Start run
-        public async Task<Unit> Handle(StartRunCommand request, CancellationToken cancellationToken)
+        public async Task Handle(StartRunCommand request, CancellationToken cancellationToken)
         {
             var run = _mapper.Map<StartRunCommand, Run>(request);
 
@@ -50,15 +50,20 @@ namespace TeaTime.Common.Features.Runs
 
             await _runRepository.CreateAsync(run);
 
-            var evt = _mapper.Map<Run, RunStartedEvent>(run);
+            var evt = new RunStartedEvent
+            (
+                RunId: run.Id,
+                UserId: run.UserId,
+                RoomId: run.RoomId,
+                StartTime: run.StartTime,
+                EndTime: run.EndTime
+            );
 
             await _eventPublisher.PublishAsync(evt);
-
-            return Unit.Value;
         }
 
         //End run
-        public async Task<Unit> Handle(EndRunCommand request, CancellationToken cancellationToken)
+        public async Task Handle(EndRunCommand request, CancellationToken cancellationToken)
         {
             var runTask = _runRepository.GetAsync(request.RunId);
             var runnerUserId = await GetRunner(request);
@@ -68,7 +73,7 @@ namespace TeaTime.Common.Features.Runs
             if (run is null)
             {
                 _logger.LogWarning("Failed to get run {RunId}", request.RunId);
-                return Unit.Value;
+                return;
             }
 
             //update run
@@ -99,8 +104,6 @@ namespace TeaTime.Common.Features.Runs
             };
 
             await _eventPublisher.PublishAsync(evt);
-
-            return Unit.Value;
         }
 
         private async Task<long> GetRunner(EndRunCommand command)

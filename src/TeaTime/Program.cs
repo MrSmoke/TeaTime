@@ -39,7 +39,7 @@ public static class Program
 
         // Log our version for startup
         var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("TeaTime");
-        logger.LogInformation("TeaTime - {Version}", Program.Version);
+        logger.LogInformation("TeaTime - {Version}", Version);
 
         // Run
         app.Run();

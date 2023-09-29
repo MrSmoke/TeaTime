@@ -40,7 +40,7 @@
             return attachments;
         }
 
-        internal static Action CreateButton(Option option, string name = "tea-option")
+        private static Action CreateButton(Option option, string name = "tea-option")
         {
             return new Button
             {
