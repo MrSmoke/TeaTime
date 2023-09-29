@@ -8,4 +8,4 @@ alter table `option_groups`
     add column deleted boolean default 0,
     add column deletedDate datetime default null,
     drop index `idx_optiongroups_name`,
-    unique `idx_optiongroups_name` (`roomId`, `name`, (IF(deleted,null,1)));
+    add unique `idx_optiongroups_name` (`roomId`, `name`, (IF(deleted,null,1)));
