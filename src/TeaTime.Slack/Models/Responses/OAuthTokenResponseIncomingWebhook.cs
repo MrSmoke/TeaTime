@@ -1,19 +1,19 @@
 ﻿namespace TeaTime.Slack.Models.Responses
 {
-    using Newtonsoft.Json;
+    using System.Text.Json.Serialization;
 
     public class OAuthTokenResponseIncomingWebhook
     {
-        [JsonProperty("channel")]
+        [JsonPropertyName("channel")]
         public string Channel { get; set; }
 
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public string ChannelId { get; set; }
 
-        [JsonProperty("configuration_url")]
+        [JsonPropertyName("configuration_url")]
         public string ConfigurationUrl { get; set; }
 
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public string Url { get; set; }
     }
 }

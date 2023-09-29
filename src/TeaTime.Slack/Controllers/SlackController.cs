@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Text.Json;
     using System.Threading.Tasks;
     using CommandRouter;
     using CommandRouter.Exceptions;
@@ -13,7 +14,6 @@
     using Models.Requests;
     using Models.Requests.InteractiveMessages;
     using Models.Responses;
-    using Newtonsoft.Json;
     using Resources;
     using Services;
 
@@ -134,7 +134,7 @@
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
-            var message = JsonConvert.DeserializeObject<MessageRequestPayload>(request.PayloadJson);
+            var message = JsonSerializer.Deserialize<MessageRequestPayload>(request.PayloadJson);
             if (message == null)
             {
                 _logger.LogError("Failed to deserialize interactive message request");
