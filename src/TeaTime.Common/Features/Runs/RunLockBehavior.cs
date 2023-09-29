@@ -7,8 +7,7 @@
     using Exceptions;
     using MediatR;
 
-    public class RunLockBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse>
-        where TCommand : IRequest<TResponse>
+    public class RunLockBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse> where TCommand : notnull
     {
         private readonly IRoomRunLockService _lockService;
 
@@ -17,8 +16,8 @@
             _lockService = lockService;
         }
 
-        public async Task<TResponse> Handle(TCommand request, CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TCommand request, RequestHandlerDelegate<TResponse> next,
+            CancellationToken cancellationToken)
         {
             await ProcessAsync(request, cancellationToken);
 

@@ -66,14 +66,21 @@
             // Register all PreProcessors
             services.AddSingleton<ICommandPreProcessor<EndRunCommand>, RunPreProcessor>();
 
-            services.AddMediatR(typeof(ICommand));
+            services.AddMediatR(o =>
+            {
+                o.RegisterServicesFromAssemblyContaining<ICommand>();
+            });
 
             // Run Lock should be last behavior to run
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -83,11 +90,6 @@
                 app.UseStatusCodePages();
                 app.UseStatusCodePagesWithReExecute("/ErrorStatusCode", "?code={0}");
             }
-
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
 
             app.UseStaticFiles();
 

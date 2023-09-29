@@ -19,7 +19,7 @@
             _clock = clock;
         }
 
-        public async Task<Unit> Handle(IllMakeCommand request, CancellationToken cancellationToken)
+        public Task Handle(IllMakeCommand request, CancellationToken cancellationToken)
         {
             var model = new IllMake
             {
@@ -30,9 +30,7 @@
             };
 
             //todo: event
-            await _repository.CreateAsync(model);
-
-            return Unit.Value;
+            return _repository.CreateAsync(model);
         }
     }
 }

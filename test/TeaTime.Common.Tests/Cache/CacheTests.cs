@@ -22,7 +22,7 @@
             var value = await cache.GetAsync<bool>(nameof(SetAsync_GetAsync_Bool_Returns));
 
             Assert.NotNull(value);
-            Assert.True(value!.Value);
+            Assert.True(value.Value);
         }
 
         [Fact]

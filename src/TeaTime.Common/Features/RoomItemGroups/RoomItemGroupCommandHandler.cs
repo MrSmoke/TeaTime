@@ -24,24 +24,20 @@
             _clock = clock;
         }
 
-        public async Task<Unit> Handle(CreateRoomItemGroupCommand request, CancellationToken cancellationToken)
+        public Task Handle(CreateRoomItemGroupCommand request, CancellationToken cancellationToken)
         {
             var roomGroup = _mapper.Map<CreateRoomItemGroupCommand, RoomItemGroup>(request);
 
             roomGroup.CreatedDate = _clock.UtcNow();
 
-            await _optionsRepository.CreateGroupAsync(roomGroup);
+            return _optionsRepository.CreateGroupAsync(roomGroup);
 
             //todo: event
-
-            return Unit.Value;
         }
 
-        public async Task<Unit> Handle(DeleteRoomItemGroupCommand request, CancellationToken cancellationToken)
+        public Task Handle(DeleteRoomItemGroupCommand request, CancellationToken cancellationToken)
         {
-            await _optionsRepository.DeleteGroupAsync(request.GroupId);
-
-            return Unit.Value;
+            return _optionsRepository.DeleteGroupAsync(request.GroupId);
         }
     }
 }

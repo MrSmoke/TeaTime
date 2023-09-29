@@ -4,7 +4,7 @@
 
     public class SlackOptionsValidator : IValidateOptions<SlackOptions>
     {
-        public ValidateOptionsResult Validate(string name, SlackOptions options)
+        public ValidateOptionsResult Validate(string? name, SlackOptions options)
         {
             if (string.IsNullOrWhiteSpace(options.VerificationToken))
                 return ValidateOptionsResult.Fail("Slack VerificationToken is missing");
