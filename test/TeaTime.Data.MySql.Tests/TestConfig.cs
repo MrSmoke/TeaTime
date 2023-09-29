@@ -11,7 +11,7 @@
 
         public static string Schema => ConfigBuilder.Value["schema"];
 
-        private static Lazy<IConfiguration> ConfigBuilder { get; } = new Lazy<IConfiguration>(
+        private static Lazy<IConfiguration> ConfigBuilder { get; } = new(
             () => new ConfigurationBuilder()
                 .SetBasePath(GetCodeRootPath())
                 .AddJsonFile("config.json")
