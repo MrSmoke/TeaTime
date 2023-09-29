@@ -2,7 +2,7 @@
 {
     using System;
     using Common;
-    using Evolve;
+    using EvolveDb;
     using Microsoft.Extensions.Logging;
 
     public class MySqlServerVerificationStartupAction : IStartupAction
