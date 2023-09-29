@@ -2,7 +2,6 @@
 {
     using AutoMapper;
     using Commands;
-    using Events;
     using Models.Data;
 
     public class MappingProfile : Profile
@@ -11,8 +10,6 @@
         {
             CreateMap<CreateRoomCommand, Room>()
                 .ForMember(m => m.CreatedBy, cfg => cfg.MapFrom(src => src.UserId));
-
-            CreateMap<CreateRoomCommand, RoomCreatedEvent>();
         }
     }
 }

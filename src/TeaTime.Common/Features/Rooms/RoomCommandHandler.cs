@@ -36,7 +36,13 @@
 
             await _roomRepository.CreateAsync(room);
 
-            var evt = _mapper.Map<CreateRoomCommand, RoomCreatedEvent>(request);
+            var evt = new RoomCreatedEvent
+            (
+                Id: request.Id,
+                Name: request.Name,
+                CreatedBy: request.UserId,
+                CreateDefaultItemGroup: request.CreateDefaultItemGroup
+            );
 
             await _eventPublisher.PublishAsync(evt);
         }

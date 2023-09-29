@@ -50,7 +50,14 @@ namespace TeaTime.Common.Features.Runs
 
             await _runRepository.CreateAsync(run);
 
-            var evt = _mapper.Map<Run, RunStartedEvent>(run);
+            var evt = new RunStartedEvent
+            (
+                RunId: run.Id,
+                UserId: run.UserId,
+                RoomId: run.RoomId,
+                StartTime: run.StartTime,
+                EndTime: run.EndTime
+            );
 
             await _eventPublisher.PublishAsync(evt);
         }

@@ -2,7 +2,8 @@
 
 using Abstractions;
 
-public record OrderPlacedEvent(
+public record OrderPlacedEvent
+(
     long OrderId,
     long RunId,
     long UserId,

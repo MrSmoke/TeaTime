@@ -41,8 +41,16 @@ namespace TeaTime.Common.Features.Orders
 
             await _orderRepository.CreateAsync(order);
 
-            var evt = _mapper.Map<Order, OrderPlacedEvent>(order);
-            evt.State = request.State;
+            var evt = new OrderPlacedEvent
+            (
+                OrderId: order.Id,
+                RunId: order.RunId,
+                UserId: order.UserId,
+                OptionId: order.OptionId
+            )
+            {
+                State = request.State
+            };
 
             await _eventPublisher.PublishAsync(evt);
         }
@@ -68,7 +76,8 @@ namespace TeaTime.Common.Features.Orders
             await _orderRepository.UpdateAsync(existing);
 
             //create event
-            var evt = new OrderOptionChangedEvent(
+            var evt = new OrderOptionChangedEvent
+            (
                 OrderId: request.OrderId,
                 UserId: request.UserId,
                 PreviousOptionId: previousOptionId,
