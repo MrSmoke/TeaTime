@@ -15,6 +15,7 @@
     <EmbeddedResource Include="..\..\sql\V0_2_0__Add_illmake.sql" Link="Sql\V0_2_0__Add_illmake.sql" />
     <EmbeddedResource Include="..\..\sql\V0_3_0__Add_hashes_table.sql" Link="Sql\V0_3_0__Add_hashes_table.sql" />
     <EmbeddedResource Include="..\..\sql\V0_3_1__Add_soft_delete.sql" Link="Sql\V0_3_1__Add_soft_delete.sql" />
+    <EmbeddedResource Include="..\..\sql\V0_3_2__Add_missing_deleted_data.sql" Link="Sql\V0_3_2__Add_missing_deleted_data.sql" />
     <EmbeddedResource Include="..\..\sql\V0_4_0__Add_foreign_keys.sql" Link="Sql\V0_4_0__Add_foreign_keys.sql" />
     <EmbeddedResource Include="..\..\sql\V0_4_1__Add_indexes.sql" Link="Sql\V0_4_1__Add_indexes.sql" />
   </ItemGroup>
