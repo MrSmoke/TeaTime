@@ -3,7 +3,7 @@
     using Abstractions;
     using Models.Data;
 
-    public class GetRoomQuery : IQuery<Room>
+    public class GetRoomQuery : IQuery<Room?>
     {
         public long RoomId { get; }
 

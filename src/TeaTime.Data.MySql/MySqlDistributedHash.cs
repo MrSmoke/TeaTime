@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Common;
+    using Common.Collections;
 
     public class MySqlDistributedHash : BaseRepository, IDistributedHash
     {
@@ -44,7 +44,7 @@
             return QueryAsync<HashEntry>(sql, new {key});
         }
 
-        public Task<string> GetValueAsync(string key, string field)
+        public Task<string?> GetValueAsync(string key, string field)
         {
             const string sql = "SELECT Value FROM hashes WHERE `Key` = @key AND Field = @field";
 

@@ -2,7 +2,6 @@
 {
     using AutoMapper;
     using Commands;
-    using Events;
     using Models.Data;
 
     public class MappingProfile : Profile
@@ -11,7 +10,6 @@
         {
             CreateMap<StartRunCommand, Run>()
                 .ForMember(m => m.GroupId, o => o.MapFrom(m => m.RoomGroupId));
-            CreateMap<Run, RunStartedEvent>();
         }
     }
 }

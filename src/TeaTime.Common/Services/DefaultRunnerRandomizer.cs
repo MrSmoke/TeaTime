@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Abstractions;
+    using Extensions;
     using Models.Domain;
 
     public class DefaultRunnerRandomizer : IRunnerRandomizer
@@ -18,7 +19,10 @@
 
         public Task<long> GetRunnerUserId(IEnumerable<OrderModel> orders)
         {
-            var userIds = orders.Select(o => o.User.Id).ToList();
+            var userIds = orders
+                .WhereNotNull(o => o.User)
+                .Select(o => o.Id)
+                .ToList();
 
             var random = _random.Next(userIds.Count);
 

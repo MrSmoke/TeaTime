@@ -28,7 +28,7 @@
             {
                 var errorMessage = e.Failures.First();
 
-                _logger.LogCritical("Fatal config error: " + errorMessage);
+                _logger.LogCritical("Fatal config error: {Message}", errorMessage);
 
                 throw;
             }

@@ -3,7 +3,7 @@
     using Abstractions;
     using Models.Data;
 
-    public class GetCurrentRunQuery : IUserQuery<Run>
+    public class GetCurrentRunQuery : IUserQuery<Run?>
     {
         public long RoomId { get; }
         public long UserId { get; }

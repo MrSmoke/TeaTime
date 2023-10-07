@@ -21,7 +21,7 @@
 
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
         {
-            _logger.LogDebug("Running {Count} startup action" + (_actions.Count == 1 ? "" : "s"), _actions.Count);
+            _logger.LogDebug("Running {Count} startup actions", _actions.Count);
 
             foreach (var action in _actions)
             {

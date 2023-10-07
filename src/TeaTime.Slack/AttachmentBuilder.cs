@@ -26,7 +26,7 @@
             if(actions.Count < maxButtons)
                 return attachments;
 
-            //Add any aditional attachments
+            //Add any additional attachments
             for (var i = 1; i <= (actions.Count) / maxButtons; i++)
             {
                 var additionalAttachment = new Attachment
@@ -40,7 +40,7 @@
             return attachments;
         }
 
-        internal static Action CreateButton(Option option, string name = "tea-option")
+        private static Action CreateButton(Option option, string name = "tea-option")
         {
             return new Button
             {

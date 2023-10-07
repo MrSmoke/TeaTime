@@ -1,23 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeaTime.Common", "src\TeaTime.Common\TeaTime.Common.csproj", "{CFB430B9-1ABD-40D9-BE44-CC58787D338F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeaTime.Data.MySql", "src\TeaTime.Data.MySql\TeaTime.Data.MySql.csproj", "{72C5F8D4-9EA9-44C9-BB7B-0C28C446A2A5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{32D445B8-13BA-49FF-B011-A32171506DEC}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{32D445B8-13BA-49FF-B011-A32171506DEC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeaTime.Data.MySql.Tests", "tests\TeaTime.Data.MySql.Tests\TeaTime.Data.MySql.Tests.csproj", "{F1314D32-E9AF-4CB8-AF31-8344D6D9FD96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeaTime.Data.MySql.Tests", "test\TeaTime.Data.MySql.Tests\TeaTime.Data.MySql.Tests.csproj", "{F1314D32-E9AF-4CB8-AF31-8344D6D9FD96}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeaTime.Slack", "src\TeaTime.Slack\TeaTime.Slack.csproj", "{31C27F3B-75B4-41C1-85A4-33608E9FBA20}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeaTime.Slack.Tests", "tests\TeaTime.Slack.Tests\TeaTime.Slack.Tests.csproj", "{2D6B64F2-D95B-421F-B073-CDCC987C1ED7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeaTime.Slack.Tests", "test\TeaTime.Slack.Tests\TeaTime.Slack.Tests.csproj", "{2D6B64F2-D95B-421F-B073-CDCC987C1ED7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeaTime", "src\TeaTime\TeaTime.csproj", "{CFD44BBC-887F-4048-A072-19EDA1A45010}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeaTime.Common.Tests", "tests\TeaTime.Common.Tests\TeaTime.Common.Tests.csproj", "{57191CD4-5222-44F1-889A-217C4EA80B87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeaTime.Common.Tests", "test\TeaTime.Common.Tests\TeaTime.Common.Tests.csproj", "{57191CD4-5222-44F1-889A-217C4EA80B87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{FBD0F104-CB83-4C5D-B68E-58A09E6B0388}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		LICENSE = LICENSE
+		README.md = README.md
+		.dockerignore = .dockerignore
+		Dockerfile = Dockerfile
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

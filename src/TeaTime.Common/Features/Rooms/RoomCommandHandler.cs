@@ -17,7 +17,10 @@
         private readonly IEventPublisher _eventPublisher;
         private readonly ISystemClock _clock;
 
-        public RoomCommandHandler(IRoomRepository roomRepository, IMapper mapper, IEventPublisher eventPublisher, ISystemClock clock)
+        public RoomCommandHandler(IRoomRepository roomRepository,
+            IMapper mapper,
+            IEventPublisher eventPublisher,
+            ISystemClock clock)
         {
             _roomRepository = roomRepository;
             _mapper = mapper;
@@ -25,19 +28,23 @@
             _clock = clock;
         }
 
-        public async Task<Unit> Handle(CreateRoomCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateRoomCommand request, CancellationToken cancellationToken)
         {
             var room = _mapper.Map<CreateRoomCommand, Room>(request);
 
             room.CreatedDate = _clock.UtcNow();
 
-            await _roomRepository.CreateAsync(room).ConfigureAwait(false);
+            await _roomRepository.CreateAsync(room);
 
-            var evt = _mapper.Map<CreateRoomCommand, RoomCreatedEvent>(request);
+            var evt = new RoomCreatedEvent
+            (
+                Id: request.Id,
+                Name: request.Name,
+                CreatedBy: request.UserId,
+                CreateDefaultItemGroup: request.CreateDefaultItemGroup
+            );
 
-            await _eventPublisher.Publish(evt).ConfigureAwait(false);
-
-            return Unit.Value;
+            await _eventPublisher.PublishAsync(evt);
         }
     }
 }

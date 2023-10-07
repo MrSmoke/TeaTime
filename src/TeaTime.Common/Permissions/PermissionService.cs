@@ -13,17 +13,17 @@
             _serviceProvider = serviceProvider;
         }
 
-        public Task<PermisionCheckResult> CheckAsync<T>(T request) where T : IUserCommand
+        public Task<PermissionCheckResult> CheckAsync<T>(T request) where T : IUserCommand
         {
             if (_serviceProvider.GetService(typeof(IPermissionCheck<T>)) is IPermissionCheck<T> check)
                 return check.CheckAsync(request);
 
-            return Task.FromResult(PermisionCheckResult.Ok());
+            return Task.FromResult(PermissionCheckResult.Ok());
         }
 
         public Task CheckAsync<TQuery, TResponse>(TQuery query) where TQuery : IUserQuery<TResponse>
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

@@ -32,21 +32,24 @@
 
         public async Task Handle(OrderPlacedEvent notification, CancellationToken cancellationToken)
         {
-            var slackUserId = await GetSlackUserId(notification.UserId).ConfigureAwait(false);
+            var slackUserId = await GetSlackUserId(notification.UserId);
             if (slackUserId == null)
                 return;
 
-            await SendMessage(notification, ResponseStrings.RunUserJoined(slackUserId), ResponseType.Channel).ConfigureAwait(false);
+            await SendMessage(notification, ResponseStrings.RunUserJoined(slackUserId), ResponseType.Channel);
         }
 
         public async Task Handle(OrderOptionChangedEvent notification, CancellationToken cancellationToken)
         {
-            var slackUserId = await GetSlackUserId(notification.UserId).ConfigureAwait(false);
+            var slackUserId = await GetSlackUserId(notification.UserId);
             if (slackUserId == null)
                 return;
 
-            var options = await _optionsRepository.GetManyAsync(new[] {notification.PreviousOptionId, notification.OptionId})
-                    .ConfigureAwait(false);
+            var options = await _optionsRepository.GetManyAsync(new[]
+            {
+                notification.PreviousOptionId,
+                notification.OptionId
+            });
 
             var oDict = options.ToDictionary(o => o.Id);
 
@@ -54,12 +57,12 @@
                 oDict[notification.PreviousOptionId].Name,
                 oDict[notification.OptionId].Name);
 
-            await SendMessage(notification, message, ResponseType.User).ConfigureAwait(false);
+            await SendMessage(notification, message, ResponseType.User);
         }
 
-        private async Task<string> GetSlackUserId(long userId)
+        private async Task<string?> GetSlackUserId(long userId)
         {
-            var slackUserId = await _linkRepository.GetLinkAsync(userId, LinkType.User).ConfigureAwait(false);
+            var slackUserId = await _linkRepository.GetLinkAsync(userId, LinkType.User);
             if (!string.IsNullOrWhiteSpace(slackUserId))
                 return slackUserId;
 
@@ -73,8 +76,7 @@
                 return;
 
             await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl,
-                    new SlashCommandResponse(message, responseType))
-                .ConfigureAwait(false);
+                new SlashCommandResponse(message, responseType));
         }
     }
 }

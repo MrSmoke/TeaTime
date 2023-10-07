@@ -13,7 +13,7 @@
             _mediator = mediator;
         }
 
-        public Task Publish<T>(T @event) where T : IEvent
+        public Task PublishAsync<T>(T @event) where T : IEvent
         {
             return _mediator.Publish(@event);
         }

@@ -3,7 +3,7 @@
     using Abstractions;
     using Models;
 
-    public class GetObjectIdByLinkValueQuery : IQuery<long>
+    public class GetObjectIdByLinkValueQuery : IQuery<long?>
     {
         public LinkType LinkType { get; }
         public string Value { get; }

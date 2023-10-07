@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.1</LangVersion>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,16 +10,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="commandrouter" Version="1.0.0-beta6" />
+    <PackageReference Include="CommandRouter" Version="1.0.0-beta6" />
     <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta3" />
-    <PackageReference Include="microsoft.aspnetcore.mvc" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
-    <PackageReference Include="microsoft.extensions.configuration" Version="2.2.0" />
-    <PackageReference Include="microsoft.extensions.configuration.binder" Version="2.2.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
-    <PackageReference Include="newtonsoft.json" Version="12.0.2" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="7.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>

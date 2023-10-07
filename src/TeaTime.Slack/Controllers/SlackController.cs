@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Text.Json;
     using System.Threading.Tasks;
     using CommandRouter;
     using CommandRouter.Exceptions;
@@ -13,7 +14,6 @@
     using Models.Requests;
     using Models.Requests.InteractiveMessages;
     using Models.Responses;
-    using Newtonsoft.Json;
     using Resources;
     using Services;
 
@@ -44,6 +44,12 @@
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
+            if (string.IsNullOrWhiteSpace(slashCommand.Command))
+            {
+                _logger.LogError("Slash command contains no command");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
+
             if (!_messageVerifier.IsValid(slashCommand))
             {
                 _logger.LogError("Bad verification token");
@@ -57,7 +63,7 @@
                 var result = await _commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
                 {
                     {Constants.SlashCommand, slashCommand}
-                }).ConfigureAwait(false);
+                });
 
                 Response.ContentType = "application/json";
                 return new CommandRouterResult(result);
@@ -122,7 +128,13 @@
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
-            var message = JsonConvert.DeserializeObject<MessageRequestPayload>(request.PayloadJson);
+            if (string.IsNullOrWhiteSpace(request.PayloadJson))
+            {
+                _logger.LogError("PayloadJson is empty");
+                return Ok(ErrorStrings.General(), ResponseType.User);
+            }
+
+            var message = SlackJsonSerializer.Deserialize<MessageRequestPayload>(request.PayloadJson);
             if (message == null)
             {
                 _logger.LogError("Failed to deserialize interactive message request");
@@ -139,7 +151,7 @@
 
             try
             {
-                await _slackService.JoinRunAsync(message).ConfigureAwait(false);
+                await _slackService.JoinRunAsync(message);
 
                 return Ok();
             }

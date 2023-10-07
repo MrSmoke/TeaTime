@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Orders
+namespace TeaTime.Common.Features.Orders
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -11,8 +11,8 @@
     using Queries;
 
     public class OrdersQueryHandler :
-        IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>
-        , IRequestHandler<GetUserOrderQuery, Order>
+        IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>,
+        IRequestHandler<GetUserOrderQuery, Order?>
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IUserRepository _userRepository;
@@ -31,14 +31,14 @@
         public async Task<IEnumerable<OrderModel>> Handle(GetRunOrdersQuery request,
             CancellationToken cancellationToken)
         {
-            var run = _runRepository.GetAsync(request.RunId);
+            var runTask = _runRepository.GetAsync(request.RunId);
 
-            var orders = (await _orderRepository.GetOrdersAsync(request.RunId).ConfigureAwait(false)).ToList();
+            var orders = (await _orderRepository.GetOrdersAsync(request.RunId)).ToList();
             if (orders.Count == 0)
                 return new List<OrderModel>();
 
-            var users = _userRepository.GetManyAsync(orders.Select(o => o.UserId)).ConfigureAwait(false);
-            var options = _optionsRepository.GetManyAsync(orders.Select(o => o.OptionId)).ConfigureAwait(false);
+            var users = _userRepository.GetManyAsync(orders.Select(o => o.UserId));
+            var options = _optionsRepository.GetManyAsync(orders.Select(o => o.OptionId));
 
             var userDict = (await users).ToDictionary(k => k.Id);
             var optionsDict = (await options).ToDictionary(k => k.Id);
@@ -50,7 +50,7 @@
                 {
                     Id = order.Id,
                     CreatedDate = order.CreatedDate,
-                    Run = await run.ConfigureAwait(false),
+                    Run = await runTask,
                     User = userDict[order.UserId],
                     Option = optionsDict[order.OptionId]
                 });
@@ -59,9 +59,9 @@
             return models;
         }
 
-        public async Task<Order> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
+        public async Task<Order?> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
         {
-            var orders = await _orderRepository.GetOrdersAsync(request.RunId).ConfigureAwait(false);
+            var orders = await _orderRepository.GetOrdersAsync(request.RunId);
 
             return orders.FirstOrDefault(o => o.UserId == request.UserId);
         }

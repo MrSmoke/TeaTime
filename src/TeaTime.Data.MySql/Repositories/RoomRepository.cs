@@ -1,6 +1,5 @@
 ﻿namespace TeaTime.Data.MySql.Repositories
 {
-    using System;
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
     using Common.Models.Data;
@@ -20,7 +19,7 @@
             return ExecuteAsync(sql, room);
         }
 
-        public Task<Room> GetAsync(long id)
+        public Task<Room?> GetAsync(long id)
         {
             const string sql = "SELECT id, name, createdBy, createdDate FROM rooms WHERE id = @id";
 

@@ -1,7 +1,7 @@
 ﻿namespace TeaTime.Slack.Models
 {
     using System.Collections.Generic;
-    using Newtonsoft.Json;
+    using System.Text.Json.Serialization;
 
     public class Attachment
     {
@@ -21,12 +21,12 @@
         /// </summary>
         public string Fallback { get; set; }
 
-        [JsonProperty("callback_id")]
+        [JsonPropertyName("callback_id")]
         public string CallBackId { get; set; }
 
         public string Color { get; set; }
 
-        [JsonProperty("attachment_type")]
+        [JsonPropertyName("attachment_type")]
         public string AttachmentType { get; set; } = "default";
 
         public List<Action> Actions { get; }

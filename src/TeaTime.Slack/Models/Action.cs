@@ -8,11 +8,4 @@
 
         public abstract string Type { get; }
     }
-
-    public class Button : Action
-    {
-        public override string Type => "button";
-
-        public string Style { get; set; } = "default";
-    }
 }

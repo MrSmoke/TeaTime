@@ -27,23 +27,23 @@
                 return;
 
             var command = new CreateRoomItemGroupCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                id: await _idGenerator.GenerateAsync(),
                 roomId: notification.Id,
                 userId: notification.CreatedBy,
                 name: "tea");
 
-            await _mediator.Send(command, CancellationToken.None).ConfigureAwait(false);
+            await _mediator.Send(command, CancellationToken.None);
 
             //create some options
             foreach (var name in DefaultItemNames)
             {
                 var optionCommand = new CreateOptionCommand(
-                    id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                    id: await _idGenerator.GenerateAsync(),
                     userId: notification.CreatedBy,
                     groupId: command.Id,
                     name: name);
 
-                await _mediator.Send(optionCommand, CancellationToken.None).ConfigureAwait(false);
+                await _mediator.Send(optionCommand, CancellationToken.None);
             }
         }
     }

@@ -5,6 +5,6 @@
         /// <summary>
         /// The name of the object
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
     }
 }

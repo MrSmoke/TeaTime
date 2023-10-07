@@ -1,7 +1,7 @@
 ﻿namespace TeaTime.Data.MySql
 {
     using System;
-    using global::MySql.Data.MySqlClient;
+    using MySqlConnector;
 
     public class MySqlConnectionFactory : IMySqlConnectionFactory
     {
@@ -22,7 +22,7 @@
 
         private static string GetConnectionString(MySqlConnectionOptions options)
         {
-            string GetOption(string key, string value)
+            static string GetOption(string key, string? value)
                 => string.IsNullOrWhiteSpace(value) ? string.Empty : key + "=" + value + ";";
 
             return string.Concat(

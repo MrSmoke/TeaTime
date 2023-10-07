@@ -2,10 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Threading.Tasks;
     using Client;
-    using Common;
+    using Common.Collections;
     using Configuration;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
@@ -53,9 +52,9 @@
                 // If we want to use the access token we'll need to store it
                 var response = await _slackApiClient.GetOAuthTokenAsync(new OAuthTokenRequest
                 {
-                    ClientId = options.ClientId,
-                    ClientSecret = options.ClientSecret,
-                    RedirectUri = options.RedirectUri,
+                    ClientId = options.ClientId!,
+                    ClientSecret = options.ClientSecret!,
+                    RedirectUri = options.RedirectUri!,
                     Code = code
                 });
 
@@ -66,9 +65,9 @@
 
                     var fields = new List<HashEntry>
                     {
-                        new HashEntry("team_name", response.TeamName),
-                        new HashEntry("access_token", response.AccessToken),
-                        new HashEntry("install_time", DateTime.UtcNow.ToString("O"))
+                        new("team_name", response.TeamName),
+                        new("access_token", response.AccessToken),
+                        new("install_time", DateTime.UtcNow.ToString("O"))
                     };
 
                     // Add config for webhook if available

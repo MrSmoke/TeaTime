@@ -11,7 +11,6 @@
     using Common.Features.Runs.Commands;
     using Exceptions;
     using MediatR;
-    using Microsoft.Extensions.Logging;
     using Models.Responses;
     using Resources;
     using Services;
@@ -22,23 +21,24 @@
         private readonly IIdGenerator<long> _idGenerator;
         private readonly ISystemClock _clock;
         private readonly ISlackService _slackService;
-        private readonly ILogger<RunCommand> _logger;
 
-        public RunCommand(IMediator mediator, IIdGenerator<long> idGenerator, ISystemClock clock, ISlackService slackService, ILogger<RunCommand> logger) : base(slackService)
+        public RunCommand(IMediator mediator,
+            IIdGenerator<long> idGenerator,
+            ISystemClock clock,
+            ISlackService slackService) : base(slackService)
         {
             _mediator = mediator;
             _idGenerator = idGenerator;
             _clock = clock;
             _slackService = slackService;
-            _logger = logger;
         }
 
         [Command("")]
         public async Task<ICommandResult> Start(string group = "tea")
         {
-            var context = await GetContextAsync().ConfigureAwait(false);
+            var context = await GetContextAsync();
 
-            var roomItemGroup = await _mediator.Send(new GetRoomItemGroupByNameQuery(roomId: context.Room.Id, userId: context.User.Id, name: group)).ConfigureAwait(false);
+            var roomItemGroup = await _mediator.Send(new GetRoomItemGroupByNameQuery(roomId: context.Room.Id, userId: context.User.Id, name: group));
             if (roomItemGroup == null)
                 return Response(ErrorStrings.StartRun_GroupInvalidName(group), ResponseType.User);
 
@@ -46,13 +46,13 @@
                 return Response(ErrorStrings.StartRun_GroupNoOptions(roomItemGroup.Name), ResponseType.User);
 
             var command = new StartRunCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                id: await _idGenerator.GenerateAsync(),
                 userId: context.User.Id,
                 roomId: context.Room.Id,
                 roomGroupId: roomItemGroup.Id,
                 startTime: _clock.UtcNow());
 
-            await _mediator.Send(command).ConfigureAwait(false);
+            await _mediator.Send(command);
 
             return Response(new SlashCommandResponse
             {
@@ -69,7 +69,7 @@
 
             try
             {
-                await _slackService.JoinRunAsync(slashCommand, optionName).ConfigureAwait(false);
+                await _slackService.JoinRunAsync(slashCommand, optionName);
 
                 return Ok();
             }
@@ -82,13 +82,13 @@
         [Command("end")]
         public async Task<ICommandResult> End()
         {
-            var context = await GetContextAsync().ConfigureAwait(false);
+            var context = await GetContextAsync();
 
-            var run = await _mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id)).ConfigureAwait(false);
+            var run = await _mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
             if (run == null)
                 return Response(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User);
 
-            var orders = await _mediator.Send(new GetRunOrdersQuery(run.Id, context.User.Id)).ConfigureAwait(false);
+            var orders = await _mediator.Send(new GetRunOrdersQuery(run.Id, context.User.Id));
 
             var command = new EndRunCommand(
                 runId: run.Id,
@@ -99,7 +99,7 @@
 
             command.AddCallbackState(context.Command.ToCallbackData());
 
-            await _mediator.Send(command).ConfigureAwait(false);
+            await _mediator.Send(command);
 
             return Response(null, ResponseType.Channel);
         }

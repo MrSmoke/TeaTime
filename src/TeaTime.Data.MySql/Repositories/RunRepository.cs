@@ -21,7 +21,7 @@
             return ExecuteAsync(sql, run);
         }
 
-        public Task<Run> GetAsync(long runId)
+        public Task<Run?> GetAsync(long runId)
         {
             const string sql =
                 "SELECT " + Columns + " FROM runs WHERE id = @runId";
@@ -29,7 +29,7 @@
             return SingleOrDefaultAsync<Run>(sql, new {runId});
         }
 
-        public Task<Run> GetCurrentRunAsync(long roomId)
+        public Task<Run?> GetCurrentRunAsync(long roomId)
         {
             const string sql =
                 "SELECT " + Columns + " FROM runs WHERE roomId = @roomId AND ended = 0 order by createdDate desc";

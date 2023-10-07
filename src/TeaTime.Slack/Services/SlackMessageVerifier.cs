@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Slack.Services
 {
+    using System;
     using Configuration;
     using Microsoft.Extensions.Options;
     using Models.Requests;
@@ -15,6 +16,11 @@
 
         public bool IsValid(IVerifiableRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
+
+            if (request.Token is null)
+                return false;
+
             return request.Token.Equals(_optionsMonitor.CurrentValue.VerificationToken);
         }
     }

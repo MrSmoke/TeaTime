@@ -1,9 +1,0 @@
-version: 1.0.{build}
-image: Visual Studio 2017
-before_build:
-- cmd: dotnet restore
-before_test:
-- cmd: dotnet restore
-test_script:
-- cmd: dotnet test tests\TeaTime.Common.Tests\TeaTime.Common.Tests.csproj
-- cmd: dotnet test tests\TeaTime.Slack.Tests\TeaTime.Slack.Tests.csproj

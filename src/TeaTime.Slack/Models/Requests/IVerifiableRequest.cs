@@ -2,6 +2,6 @@
 {
     public interface IVerifiableRequest
     {
-        string Token { get; }
+        string? Token { get; }
     }
 }

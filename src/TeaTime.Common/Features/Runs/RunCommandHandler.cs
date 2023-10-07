@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Runs
+namespace TeaTime.Common.Features.Runs
 {
     using System.Linq;
     using System.Threading;
@@ -9,6 +9,7 @@
     using Commands;
     using Events;
     using MediatR;
+    using Microsoft.Extensions.Logging;
     using Models.Data;
 
     public class RunCommandHandler :
@@ -21,8 +22,15 @@
         private readonly IMapper _mapper;
         private readonly ISystemClock _clock;
         private readonly IIllMakeRepository _illMakeRepository;
+        private readonly ILogger<RunCommandHandler> _logger;
 
-        public RunCommandHandler(IRunRepository runRepository, IEventPublisher eventPublisher, IRunnerRandomizer randomizer, IMapper mapper, ISystemClock clock, IIllMakeRepository illMakeRepository)
+        public RunCommandHandler(IRunRepository runRepository,
+            IEventPublisher eventPublisher,
+            IRunnerRandomizer randomizer,
+            IMapper mapper,
+            ISystemClock clock,
+            IIllMakeRepository illMakeRepository,
+            ILogger<RunCommandHandler> logger)
         {
             _runRepository = runRepository;
             _eventPublisher = eventPublisher;
@@ -30,34 +38,47 @@
             _mapper = mapper;
             _clock = clock;
             _illMakeRepository = illMakeRepository;
+            _logger = logger;
         }
 
         //Start run
-        public async Task<Unit> Handle(StartRunCommand request, CancellationToken cancellationToken)
+        public async Task Handle(StartRunCommand request, CancellationToken cancellationToken)
         {
             var run = _mapper.Map<StartRunCommand, Run>(request);
 
             run.CreatedDate = _clock.UtcNow();
 
-            await _runRepository.CreateAsync(run).ConfigureAwait(false);
+            await _runRepository.CreateAsync(run);
 
-            var evt = _mapper.Map<Run, RunStartedEvent>(run);
+            var evt = new RunStartedEvent
+            (
+                RunId: run.Id,
+                UserId: run.UserId,
+                RoomId: run.RoomId,
+                StartTime: run.StartTime,
+                EndTime: run.EndTime
+            );
 
-            await _eventPublisher.Publish(evt).ConfigureAwait(false);
-
-            return Unit.Value;
+            await _eventPublisher.PublishAsync(evt);
         }
 
         //End run
-        public async Task<Unit> Handle(EndRunCommand request, CancellationToken cancellationToken)
+        public async Task Handle(EndRunCommand request, CancellationToken cancellationToken)
         {
-            var run = await _runRepository.GetAsync(request.RunId).ConfigureAwait(false);
+            var runTask = _runRepository.GetAsync(request.RunId);
+            var runnerUserId = await GetRunner(request);
 
-            var runnerUserId = await GetRunner(request).ConfigureAwait(false);
+            var run = await runTask;
+
+            if (run is null)
+            {
+                _logger.LogWarning("Failed to get run {RunId}", request.RunId);
+                return;
+            }
 
             //update run
             run.Ended = true;
-            await _runRepository.UpdateAsync(run).ConfigureAwait(false);
+            await _runRepository.UpdateAsync(run);
 
             //store result
             var runResult = new RunResult
@@ -67,34 +88,36 @@
                 EndedTime = _clock.UtcNow()
             };
 
-            await _runRepository.CreateResultAsync(runResult).ConfigureAwait(false);
+            await _runRepository.CreateResultAsync(runResult);
 
             //publish event
             var evt = new RunEndedEvent
+            (
+                Orders: request.Orders,
+                RoomId: request.RoomId,
+                RunnerUserId: runResult.RunnerUserId,
+                RunId: runResult.RunId,
+                EndedTime: runResult.EndedTime
+            )
             {
-                Orders = request.Orders,
-                RoomId = request.RoomId,
-                RunnerUserId = runResult.RunnerUserId,
-                RunId = runResult.RunId,
-                EndedTime = runResult.EndedTime,
                 State = request.State
             };
 
-            await _eventPublisher.Publish(evt).ConfigureAwait(false);
-
-            return Unit.Value;
+            await _eventPublisher.PublishAsync(evt);
         }
 
         private async Task<long> GetRunner(EndRunCommand command)
         {
             //todo: dont tie illmake in with this handler directly...kinda gross
-            var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.RunId).ConfigureAwait(false);
+            var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.RunId);
 
-            if (illMakeResults.Any())
-                return illMakeResults.OrderByDescending(o => o.CreatedDate).First().UserId;
+            var illMakeUser = illMakeResults.MaxBy(o => o.CreatedDate);
+
+            if (illMakeUser is not null)
+                return illMakeUser.Id;
 
             //random runner
-            return await _randomizer.GetRunnerUserId(command.Orders).ConfigureAwait(false);
+            return await _randomizer.GetRunnerUserId(command.Orders);
         }
     }
 }

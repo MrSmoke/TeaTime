@@ -1,23 +1,25 @@
 ﻿namespace TeaTime.Slack
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
 
     internal static class SlackJsonSerializer
     {
-        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        private static readonly JsonSerializerOptions JsonSerializerSettings = new()
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString
         };
 
         internal static string Serialize(object obj)
         {
-            return JsonConvert.SerializeObject(obj, JsonSerializerSettings);
+            return JsonSerializer.Serialize(obj, JsonSerializerSettings);
         }
 
-        internal static T Deserialize<T>(string json)
+        internal static T? Deserialize<T>(string json)
         {
-            return JsonConvert.DeserializeObject<T>(json, JsonSerializerSettings);
+            return JsonSerializer.Deserialize<T>(json, JsonSerializerSettings);
         }
     }
 }

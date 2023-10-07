@@ -3,8 +3,8 @@
     public class OAuthCallbackViewModel
     {
         public bool Success { get; }
-        public string TeamName { get; set; }
-        public string ErrorCode { get; private set; }
+        public string? TeamName { get; set; }
+        public string? ErrorCode { get; private set; }
 
         public OAuthCallbackViewModel(bool success)
         {

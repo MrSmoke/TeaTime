@@ -26,16 +26,16 @@
         [Command("add")]
         public async Task<ICommandResult> AddGroup(string name)
         {
-            var context = await GetContextAsync().ConfigureAwait(false);
+            var context = await GetContextAsync();
 
             var command = new CreateRoomItemGroupCommand(
-                id: await _idGenerator.GenerateAsync().ConfigureAwait(false),
+                id: await _idGenerator.GenerateAsync(),
                 roomId: context.Room.Id,
                 name: name,
                 userId: context.User.Id
             );
 
-            await _mediator.Send(command).ConfigureAwait(false);
+            await _mediator.Send(command);
 
             return Response(ResponseStrings.GroupAdded(name), ResponseType.User);
         }
@@ -46,9 +46,9 @@
             if (string.IsNullOrWhiteSpace(name))
                 return Response(ErrorStrings.RemoveGroup_BadArguments(), ResponseType.User);
 
-            var context = await GetContextAsync().ConfigureAwait(false);
+            var context = await GetContextAsync();
 
-            var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(context.Room.Id, context.User.Id, name)).ConfigureAwait(false);
+            var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(context.Room.Id, context.User.Id, name));
             if(group == null)
                 return Response(ErrorStrings.RemoveGroup_GroupInvalidName(name), ResponseType.User);
 
@@ -57,7 +57,7 @@
                 userId: context.User.Id
             );
 
-            await _mediator.Send(command).ConfigureAwait(false);
+            await _mediator.Send(command);
 
             return Response(ResponseStrings.GroupRemoved(name), ResponseType.User);
         }
