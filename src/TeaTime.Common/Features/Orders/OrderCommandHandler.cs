@@ -82,7 +82,10 @@ namespace TeaTime.Common.Features.Orders
                 UserId: request.UserId,
                 PreviousOptionId: previousOptionId,
                 OptionId: request.OptionId
-            );
+            )
+            {
+                State = request.State,
+            };
 
             await _eventPublisher.PublishAsync(evt);
         }

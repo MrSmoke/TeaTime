@@ -45,8 +45,11 @@
             if (slackUserId == null)
                 return;
 
-            var options = await _optionsRepository.GetManyAsync(new[] {notification.PreviousOptionId, notification.OptionId})
-                    ;
+            var options = await _optionsRepository.GetManyAsync(new[]
+            {
+                notification.PreviousOptionId,
+                notification.OptionId
+            });
 
             var oDict = options.ToDictionary(o => o.Id);
 
@@ -73,8 +76,7 @@
                 return;
 
             await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl,
-                    new SlashCommandResponse(message, responseType))
-                ;
+                new SlashCommandResponse(message, responseType));
         }
     }
 }

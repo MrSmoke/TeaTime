@@ -4,6 +4,6 @@
 
     public abstract class BaseCommand : ICommand
     {
-        public Dictionary<string, string> State { get; set; } = new();
+        public Dictionary<string, object> State { get; set; } = new();
     }
 }

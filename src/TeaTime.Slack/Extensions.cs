@@ -10,27 +10,26 @@
     {
         internal static void AddCallbackState(this BaseCommand command, CallbackData callbackData)
         {
-            command.State[Constants.CallbackData] = SlackJsonSerializer.Serialize(callbackData);
+            command.State[Constants.CallbackData] = callbackData;
         }
 
         internal static bool TryGetCallbackState(this Event command, [NotNullWhen(true)] out CallbackData? callbackData)
         {
-            if (!command.State.TryGetValue(Constants.CallbackData, out var json))
+            if (!command.State.TryGetValue(Constants.CallbackData, out var value))
             {
                 callbackData = null;
                 return false;
             }
 
-            try
+            if (value is CallbackData typedData)
             {
-                callbackData = SlackJsonSerializer.Deserialize<CallbackData>(json);
-                return callbackData != null;
+                callbackData = typedData;
+                return true;
             }
-            catch
-            {
-                callbackData = null;
-                return false;
-            }
+
+
+            callbackData = null;
+            return false;
         }
 
         internal static CallbackData ToCallbackData(this SlashCommand command)

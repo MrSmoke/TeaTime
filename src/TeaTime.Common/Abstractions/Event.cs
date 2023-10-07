@@ -6,6 +6,6 @@
     public abstract record Event : IEvent
     {
         public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
-        public Dictionary<string, string> State { get; set; } = new();
+        public Dictionary<string, object> State { get; set; } = new();
     }
 }
