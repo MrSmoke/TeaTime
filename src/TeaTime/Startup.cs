@@ -74,30 +74,6 @@
             // Run Lock should be last behavior to run
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseStatusCodePages();
-                app.UseStatusCodePagesWithReExecute("/ErrorStatusCode", "?code={0}");
-            }
-
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
-        }
-
         private void RegisterDataLayer(IServiceCollection services)
         {
             var mysqlOptions = _configuration.GetSection("mysql").Get<MySqlConnectionOptions>();
