@@ -1,7 +1,5 @@
 # TeaTime ☕
 
-![AppVeyor](https://img.shields.io/appveyor/ci/mrsmoke/teatime.svg)
-![AppVeyor tests](https://img.shields.io/appveyor/tests/mrsmoke/teatime.svg)
 [![Docker Pulls](https://img.shields.io/docker/pulls/dockdockcontainer/teatime.svg)](https://hub.docker.com/r/dockdockcontainer/teatime)
 ![GitHub](https://img.shields.io/github/license/mrsmoke/teatime.svg)
 
