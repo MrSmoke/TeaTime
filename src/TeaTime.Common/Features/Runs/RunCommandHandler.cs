@@ -5,7 +5,6 @@ namespace TeaTime.Common.Features.Runs
     using System.Threading.Tasks;
     using Abstractions;
     using Abstractions.Data;
-    using AutoMapper;
     using Commands;
     using Events;
     using MediatR;
@@ -19,7 +18,6 @@ namespace TeaTime.Common.Features.Runs
         private readonly IRunRepository _runRepository;
         private readonly IEventPublisher _eventPublisher;
         private readonly IRunnerRandomizer _randomizer;
-        private readonly IMapper _mapper;
         private readonly ISystemClock _clock;
         private readonly IIllMakeRepository _illMakeRepository;
         private readonly ILogger<RunCommandHandler> _logger;
@@ -27,7 +25,6 @@ namespace TeaTime.Common.Features.Runs
         public RunCommandHandler(IRunRepository runRepository,
             IEventPublisher eventPublisher,
             IRunnerRandomizer randomizer,
-            IMapper mapper,
             ISystemClock clock,
             IIllMakeRepository illMakeRepository,
             ILogger<RunCommandHandler> logger)
@@ -35,7 +32,6 @@ namespace TeaTime.Common.Features.Runs
             _runRepository = runRepository;
             _eventPublisher = eventPublisher;
             _randomizer = randomizer;
-            _mapper = mapper;
             _clock = clock;
             _illMakeRepository = illMakeRepository;
             _logger = logger;
@@ -44,9 +40,15 @@ namespace TeaTime.Common.Features.Runs
         //Start run
         public async Task Handle(StartRunCommand request, CancellationToken cancellationToken)
         {
-            var run = _mapper.Map<StartRunCommand, Run>(request);
-
-            run.CreatedDate = _clock.UtcNow();
+            var run = new Run
+            {
+                Id = request.Id,
+                CreatedDate = _clock.UtcNow(),
+                GroupId = request.RoomGroupId,
+                RoomId = request.RoomId,
+                StartTime = request.StartTime,
+                UserId = request.UserId
+            };
 
             await _runRepository.CreateAsync(run);
 
@@ -77,8 +79,10 @@ namespace TeaTime.Common.Features.Runs
             }
 
             //update run
-            run.Ended = true;
-            await _runRepository.UpdateAsync(run);
+            await _runRepository.UpdateAsync(run with
+            {
+                Ended = true
+            });
 
             //store result
             var runResult = new RunResult
