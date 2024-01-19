@@ -49,9 +49,9 @@
             //we need to create a new user
             var command = new CreateUserCommand
             (
-                id: await _idGenerator.GenerateAsync(),
-                username: "slack_" + userId,
-                displayName: name
+                Id: await _idGenerator.GenerateAsync(),
+                Username: "slack_" + userId,
+                DisplayName: name
             );
             await _mediator.Send(command);
 
@@ -80,9 +80,9 @@
 
             var command = new CreateRoomCommand
             (
-                id: await _idGenerator.GenerateAsync(),
-                name: channelName,
-                userId: userId
+                Id: await _idGenerator.GenerateAsync(),
+                Name: channelName,
+                UserId: userId
             );
 
             await _mediator.Send(command);
@@ -171,10 +171,10 @@
             {
                 command = new CreateOrderCommand
                 (
-                    id: await _idGenerator.GenerateAsync(),
-                    runId: run.Id,
-                    userId: userId,
-                    optionId: optionId
+                    Id: await _idGenerator.GenerateAsync(),
+                    RunId: run.Id,
+                    UserId: userId,
+                    OptionId: optionId
                 );
             }
             else

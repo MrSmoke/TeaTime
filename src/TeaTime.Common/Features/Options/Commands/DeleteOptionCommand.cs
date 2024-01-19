@@ -1,16 +1,5 @@
-﻿namespace TeaTime.Common.Features.Options.Commands
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.Options.Commands;
 
-    public class DeleteOptionCommand : BaseCommand, IUserCommand
-    {
-        public long OptionId { get; }
-        public long UserId { get; }
+using Abstractions;
 
-        public DeleteOptionCommand(long optionId, long userId)
-        {
-            OptionId = optionId;
-            UserId = userId;
-        }
-    }
-}
+public record DeleteOptionCommand(long OptionId, long UserId) : BaseCommand, IUserCommand;

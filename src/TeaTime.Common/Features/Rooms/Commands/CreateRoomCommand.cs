@@ -1,28 +1,12 @@
-﻿namespace TeaTime.Common.Features.Rooms.Commands
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.Rooms.Commands;
 
-    public class CreateRoomCommand : IUserCommand
-    {
-        public long Id { get; }
-        public string Name { get; }
+using Abstractions;
 
-        /// <summary>
-        /// The user id of the user who created the room
-        /// </summary>
-        public long UserId { get; }
-
-        /// <summary>
-        /// Set to true to create the default item groups for this room
-        /// </summary>
-        public bool CreateDefaultItemGroup { get; }
-
-        public CreateRoomCommand(long id, string name, long userId, bool createDefaultItemGroup = true)
-        {
-            Id = id;
-            Name = name;
-            UserId = userId;
-            CreateDefaultItemGroup = createDefaultItemGroup;
-        }
-    }
-}
+/// <summary>
+/// Creates a room
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Name"></param>
+/// <param name="UserId">The user id of the user who created the room</param>
+/// <param name="CreateDefaultItemGroup">Set to true to create the default item groups for this room</param>
+public record CreateRoomCommand(long Id, string Name, long UserId, bool CreateDefaultItemGroup = true) : IUserCommand;

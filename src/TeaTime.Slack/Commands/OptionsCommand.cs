@@ -42,10 +42,10 @@
 
             var command =
                 new CreateOptionCommand(
-                    id: await _idGenerator.GenerateAsync(),
-                    userId: context.User.Id,
-                    groupId: group.Id,
-                    name: optionName);
+                    Id: await _idGenerator.GenerateAsync(),
+                    UserId: context.User.Id,
+                    GroupId: group.Id,
+                    Name: optionName);
 
             await _mediator.Send(command);
 
