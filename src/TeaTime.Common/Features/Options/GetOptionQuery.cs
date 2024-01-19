@@ -1,15 +1,6 @@
-﻿namespace TeaTime.Common.Features.Options
-{
-    using Abstractions;
-    using Models.Data;
+﻿namespace TeaTime.Common.Features.Options;
 
-    public class GetOptionQuery : IQuery<Option?>
-    {
-        public long Id { get; }
+using Abstractions;
+using Models.Data;
 
-        public GetOptionQuery(long id)
-        {
-            Id = id;
-        }
-    }
-}
+public record GetOptionQuery(long Id) : IQuery<Option?>;

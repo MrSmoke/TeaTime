@@ -33,19 +33,19 @@
             var context = await GetContextAsync();
 
             var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(
-                roomId: context.Room.Id,
-                userId: context.User.Id,
-                name: groupName));
+                RoomId: context.Room.Id,
+                UserId: context.User.Id,
+                Name: groupName));
 
             if (group == null)
                 return Response(ErrorStrings.AddOption_GroupInvalidName(groupName), ResponseType.User);
 
             var command =
                 new CreateOptionCommand(
-                    id: await _idGenerator.GenerateAsync(),
-                    userId: context.User.Id,
-                    groupId: group.Id,
-                    name: optionName);
+                    Id: await _idGenerator.GenerateAsync(),
+                    UserId: context.User.Id,
+                    GroupId: group.Id,
+                    Name: optionName);
 
             await _mediator.Send(command);
 
@@ -61,9 +61,9 @@
             var context = await GetContextAsync();
 
             var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(
-                roomId: context.Room.Id,
-                userId: context.User.Id,
-                name: groupName));
+                RoomId: context.Room.Id,
+                UserId: context.User.Id,
+                Name: groupName));
 
             if (group == null)
                 return Response(ErrorStrings.RemoveOption_GroupInvalidName(groupName), ResponseType.User);

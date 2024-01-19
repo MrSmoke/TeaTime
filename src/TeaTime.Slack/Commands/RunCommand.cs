@@ -38,7 +38,11 @@
         {
             var context = await GetContextAsync();
 
-            var roomItemGroup = await _mediator.Send(new GetRoomItemGroupByNameQuery(roomId: context.Room.Id, userId: context.User.Id, name: group));
+            var roomItemGroup = await _mediator.Send(new GetRoomItemGroupByNameQuery(
+                RoomId: context.Room.Id,
+                UserId: context.User.Id,
+                Name: group));
+
             if (roomItemGroup == null)
                 return Response(ErrorStrings.StartRun_GroupInvalidName(group), ResponseType.User);
 
@@ -46,11 +50,11 @@
                 return Response(ErrorStrings.StartRun_GroupNoOptions(roomItemGroup.Name), ResponseType.User);
 
             var command = new StartRunCommand(
-                id: await _idGenerator.GenerateAsync(),
-                userId: context.User.Id,
-                roomId: context.Room.Id,
-                roomGroupId: roomItemGroup.Id,
-                startTime: _clock.UtcNow());
+                Id: await _idGenerator.GenerateAsync(),
+                UserId: context.User.Id,
+                RoomId: context.Room.Id,
+                RoomGroupId: roomItemGroup.Id,
+                StartTime: _clock.UtcNow());
 
             await _mediator.Send(command);
 
@@ -91,10 +95,10 @@
             var orders = await _mediator.Send(new GetRunOrdersQuery(run.Id, context.User.Id));
 
             var command = new EndRunCommand(
-                runId: run.Id,
-                roomId: context.Room.Id,
-                userId: context.User.Id,
-                orders: orders
+                RunId: run.Id,
+                RoomId: context.Room.Id,
+                UserId: context.User.Id,
+                Orders: orders
             );
 
             command.AddCallbackState(context.Command.ToCallbackData());

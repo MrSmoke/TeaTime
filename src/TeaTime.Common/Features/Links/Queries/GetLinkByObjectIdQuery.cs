@@ -1,17 +1,6 @@
-﻿namespace TeaTime.Common.Features.Links.Queries
-{
-    using Abstractions;
-    using Models;
+﻿namespace TeaTime.Common.Features.Links.Queries;
 
-    public class GetObjectIdByLinkValueQuery : IQuery<long?>
-    {
-        public LinkType LinkType { get; }
-        public string Value { get; }
+using Abstractions;
+using Models;
 
-        public GetObjectIdByLinkValueQuery(LinkType linkType, string value)
-        {
-            LinkType = linkType;
-            Value = value;
-        }
-    }
-}
+public record GetObjectIdByLinkValueQuery(LinkType LinkType, string Value) : IQuery<long?>;

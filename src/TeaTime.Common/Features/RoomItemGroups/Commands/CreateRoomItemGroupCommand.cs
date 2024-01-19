@@ -1,20 +1,5 @@
-﻿namespace TeaTime.Common.Features.RoomItemGroups.Commands
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.RoomItemGroups.Commands;
 
-    public class CreateRoomItemGroupCommand : IUserCommand
-    {
-        public long Id { get; }
-        public long RoomId { get; }
-        public string Name { get; }
-        public long UserId { get; }
+using Abstractions;
 
-        public CreateRoomItemGroupCommand(long id, long roomId, string name, long userId)
-        {
-            Id = id;
-            RoomId = roomId;
-            Name = name;
-            UserId = userId;
-        }
-    }
-}
+public record CreateRoomItemGroupCommand(long Id, long RoomId, string Name, long UserId) : IUserCommand;
