@@ -4,7 +4,7 @@
     using Abstractions;
     using Models;
 
-    public class GetGlobalTotalsQuery : IQuery<GlobalTotals>, ICacheableQuery
+    public record GetGlobalTotalsQuery : IQuery<GlobalTotals>, ICacheableQuery
     {
         public string CacheKey => "global-totals";
         public bool SlidingCache => false;

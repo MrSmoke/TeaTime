@@ -3,12 +3,4 @@
 using Abstractions;
 using Models.Data;
 
-public class GetRunQuery : IQuery<Run?>
-{
-    public long RunId { get; }
-
-    public GetRunQuery(long runId)
-    {
-        RunId = runId;
-    }
-}
+public record GetRunQuery(long RunId) : IQuery<Run?>;

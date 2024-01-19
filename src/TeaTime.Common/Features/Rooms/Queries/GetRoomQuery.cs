@@ -1,15 +1,6 @@
-﻿namespace TeaTime.Common.Features.Rooms.Queries
-{
-    using Abstractions;
-    using Models.Data;
+﻿namespace TeaTime.Common.Features.Rooms.Queries;
 
-    public class GetRoomQuery : IQuery<Room?>
-    {
-        public long RoomId { get; }
+using Abstractions;
+using Models.Data;
 
-        public GetRoomQuery(long roomId)
-        {
-            RoomId = roomId;
-        }
-    }
-}
+public record GetRoomQuery(long RoomId) : IQuery<Room?>;
