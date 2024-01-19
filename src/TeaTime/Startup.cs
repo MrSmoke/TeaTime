@@ -51,8 +51,6 @@
             services.AddSingleton<ISystemClock, DefaultSystemClock>();
             services.AddSingleton<IPermissionService, PermissionService>();
 
-            services.AddAutoMapper(typeof(ICommand));
-
             // Register the pipelines manually so we can define order
             // - Check permissions first
             // - Then run PreProcessors
