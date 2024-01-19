@@ -38,7 +38,11 @@
         {
             var context = await GetContextAsync();
 
-            var roomItemGroup = await _mediator.Send(new GetRoomItemGroupByNameQuery(roomId: context.Room.Id, userId: context.User.Id, name: group));
+            var roomItemGroup = await _mediator.Send(new GetRoomItemGroupByNameQuery(
+                RoomId: context.Room.Id,
+                UserId: context.User.Id,
+                Name: group));
+
             if (roomItemGroup == null)
                 return Response(ErrorStrings.StartRun_GroupInvalidName(group), ResponseType.User);
 

@@ -33,9 +33,9 @@
             var context = await GetContextAsync();
 
             var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(
-                roomId: context.Room.Id,
-                userId: context.User.Id,
-                name: groupName));
+                RoomId: context.Room.Id,
+                UserId: context.User.Id,
+                Name: groupName));
 
             if (group == null)
                 return Response(ErrorStrings.AddOption_GroupInvalidName(groupName), ResponseType.User);
@@ -61,9 +61,9 @@
             var context = await GetContextAsync();
 
             var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(
-                roomId: context.Room.Id,
-                userId: context.User.Id,
-                name: groupName));
+                RoomId: context.Room.Id,
+                UserId: context.User.Id,
+                Name: groupName));
 
             if (group == null)
                 return Response(ErrorStrings.RemoveOption_GroupInvalidName(groupName), ResponseType.User);
