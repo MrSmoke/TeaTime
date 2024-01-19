@@ -1,10 +1,9 @@
-﻿namespace TeaTime.Common.Abstractions
-{
-    using System;
-    using MediatR;
+﻿namespace TeaTime.Common.Abstractions;
 
-    public interface IEvent : INotification
-    {
-        DateTimeOffset Timestamp { get; set; }
-    }
+using System;
+using MediatR;
+
+public interface IEvent : INotification
+{
+    DateTimeOffset Timestamp { get; init; }
 }
