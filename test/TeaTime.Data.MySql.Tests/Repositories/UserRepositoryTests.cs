@@ -14,6 +14,7 @@ public class UserRepositoryTests : IClassFixture<DatabaseFixture>
         _databaseFixture = databaseFixture;
     }
 
+    //[Fact]
     [Fact(Skip = "Requires local mysql")]
     public async Task CreateAsync_GetAsync()
     {
@@ -22,9 +23,9 @@ public class UserRepositoryTests : IClassFixture<DatabaseFixture>
         var user = new User
         {
             Id = TestData.Int64(),
-            Username = TestData.String(30),
+            Username = TestData.String(),
             CreatedDate = TestData.MySqlNow(),
-            DisplayName = TestData.String(30)
+            DisplayName = TestData.String()
         };
 
         await repo.CreateAsync(user);
@@ -32,10 +33,6 @@ public class UserRepositoryTests : IClassFixture<DatabaseFixture>
         var result = await repo.GetAsync(user.Id);
 
         Assert.NotNull(result);
-
-        Assert.Equal(user.Id, result.Id);
-        Assert.Equal(user.Username, result.Username);
-        Assert.Equal(user.DisplayName, result.DisplayName);
-        Assert.Equal(user.CreatedDate, result.CreatedDate);
+        Assert.Equal(user, result);
     }
 }

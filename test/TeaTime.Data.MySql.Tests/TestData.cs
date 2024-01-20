@@ -8,7 +8,7 @@ public static class TestData
 
     public static long Int64() => Random.Shared.NextInt64();
 
-    public static string String(int length)
+    public static string String(int length = 30)
     {
         var chars = new char[length];
 
