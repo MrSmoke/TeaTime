@@ -7,6 +7,7 @@
     using Common.Features.Links.Commands;
     using Common.Features.Links.Queries;
     using Common.Features.Options;
+    using Common.Features.Options.Queries;
     using Common.Features.Orders.Commands;
     using Common.Features.Orders.Queries;
     using Common.Features.RoomItemGroups.Queries;
