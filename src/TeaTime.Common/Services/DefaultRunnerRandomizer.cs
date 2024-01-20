@@ -1,8 +1,8 @@
 ﻿namespace TeaTime.Common.Services
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Security.Cryptography;
     using System.Threading.Tasks;
     using Abstractions;
     using Extensions;
@@ -10,13 +10,6 @@
 
     public class DefaultRunnerRandomizer : IRunnerRandomizer
     {
-        private readonly Random _random;
-
-        public DefaultRunnerRandomizer()
-        {
-            _random = new Random();
-        }
-
         public Task<long> GetRunnerUserId(IEnumerable<OrderModel> orders)
         {
             var userIds = orders
@@ -24,7 +17,7 @@
                 .Select(o => o.Id)
                 .ToList();
 
-            var random = _random.Next(userIds.Count);
+            var random = RandomNumberGenerator.GetInt32(userIds.Count);;
 
             return Task.FromResult(userIds[random]);
         }
