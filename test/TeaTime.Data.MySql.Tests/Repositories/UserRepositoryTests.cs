@@ -1,8 +1,8 @@
-﻿namespace TeaTime.Data.MySql.Tests;
+﻿namespace TeaTime.Data.MySql.Tests.Repositories;
 
 using System.Threading.Tasks;
-using Common.Models.Data;
-using Repositories;
+using TeaTime.Common.Models.Data;
+using TeaTime.Data.MySql.Repositories;
 using Xunit;
 
 public class UserRepositoryTests : IClassFixture<DatabaseFixture>
