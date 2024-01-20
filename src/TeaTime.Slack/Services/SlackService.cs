@@ -94,6 +94,7 @@
             {
                 Id = command.Id,
                 Name = command.Name,
+                CreatedBy = userId,
                 CreatedDate = DateTimeOffset.MinValue //dunno this value *shrug*
             };
         }

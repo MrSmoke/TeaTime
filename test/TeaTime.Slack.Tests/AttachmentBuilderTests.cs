@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Slack.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Common.Models.Data;
@@ -12,35 +13,53 @@
         {
             var options = new List<Option>
             {
-                new Option
+                new()
                 {
                     Id = 1,
-                    Name = "test1"
+                    Name = "test1",
+                    CreatedBy = 2,
+                    CreatedDate = DateTimeOffset.UtcNow,
+                    GroupId = 3
                 },
-                new Option
+                new()
                 {
                     Id = 2,
-                    Name = "test2"
+                    Name = "test2",
+                    CreatedBy = 2,
+                    CreatedDate = DateTimeOffset.UtcNow,
+                    GroupId = 3
                 },
-                new Option
+                new()
                 {
                     Id = 3,
-                    Name = "test3"
+                    Name = "test3",
+                    CreatedBy = 2,
+                    CreatedDate = DateTimeOffset.UtcNow,
+                    GroupId = 3
                 },
-                new Option
+                new()
                 {
                     Id = 4,
-                    Name = "test4"
+                    Name = "test4",
+                    CreatedBy = 2,
+                    CreatedDate = DateTimeOffset.UtcNow,
+                    GroupId = 3
                 },
-                new Option
+                new()
                 {
                     Id = 5,
-                    Name = "test5"
+                    Name = "test5",
+                    CreatedBy = 2,
+                    CreatedDate = DateTimeOffset.UtcNow,
+                    GroupId = 3
                 },
-                new Option
+                new()
                 {
                     Id = 6,
-                    Name = "test6"
+                    Name = "test6",
+                    CreatedBy = 2,
+                    CreatedDate = DateTimeOffset.UtcNow,
+                    GroupId = 3
                 },
             };
 
