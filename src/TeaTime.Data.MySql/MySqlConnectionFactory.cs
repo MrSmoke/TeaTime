@@ -31,7 +31,8 @@
                 GetOption("username", options.Username),
                 GetOption("password", options.Password),
                 GetOption("database", options.Database),
-                "UseAffectedRows=true"
+                "UseAffectedRows=true;",
+                "DateTimeKind=utc;"
             );
         }
     }
