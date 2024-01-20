@@ -18,6 +18,7 @@
     <EmbeddedResource Include="..\..\sql\V0_3_2__Add_missing_deleted_data.sql" Link="Sql\V0_3_2__Add_missing_deleted_data.sql" />
     <EmbeddedResource Include="..\..\sql\V0_4_0__Add_foreign_keys.sql" Link="Sql\V0_4_0__Add_foreign_keys.sql" />
     <EmbeddedResource Include="..\..\sql\V0_4_1__Add_indexes.sql" Link="Sql\V0_4_1__Add_indexes.sql" />
+    <EmbeddedResource Include="..\..\sql\V0_5_0__Nullable_fixes.sql" Link="Sql\V0_5_0__Nullable_fixes.sql" />
   </ItemGroup>
 
 </Project>
