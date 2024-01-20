@@ -19,4 +19,10 @@
     <ProjectReference Include="..\..\src\TeaTime.Data.MySql\TeaTime.Data.MySql.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
