@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Options;
+﻿namespace TeaTime.Common.Features.Options.Queries;
 
 using Abstractions;
 using Models.Data;
