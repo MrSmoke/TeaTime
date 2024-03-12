@@ -31,4 +31,17 @@ public class OAuthTokenResponse : BaseResponse
                !string.IsNullOrWhiteSpace(TeamName) &&
                !string.IsNullOrWhiteSpace(TeamId);
     }
+
+    public object ToLogObject()
+    {
+        return new
+        {
+            AccessToken = Redact(AccessToken),
+            Scope,
+            TeamName = Redact(TeamName),
+            TeamId
+        };
+
+        static string? Redact(string? value) => string.IsNullOrWhiteSpace(value) ? value : "***";
+    }
 }

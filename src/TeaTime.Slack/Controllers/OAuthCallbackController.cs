@@ -69,7 +69,7 @@
                 // Validate the response to make sure we have all the data
                 if (!response.ValidateProperties())
                 {
-                    _logger.LogWarning("Response is missing data {@Response}", response);
+                    _logger.LogWarning("Response is missing data {@Response}", response.ToLogObject());
                     return View(OAuthCallbackViewModel.Error("installation_error"));
                 }
 
@@ -90,7 +90,7 @@
                     if (string.IsNullOrWhiteSpace(incomingWebhook.ChannelId) ||
                         string.IsNullOrWhiteSpace(incomingWebhook.Url))
                     {
-                        _logger.LogWarning("Incomming WebHook is missing data");
+                        _logger.LogWarning("Incoming WebHook is missing data");
                     }
                     else
                     {
