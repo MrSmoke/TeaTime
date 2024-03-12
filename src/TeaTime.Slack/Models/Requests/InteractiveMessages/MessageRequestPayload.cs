@@ -1,4 +1,5 @@
-﻿namespace TeaTime.Slack.Models.Requests.InteractiveMessages
+﻿#nullable disable
+namespace TeaTime.Slack.Models.Requests.InteractiveMessages
 {
     using System.Collections.Generic;
     using System.Text.Json.Serialization;

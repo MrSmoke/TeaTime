@@ -1,50 +1,42 @@
-﻿namespace TeaTime.Slack.Models.Responses
+﻿namespace TeaTime.Slack.Models.Responses;
+
+using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
+public class SlashCommandResponse(string? text, ResponseType responseType)
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text.Json.Serialization;
-
-    public class SlashCommandResponse
+    public SlashCommandResponse() : this(null, Responses.ResponseType.Channel)
     {
-        public SlashCommandResponse()
+    }
+
+    public string? Text { get; set; } = text;
+
+    [JsonPropertyName("replace_original")]
+    public bool ReplaceOriginal { get; set; }
+
+    [JsonIgnore]
+    public ResponseType Type { get; set; } = responseType;
+
+    public IEnumerable<Attachment>? Attachments { get; set; }
+
+    [JsonPropertyName("response_type")]
+    public string ResponseType
+    {
+        get
         {
-            Type = Responses.ResponseType.Channel;
-        }
-
-        public SlashCommandResponse(string? text, ResponseType responseType)
-        {
-            Type = responseType;
-            Text = text;
-        }
-
-        public string? Text { get; set; }
-
-        [JsonPropertyName("replace_original")]
-        public bool ReplaceOriginal { get; set; }
-
-        [JsonIgnore]
-        public ResponseType Type { get; set; }
-
-        public IEnumerable<Attachment>? Attachments { get; set; }
-
-        [JsonPropertyName("response_type")]
-        public string ResponseType
-        {
-            get
+            return Type switch
             {
-                return Type switch
-                {
-                    Responses.ResponseType.Channel => "in_channel",
-                    Responses.ResponseType.User => "ephemeral",
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-            }
+                Responses.ResponseType.Channel => "in_channel",
+                Responses.ResponseType.User => "ephemeral",
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
     }
+}
 
-    public enum ResponseType
-    {
-        Channel,
-        User
-    }
+public enum ResponseType
+{
+    Channel,
+    User
 }

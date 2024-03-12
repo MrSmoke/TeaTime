@@ -43,11 +43,8 @@
             if (options == null || !options.IsValid())
             {
                 _logger.LogWarning("Ignoring OAuth callback. No OAuth settings set");
-
                 return View(OAuthCallbackViewModel.Error("not_configured"));
             }
-
-            var errorCode = "unknown";
 
             try
             {
@@ -60,41 +57,57 @@
                     Code = code
                 });
 
-                if (response.IsSuccess)
+                // Check response is successful or not (according to slack)
+                if (!response.IsSuccess)
                 {
-                    _logger.LogInformation("TeaTime installed in team {TeamId} ({TeamName}) with scope {Scope}",
-                        response.TeamId, response.TeamName, response.Scope);
+                    _logger.LogError("Failed to install into slack channel. Error: {ErrorCode}", response.Error);
 
-                    var fields = new List<HashEntry>
-                    {
-                        new("team_name", response.TeamName),
-                        new("access_token", response.AccessToken),
-                        new("install_time", DateTime.UtcNow.ToString("O"))
-                    };
-
-                    // Add config for webhook if available
-                    if (response.IncomingWebhook != null)
-                    {
-                        fields.Add(new HashEntry($"webhook:{response.IncomingWebhook.ChannelId}:url",
-                            response.IncomingWebhook.Url));
-                    }
-
-                    await _hash.SetAsync("slack:" + response.TeamId, fields);
-
-                    return View(OAuthCallbackViewModel.Ok(response.TeamName));
+                    // set the error code for the view
+                    return View(OAuthCallbackViewModel.Error("slack:" + response.Error));
                 }
 
-                _logger.LogError("Failed to install into slack channel. Error: {ErrorCode}", response.Error);
+                // Validate the response to make sure we have all the data
+                if (!response.ValidateProperties())
+                {
+                    _logger.LogWarning("Response is missing data {@Response}", response.ToLogObject());
+                    return View(OAuthCallbackViewModel.Error("installation_error"));
+                }
 
-                // set the error code for the view
-                errorCode = "slack:" + response.Error;
+                _logger.LogInformation("TeaTime installed in team {TeamId} ({TeamName}) with scope {Scope}",
+                    response.TeamId, response.TeamName, response.Scope);
+
+                var fields = new List<HashEntry>
+                {
+                    new("team_name", response.TeamName),
+                    new("access_token", response.AccessToken),
+                    new("install_time", DateTime.UtcNow.ToString("O"))
+                };
+
+                // Add config for webhook if available
+                var incomingWebhook = response.IncomingWebhook;
+                if (incomingWebhook != null)
+                {
+                    if (string.IsNullOrWhiteSpace(incomingWebhook.ChannelId) ||
+                        string.IsNullOrWhiteSpace(incomingWebhook.Url))
+                    {
+                        _logger.LogWarning("Incoming WebHook is missing data");
+                    }
+                    else
+                    {
+
+                        fields.Add(new HashEntry($"webhook:{incomingWebhook.ChannelId}:url", incomingWebhook.Url));
+                    }
+                }
+
+                await _hash.SetAsync("slack:" + response.TeamId, fields);
+
+                return View(OAuthCallbackViewModel.Ok(response.TeamName));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to get OAuth token");
+                return View(OAuthCallbackViewModel.Error("unknown"));
             }
-
-            return View(OAuthCallbackViewModel.Error(errorCode));
         }
     }
 }
