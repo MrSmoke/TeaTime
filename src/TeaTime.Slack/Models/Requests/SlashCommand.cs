@@ -1,3 +1,4 @@
+#nullable disable
 namespace TeaTime.Slack.Models.Requests
 {
     using Microsoft.AspNetCore.Mvc;

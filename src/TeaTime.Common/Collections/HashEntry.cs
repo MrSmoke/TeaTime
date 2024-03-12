@@ -14,9 +14,9 @@
         }
 
         public static implicit operator HashEntry(KeyValuePair<string, string> keyValuePair) =>
-            new HashEntry(keyValuePair.Key, keyValuePair.Value);
+            new(keyValuePair.Key, keyValuePair.Value);
 
         public static implicit operator KeyValuePair<string, string>(HashEntry hashEntry) =>
-            new KeyValuePair<string, string>(hashEntry.Field, hashEntry.Value);
+            new(hashEntry.Field, hashEntry.Value);
     }
 }
