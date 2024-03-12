@@ -12,8 +12,7 @@
     {
         public static void AddMySql(this IServiceCollection services, MySqlConnectionOptions options)
         {
-            if(options == null)
-                throw new ArgumentNullException(nameof(options));
+            ArgumentNullException.ThrowIfNull(options);
 
             options.Validate();
 

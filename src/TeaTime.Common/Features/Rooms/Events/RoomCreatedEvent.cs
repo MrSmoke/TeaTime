@@ -12,4 +12,4 @@ public record RoomCreatedEvent
     string Name,
     long CreatedBy,
     bool CreateDefaultItemGroup
-) : Event;
+) : BaseEvent;

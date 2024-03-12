@@ -8,4 +8,4 @@ public record OrderOptionChangedEvent
     long UserId,
     long PreviousOptionId,
     long OptionId
-) : Event;
+) : BaseEvent;

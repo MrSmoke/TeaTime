@@ -2,5 +2,9 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <LangVersion>11</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AnalysisLevel>latest-Minimum</AnalysisLevel>
   </PropertyGroup>
 </Project>

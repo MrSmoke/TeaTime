@@ -22,10 +22,10 @@ public class UserRepositoryTests : IClassFixture<DatabaseFixture>
 
         var user = new User
         {
-            Id = TestData.Int64(),
-            Username = TestData.String(),
+            Id = TestData.NewInt64(),
+            Username = TestData.NewString(),
             CreatedDate = TestData.MySqlNow(),
-            DisplayName = TestData.String()
+            DisplayName = TestData.NewString()
         };
 
         await repo.CreateAsync(user);

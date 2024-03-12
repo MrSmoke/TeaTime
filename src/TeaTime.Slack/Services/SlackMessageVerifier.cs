@@ -21,7 +21,7 @@
             if (request.Token is null)
                 return false;
 
-            return request.Token.Equals(_optionsMonitor.CurrentValue.VerificationToken);
+            return request.Token.Equals(_optionsMonitor.CurrentValue.VerificationToken, StringComparison.Ordinal);
         }
     }
 }

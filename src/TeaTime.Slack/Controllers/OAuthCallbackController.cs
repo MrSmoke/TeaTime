@@ -19,8 +19,10 @@
         private readonly ILogger<OAuthCallbackController> _logger;
         private readonly IDistributedHash _hash;
 
-        public OAuthCallbackController(ISlackApiClient slackApiClient, IOptionsMonitor<SlackOptions> optionsAccessor,
-            ILogger<OAuthCallbackController> logger, IDistributedHash hash)
+        public OAuthCallbackController(ISlackApiClient slackApiClient,
+            IOptionsMonitor<SlackOptions> optionsAccessor,
+            ILogger<OAuthCallbackController> logger,
+            IDistributedHash hash)
         {
             _slackApiClient = slackApiClient;
             _optionsAccessor = optionsAccessor;

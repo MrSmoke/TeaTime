@@ -8,7 +8,6 @@ namespace TeaTime.Common.Features.Runs
     using Commands;
     using Events;
     using MediatR;
-    using Microsoft.Extensions.Logging;
     using Models.Data;
 
     public class RunCommandHandler :
@@ -20,21 +19,18 @@ namespace TeaTime.Common.Features.Runs
         private readonly IRunnerRandomizer _randomizer;
         private readonly ISystemClock _clock;
         private readonly IIllMakeRepository _illMakeRepository;
-        private readonly ILogger<RunCommandHandler> _logger;
 
         public RunCommandHandler(IRunRepository runRepository,
             IEventPublisher eventPublisher,
             IRunnerRandomizer randomizer,
             ISystemClock clock,
-            IIllMakeRepository illMakeRepository,
-            ILogger<RunCommandHandler> logger)
+            IIllMakeRepository illMakeRepository)
         {
             _runRepository = runRepository;
             _eventPublisher = eventPublisher;
             _randomizer = randomizer;
             _clock = clock;
             _illMakeRepository = illMakeRepository;
-            _logger = logger;
         }
 
         //Start run
@@ -67,19 +63,10 @@ namespace TeaTime.Common.Features.Runs
         //End run
         public async Task Handle(EndRunCommand request, CancellationToken cancellationToken)
         {
-            var runTask = _runRepository.GetAsync(request.RunId);
             var runnerUserId = await GetRunner(request);
 
-            var run = await runTask;
-
-            if (run is null)
-            {
-                _logger.LogWarning("Failed to get run {RunId}", request.RunId);
-                return;
-            }
-
             //update run
-            await _runRepository.UpdateAsync(run with
+            await _runRepository.UpdateAsync(request.Run with
             {
                 Ended = true
             });
@@ -87,7 +74,7 @@ namespace TeaTime.Common.Features.Runs
             //store result
             var runResult = new RunResult
             {
-                RunId = request.RunId,
+                RunId = request.Run.Id,
                 RunnerUserId = runnerUserId,
                 EndedTime = _clock.UtcNow()
             };
@@ -98,7 +85,7 @@ namespace TeaTime.Common.Features.Runs
             var evt = new RunEndedEvent
             (
                 Orders: request.Orders,
-                RoomId: request.RoomId,
+                RoomId: request.Run.RoomId,
                 RunnerUserId: runResult.RunnerUserId,
                 RunId: runResult.RunId,
                 EndedTime: runResult.EndedTime
@@ -113,7 +100,7 @@ namespace TeaTime.Common.Features.Runs
         private async Task<long> GetRunner(EndRunCommand command)
         {
             //todo: dont tie illmake in with this handler directly...kinda gross
-            var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.RunId);
+            var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.Run.Id);
 
             var illMakeUser = illMakeResults.MaxBy(o => o.CreatedDate);
 

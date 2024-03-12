@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Commands
+namespace TeaTime.Slack.Commands
 {
     using System.Linq;
     using System.Threading.Tasks;
@@ -95,8 +95,7 @@
             var orders = await _mediator.Send(new GetRunOrdersQuery(run.Id, context.User.Id));
 
             var command = new EndRunCommand(
-                RunId: run.Id,
-                RoomId: context.Room.Id,
+                Run: run,
                 UserId: context.User.Id,
                 Orders: orders
             );

@@ -23,18 +23,18 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
         var userRepo = new UserRepository(_databaseFixture.ConnectionFactory);
         var user = new User
         {
-            Id = TestData.Int64(),
-            Username = TestData.String(),
+            Id = TestData.NewInt64(),
+            Username = TestData.NewString(),
             CreatedDate = TestData.MySqlNow(),
-            DisplayName = TestData.String()
+            DisplayName = TestData.NewString()
         };
         await userRepo.CreateAsync(user);
 
         var roomRepo = new RoomRepository(_databaseFixture.ConnectionFactory);
         var room = new Room
         {
-            Id = TestData.Int64(),
-            Name = TestData.String(),
+            Id = TestData.NewInt64(),
+            Name = TestData.NewString(),
             CreatedBy = user.Id,
             CreatedDate = TestData.MySqlNow()
         };
@@ -43,8 +43,8 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
         var optionRepo = new OptionsRepository(_databaseFixture.ConnectionFactory, new DefaultSystemClock());
         var group = new RoomItemGroup
         {
-            Id = TestData.Int64(),
-            Name = TestData.String(),
+            Id = TestData.NewInt64(),
+            Name = TestData.NewString(),
             CreatedBy = user.Id,
             CreatedDate = TestData.MySqlNow(),
             RoomId = room.Id
@@ -53,8 +53,8 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
 
         var option = new Option
         {
-            Id = TestData.Int64(),
-            Name = TestData.String(),
+            Id = TestData.NewInt64(),
+            Name = TestData.NewString(),
             CreatedBy = user.Id,
             CreatedDate = TestData.MySqlNow(),
             GroupId = group.Id
@@ -64,7 +64,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
         var runRepo = new RunRepository(_databaseFixture.ConnectionFactory);
         var run = new Run
         {
-            Id = TestData.Int64(),
+            Id = TestData.NewInt64(),
             CreatedDate = TestData.MySqlNow(),
             GroupId = group.Id,
             RoomId = room.Id,

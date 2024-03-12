@@ -13,7 +13,7 @@
             command.State[Constants.CallbackData] = callbackData;
         }
 
-        internal static bool TryGetCallbackState(this Event command, [NotNullWhen(true)] out CallbackData? callbackData)
+        internal static bool TryGetCallbackState(this BaseEvent command, [NotNullWhen(true)] out CallbackData? callbackData)
         {
             if (!command.State.TryGetValue(Constants.CallbackData, out var value))
             {
