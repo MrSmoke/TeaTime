@@ -9,15 +9,8 @@
     using Models.Responses;
     using Services;
 
-    public abstract class BaseCommand : Command
+    public abstract class BaseCommand(ISlackService slackService) : Command
     {
-        private readonly ISlackService _slackService;
-
-        protected BaseCommand(ISlackService slackService)
-        {
-            _slackService = slackService;
-        }
-
         protected async Task<CommandContext> GetContextAsync()
         {
             var command = GetCommand();
@@ -29,15 +22,15 @@
 
         private Task<User> GetOrCreateUser(SlashCommand slashCommand)
         {
-            return _slackService.GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
+            return slackService.GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
         }
 
         private Task<Room> GetOrCreateRoom(SlashCommand slashCommand, long userId)
         {
-            return _slackService.GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, userId);
+            return slackService.GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, userId);
         }
 
-        protected SlashCommand GetCommand() => (SlashCommand)Context.Items[Constants.SlashCommand];
+        protected SlashCommand GetCommand() => (SlashCommand) Context.Items[Constants.CommandContextKeys.SlashCommand];
 
         protected ICommandResult Response(string? text, ResponseType responseType)
         {

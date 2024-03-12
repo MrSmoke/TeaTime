@@ -8,14 +8,16 @@
 
     internal static class Extensions
     {
+        private const string CallbackDataKey = "CALLBACKDATA";
+
         internal static void AddCallbackState(this BaseCommand command, CallbackData callbackData)
         {
-            command.State[Constants.CallbackData] = callbackData;
+            command.State[CallbackDataKey] = callbackData;
         }
 
         internal static bool TryGetCallbackState(this BaseEvent command, [NotNullWhen(true)] out CallbackData? callbackData)
         {
-            if (!command.State.TryGetValue(Constants.CallbackData, out var value))
+            if (!command.State.TryGetValue(CallbackDataKey, out var value))
             {
                 callbackData = null;
                 return false;

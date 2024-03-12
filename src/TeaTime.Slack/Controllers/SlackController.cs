@@ -62,7 +62,7 @@ namespace TeaTime.Slack.Controllers
             {
                 var result = await _commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
                 {
-                    {Constants.SlashCommand, slashCommand}
+                    {Constants.CommandContextKeys.SlashCommand, slashCommand}
                 });
 
                 Response.ContentType = "application/json";
