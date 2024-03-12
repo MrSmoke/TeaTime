@@ -6,9 +6,9 @@ public static class TestData
 {
     private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    public static long Int64() => Random.Shared.NextInt64();
+    public static long NewInt64() => Random.Shared.NextInt64();
 
-    public static string String(int length = 30)
+    public static string NewString(int length = 30)
     {
         var chars = new char[length];
 

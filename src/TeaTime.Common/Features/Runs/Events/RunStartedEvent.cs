@@ -14,4 +14,4 @@ public record RunStartedEvent(
     long RoomId,
     DateTimeOffset StartTime,
     DateTimeOffset? EndTime
-) : Event;
+) : BaseEvent;

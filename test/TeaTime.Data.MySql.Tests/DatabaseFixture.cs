@@ -8,8 +8,8 @@ using Xunit;
 
 public class DatabaseFixture : IAsyncLifetime
 {
-    public readonly IMySqlConnectionFactory
-        ConnectionFactory = new MySqlConnectionFactory(TestConfig.ConnectionOptions);
+    public IMySqlConnectionFactory ConnectionFactory { get; } =
+        new MySqlConnectionFactory(TestConfig.ConnectionOptions);
 
     public async Task InitializeAsync()
     {
@@ -38,7 +38,7 @@ public class DatabaseFixture : IAsyncLifetime
         await conn.ExecuteAsync(sql);
 
         // Do database migrations against new schema
-        // todo: We should't be calling MySqlServerVerificationStartupAction
+        // todo: We shouldn't be calling MySqlServerVerificationStartupAction
         var migration = new MySqlServerVerificationStartupAction(ConnectionFactory,
             new NullLogger<MySqlServerVerificationStartupAction>());
 

@@ -169,7 +169,7 @@ namespace TeaTime.Slack.Controllers
             }
         }
 
-        private IActionResult Ok(string message, ResponseType responseType)
+        private OkObjectResult Ok(string message, ResponseType responseType)
         {
             return Ok(new SlashCommandResponse(message, responseType));
         }

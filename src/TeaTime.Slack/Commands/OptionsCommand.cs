@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Slack.Commands
 {
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using CommandRouter.Attributes;
@@ -68,7 +69,7 @@
             if (group == null)
                 return Response(ErrorStrings.RemoveOption_GroupInvalidName(groupName), ResponseType.User);
 
-            var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName));
+            var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.Ordinal));
             if (option == null)
                 return Response(ErrorStrings.RemoveOption_UnknownOption(optionName), ResponseType.User);
 
