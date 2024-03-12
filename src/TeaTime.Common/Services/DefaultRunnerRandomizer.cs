@@ -17,7 +17,7 @@
                 .Select(o => o.Id)
                 .ToList();
 
-            var random = RandomNumberGenerator.GetInt32(userIds.Count);;
+            var random = RandomNumberGenerator.GetInt32(userIds.Count);
 
             return Task.FromResult(userIds[random]);
         }
