@@ -2,6 +2,4 @@
 
 using MediatR;
 
-public interface IQuery<out T> : IRequest<T>
-{
-}
+public interface IQuery<out T> : IRequest<T>;
