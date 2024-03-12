@@ -36,6 +36,7 @@
             services.AddSingleton<IValidateOptions<SlackOptions>, SlackOptionsValidator>();
 
             services.AddHttpClient<ISlackApiClient, SlackApiClient>();
+            services.AddScoped<ISlackAuthenticationService, SlackAuthenticationService>();
             services.AddScoped<ISlackService, SlackService>();
             services.AddSingleton<ISlackMessageVerifier, SlackMessageVerifier>();
 
