@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Controllers
+namespace TeaTime.Slack.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -17,15 +17,17 @@
     using Services;
 
     [Route("slack")]
-    public class SlackController : Controller
+    public class SlackController : ControllerBase
     {
         private readonly ICommandRunner _commandRunner;
         private readonly ISlackService _slackService;
         private readonly ISlackMessageVerifier _messageVerifier;
         private readonly ILogger<SlackController> _logger;
 
-        public SlackController(ICommandRunner commandRunner, ISlackService slackService,
-            ISlackMessageVerifier messageVerifier, ILogger<SlackController> logger)
+        public SlackController(ICommandRunner commandRunner,
+            ISlackService slackService,
+            ISlackMessageVerifier messageVerifier,
+            ILogger<SlackController> logger)
         {
             _commandRunner = commandRunner;
             _slackService = slackService;
@@ -33,8 +35,7 @@
             _logger = logger;
         }
 
-        [HttpPost]
-        [Route("slash")]
+        [HttpPost("slash")]
         public async Task<IActionResult> SlashCommandHook(SlashCommand slashCommand)
         {
             if (slashCommand == null)
@@ -117,8 +118,7 @@
             return Ok(ErrorStrings.CommandFailed(), ResponseType.User);
         }
 
-        [HttpPost]
-        [Route("interactive-messages")]
+        [HttpPost("interactive-messages")]
         public async Task<IActionResult> InteractiveMessageHook(MessageRequest request)
         {
             if (request == null)
