@@ -30,9 +30,10 @@
             services.AddTransient<IStartupFilter, SlackStartupFilter>();
 
             // Register our options and the options startup validator
-            services.Configure<SlackOptions>(configuration);
+            services.AddOptions<SlackOptions>()
+                .Bind(configuration)
+                .ValidateOnStart();
             services.AddSingleton<IValidateOptions<SlackOptions>, SlackOptionsValidator>();
-            services.AddTransient<IStartupAction, OptionValidateStartupFilter<SlackOptions>>();
 
             services.AddHttpClient<ISlackApiClient, SlackApiClient>();
             services.AddScoped<ISlackService, SlackService>();
