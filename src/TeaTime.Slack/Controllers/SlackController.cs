@@ -44,9 +44,9 @@ namespace TeaTime.Slack.Controllers
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
-            if (string.IsNullOrWhiteSpace(slashCommand.Command))
+            if (string.IsNullOrWhiteSpace(slashCommand.Text))
             {
-                _logger.LogError("Slash command contains no command");
+                _logger.LogError("Slash command contains no text");
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
