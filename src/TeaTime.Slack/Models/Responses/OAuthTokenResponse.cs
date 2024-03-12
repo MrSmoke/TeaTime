@@ -11,25 +11,20 @@ public class OAuthTokenResponse : BaseResponse
     [JsonPropertyName("scope")]
     public string? Scope { get; set; }
 
-    [JsonPropertyName("team_name")]
-    public string? TeamName { get; set; }
-
-    [JsonPropertyName("team_id")]
-    public string? TeamId { get; set; }
+    [JsonPropertyName("team")]
+    public SlackTeam? Team { get; init; }
 
     [JsonPropertyName("incoming_webhook")]
     public OAuthTokenResponseIncomingWebhook? IncomingWebhook { get; set; }
 
     [MemberNotNullWhen(true, nameof(AccessToken))]
     [MemberNotNullWhen(true, nameof(Scope))]
-    [MemberNotNullWhen(true, nameof(TeamName))]
-    [MemberNotNullWhen(true, nameof(TeamId))]
+    [MemberNotNullWhen(true, nameof(Team))]
     public bool ValidateProperties()
     {
         return !string.IsNullOrWhiteSpace(AccessToken) &&
                !string.IsNullOrWhiteSpace(Scope) &&
-               !string.IsNullOrWhiteSpace(TeamName) &&
-               !string.IsNullOrWhiteSpace(TeamId);
+               Team is not null;
     }
 
     public object ToLogObject()
@@ -38,8 +33,8 @@ public class OAuthTokenResponse : BaseResponse
         {
             AccessToken = Redact(AccessToken),
             Scope,
-            TeamName = Redact(TeamName),
-            TeamId
+            TeamName = Redact(Team?.Name),
+            TeamId = Team?.Id
         };
 
         static string? Redact(string? value) => string.IsNullOrWhiteSpace(value) ? value : "***";

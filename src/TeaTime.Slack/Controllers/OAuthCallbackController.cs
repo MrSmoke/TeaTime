@@ -50,11 +50,11 @@
                 }
 
                 logger.LogInformation("TeaTime installed in team {TeamId} ({TeamName}) with scope {Scope}",
-                    response.TeamId, response.TeamName, response.Scope);
+                    response.Team.Id, response.Team.Name, response.Scope);
 
                 var fields = new List<HashEntry>
                 {
-                    new("team_name", response.TeamName),
+                    new("team_name", response.Team.Name),
                     new("access_token", response.AccessToken),
                     new("install_time", DateTime.UtcNow.ToString("O"))
                 };
@@ -75,9 +75,9 @@
                     }
                 }
 
-                await hash.SetAsync("slack:" + response.TeamId, fields);
+                await hash.SetAsync("slack:" + response.Team.Id, fields);
 
-                return View(OAuthCallbackViewModel.Ok(response.TeamName));
+                return View(OAuthCallbackViewModel.Ok(response.Team.Name));
             }
             catch (Exception ex)
             {
