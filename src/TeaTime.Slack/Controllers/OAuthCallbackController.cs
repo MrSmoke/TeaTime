@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Models.ViewModels;
+    using static Constants;
 
     public class OAuthCallbackController(
         ISlackAuthenticationService slackAuthenticationService,
@@ -52,12 +53,15 @@
                 logger.LogInformation("TeaTime installed in team {TeamId} ({TeamName}) with scope {Scope}",
                     response.Team.Id, response.Team.Name, response.Scope);
 
-                var fields = new List<HashEntry>
+                var hashKey = "slack:" + response.Team.Id;
+                await hash.SetAsync(hashKey, new HashEntry[]
                 {
-                    new("team_name", response.Team.Name),
-                    new("access_token", response.AccessToken),
-                    new("install_time", DateTime.UtcNow.ToString("O"))
-                };
+                    new(FieldKeys.TeamName, response.Team.Name),
+                    new(FieldKeys.AccessToken, response.AccessToken),
+                    new(FieldKeys.InstallTime, DateTime.UtcNow.ToString("O"))
+                });
+
+                string? channelName = null;
 
                 // Add config for webhook if available
                 var incomingWebhook = response.IncomingWebhook;
@@ -70,14 +74,23 @@
                     }
                     else
                     {
+                        var channelFields = new List<HashEntry>
+                        {
+                            new(FieldKeys.WebhookUrl, incomingWebhook.Url)
+                        };
 
-                        fields.Add(new HashEntry($"webhook:{incomingWebhook.ChannelId}:url", incomingWebhook.Url));
+                        if (!string.IsNullOrEmpty(incomingWebhook.Channel))
+                        {
+                            channelFields.Add(new HashEntry(FieldKeys.ChannelName, incomingWebhook.Channel));
+                            channelName = incomingWebhook.Channel;
+                        }
+
+                        var channelKey = hashKey + ":" + incomingWebhook.ChannelId;
+                        await hash.SetAsync(channelKey, channelFields);
                     }
                 }
 
-                await hash.SetAsync("slack:" + response.Team.Id, fields);
-
-                return View(OAuthCallbackViewModel.Ok(response.Team.Name));
+                return View(OAuthCallbackViewModel.Ok(response.Team.Name, channelName));
             }
             catch (Exception ex)
             {

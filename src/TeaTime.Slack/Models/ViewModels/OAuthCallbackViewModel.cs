@@ -1,19 +1,16 @@
 ﻿namespace TeaTime.Slack.Models.ViewModels;
 
-public class OAuthCallbackViewModel
+public class OAuthCallbackViewModel(bool success)
 {
-    public bool Success { get; }
-    public string? TeamName { get; set; }
-    public string? ErrorCode { get; private set; }
+    public bool Success { get; } = success;
+    public string? TeamName { get; private init; }
+    public string? ChannelName { get; private init; }
+    public string? ErrorCode { get; private init; }
 
-    public OAuthCallbackViewModel(bool success)
+    public static OAuthCallbackViewModel Ok(string teamName, string? channelName) => new(true)
     {
-        Success = success;
-    }
-
-    public static OAuthCallbackViewModel Ok(string teamName) => new(true)
-    {
-        TeamName = teamName
+        TeamName = teamName,
+        ChannelName = channelName
     };
 
     public static OAuthCallbackViewModel Error(string errorCode) => new(false)
