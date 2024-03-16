@@ -1,5 +1,6 @@
 ﻿namespace TeaTime.Slack
 {
+    using System;
     using System.Reflection;
     using Client;
     using CommandRouter.Integration.AspNetCore.Extensions;
@@ -10,9 +11,11 @@
     using Configuration;
     using EventHandlers;
     using MediatR;
+    using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
     using Services;
 
@@ -38,11 +41,22 @@
             services.AddHttpClient<ISlackApiClient, SlackApiClient>();
             services.AddScoped<ISlackAuthenticationService, SlackAuthenticationService>();
             services.AddScoped<ISlackService, SlackService>();
-            services.AddSingleton<ISlackMessageVerifier, SlackMessageVerifier>();
+
+            services.TryAddSingleton(TimeProvider.System);
+            services.AddSingleton<ISlackRequestVerifier, SignedSecretsRequestVerifier>();
+            services.Configure<SignedSecretsRequestVerifierOptions>(o =>
+            {
+                o.SigningSecret = "todo";
+            });
 
             services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedHandler>();
             services.AddTransient<INotificationHandler<OrderPlacedEvent>, OrderEventHandler>();
             services.AddTransient<INotificationHandler<OrderOptionChangedEvent>, OrderEventHandler>();
+        }
+
+        public static void UseSlack(this IApplicationBuilder builder)
+        {
+            builder.UseMiddleware<SlackMiddleware>();
         }
     }
 }

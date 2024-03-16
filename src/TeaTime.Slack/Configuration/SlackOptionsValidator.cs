@@ -6,9 +6,6 @@
     {
         public ValidateOptionsResult Validate(string? name, SlackOptions options)
         {
-            if (string.IsNullOrWhiteSpace(options.VerificationToken))
-                return ValidateOptionsResult.Fail("Slack VerificationToken is missing");
-
             // Validate oauth
             if (options.OAuth != null)
             {

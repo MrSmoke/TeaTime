@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Slack;
 
 public static class Program
 {
@@ -49,6 +50,7 @@ public static class Program
         app.UseStaticFiles();
         app.UseRouting();
         app.MapControllers();
+        app.UseSlack();
 
         // Log our version for startup
         var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("TeaTime");
