@@ -14,7 +14,7 @@ public class SlackVerifyRequestMiddleware(RequestDelegate next,
 {
     // Max size of a request body
     // This is because we need to read the body to hash it but we don't want to fill the memory with malicious requests
-    private const int MaxLength = 512 * 1024; // 512Kb
+    private const int MaxLength = 128 * 1024; //128 Kb for no real reason
 
     public async Task InvokeAsync(HttpContext context)
     {
