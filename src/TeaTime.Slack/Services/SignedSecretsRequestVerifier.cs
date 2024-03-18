@@ -68,7 +68,7 @@ public class SignedSecretsRequestVerifier(
 
         var optionValue = options.CurrentValue;
 
-        if (now - timestamp > optionValue.Something.TotalSeconds)
+        if (now - timestamp > optionValue.ClockSkew.TotalSeconds)
         {
             logger.LogWarning("Request verification failed. Too much time has passed since timestamp");
             return false;
