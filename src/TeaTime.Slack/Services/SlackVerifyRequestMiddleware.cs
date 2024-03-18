@@ -1,11 +1,11 @@
 ﻿namespace TeaTime.Slack.Services;
 
 using System;
-using System.Buffers;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 
 public class SlackVerifyRequestMiddleware(RequestDelegate next,
@@ -13,10 +13,13 @@ public class SlackVerifyRequestMiddleware(RequestDelegate next,
     ILogger<SlackVerifyRequestMiddleware> logger)
 {
     // Max size of a request body
+    // This is because we need to read the body to hash it but we don't want to fill the memory with malicious requests
     private const int MaxLength = 512 * 1024; // 512Kb
 
     public async Task InvokeAsync(HttpContext context)
     {
+        var cancellationToken = context.RequestAborted;
+
         // Check if the middleware needs to run for this request
         if (!IsForRequest(context))
         {
@@ -32,17 +35,11 @@ public class SlackVerifyRequestMiddleware(RequestDelegate next,
             return;
         }
 
-        var cancellationToken = context.RequestAborted;
+        // Set the max body size for this request now that we know we need to read it for hashing
+        SetMaxBodySize(context);
 
         // Copy body to a memory stream so we can re-read
-        var memoryStream = new MemoryStream();
-        var bodyStream = context.Request.Body;
-        await CopyToAsync(bodyStream, memoryStream, 1024, cancellationToken);
-        memoryStream.Seek(0, SeekOrigin.Begin);
-
-        // Assign back to Body for the model binding
-        context.Request.Body = memoryStream;
-        context.Response.RegisterForDispose(memoryStream);
+        await ReplaceRequestBodyAsync(context, cancellationToken);
 
         // Verify request
         if (!await requestVerifier.VerifyAsync(context.Request, cancellationToken))
@@ -63,23 +60,25 @@ public class SlackVerifyRequestMiddleware(RequestDelegate next,
         return endpoint?.Metadata.GetMetadata<SlackVerifyRequestAttribute>() != null;
     }
 
-    private static async Task CopyToAsync(Stream source, Stream destination, int bufferSize, CancellationToken cancellationToken)
+    private static void SetMaxBodySize(HttpContext context)
     {
-        var buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
-        try
-        {
-            int bytesRead;
-            while ((bytesRead = await source.ReadAsync(new Memory<byte>(buffer), cancellationToken)) != 0)
-            {
-                if (bytesRead > MaxLength)
-                    throw new Exception("Body too big");
+        var maxRequestBodySizeFeature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
+        if (maxRequestBodySizeFeature is null)
+            throw new InvalidOperationException("IHttpMaxRequestBodySizeFeature is required");
 
-                await destination.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, bytesRead), cancellationToken);
-            }
-        }
-        finally
-        {
-            ArrayPool<byte>.Shared.Return(buffer);
-        }
+        maxRequestBodySizeFeature.MaxRequestBodySize = MaxLength;
+    }
+
+    private static async Task ReplaceRequestBodyAsync(HttpContext context, CancellationToken cancellationToken)
+    {
+        // todo: replace with recyclable memory stream
+        var memoryStream = new MemoryStream();
+        context.Response.RegisterForDispose(memoryStream);
+
+        await context.Request.Body.CopyToAsync(memoryStream, cancellationToken);
+        memoryStream.Seek(0, SeekOrigin.Begin);
+
+        // Assign back to Body for the model binding
+        context.Request.Body = memoryStream;
     }
 }
