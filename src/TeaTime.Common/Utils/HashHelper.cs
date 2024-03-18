@@ -3,9 +3,9 @@
 using System.Security.Cryptography;
 using System.Text;
 
-public class HashHelper
+public static class HashHelper
 {
-    public static string HashStringHmac256(byte[] key, string value)
+    public static string HashStringSha256(byte[] key, string value)
     {
         var valueBytes = Encoding.UTF8.GetBytes(value);
         var hashBytes = HMACSHA256.HashData(key, valueBytes);

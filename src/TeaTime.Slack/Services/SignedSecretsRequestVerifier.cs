@@ -79,7 +79,7 @@ public class SignedSecretsRequestVerifier(
 
         // Hash our data
         var signatureString = VersionNumber + ':' + timestamp + ':' + requestBody;
-        var hashString = HashHelper.HashStringHmac256(keyBytes, signatureString);
+        var hashString = HashHelper.HashStringSha256(keyBytes, signatureString);
         var mySignature = VersionNumber + '=' + hashString;
 
         // Compare
