@@ -22,7 +22,7 @@
             if (string.IsNullOrWhiteSpace(code))
                 return NotFound();
 
-            logger.LogInformation("OAuth callback called with code {Code}", code);
+            logger.LogInformation("OAuth callback called. Fetching oauth token...");
 
             if (!slackAuthenticationService.OAuthEnabled())
             {
