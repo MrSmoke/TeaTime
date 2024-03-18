@@ -1,8 +1,10 @@
 ﻿namespace TeaTime.Slack.Configuration
 {
+    using Services;
+
     public class SlackOptions
     {
-        public string? SigningSecret { get; set; }
+        public SignedSecretsRequestVerifierOptions? RequestVerification { get; set; }
         public SlackOAuthOptions? OAuth { get; set; }
     }
 }

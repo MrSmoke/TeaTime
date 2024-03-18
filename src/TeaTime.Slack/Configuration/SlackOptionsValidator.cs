@@ -6,6 +6,9 @@
     {
         public ValidateOptionsResult Validate(string? name, SlackOptions options)
         {
+            var requestVerification = options.RequestVerification;
+            requestVerification?.Validate(null, requestVerification);
+
             // Validate oauth
             if (options.OAuth != null)
             {

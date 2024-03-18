@@ -20,10 +20,7 @@ public class SignedSecretsRequestVerifier(
     private const string TimestampHeaderKey = "x-slack-request-timestamp";
     private const string VersionNumber = "v0";
 
-    public bool IsEnabled()
-    {
-        return !string.IsNullOrEmpty(options.CurrentValue.SigningSecret);
-    }
+    public bool IsEnabled() => options.CurrentValue.Enabled;
 
     public async Task<bool> VerifyAsync(HttpRequest request, CancellationToken cancellationToken = default)
     {
@@ -76,6 +73,10 @@ public class SignedSecretsRequestVerifier(
             logger.LogWarning("Request verification failed. Too much time has passed since timestamp");
             return false;
         }
+
+        // This shouldn't be null (options validation) but just in case
+        if (optionValue.SigningSecret is null)
+            return false;
 
         // todo: store the bytes and use OnChange to update
         var keyBytes = Encoding.UTF8.GetBytes(optionValue.SigningSecret);
