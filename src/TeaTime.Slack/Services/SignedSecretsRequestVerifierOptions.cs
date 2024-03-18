@@ -11,10 +11,10 @@ public class SignedSecretsRequestVerifierOptions : IValidateOptions<SignedSecret
 
     public ValidateOptionsResult Validate(string? name, SignedSecretsRequestVerifierOptions options)
     {
-        if(!options.Enabled)
+        if (!options.Enabled)
             return ValidateOptionsResult.Success;
 
-        if (string.IsNullOrWhiteSpace(SigningSecret))
+        if (string.IsNullOrWhiteSpace(options.SigningSecret))
             return ValidateOptionsResult.Fail($"{nameof(SigningSecret)} is required");
 
         return ValidateOptionsResult.Success;

@@ -8,11 +8,10 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Client;
-using Configuration;
 using Models.Requests;
 using Models.Responses;
 
-internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptionsMonitor<SlackOptions> options)
+internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptionsMonitor<SlackOAuthOptions> options)
     : ISlackAuthenticationService
 {
     private static readonly string[] OAuthScopes =
@@ -23,8 +22,8 @@ internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptio
 
     public bool OAuthEnabled()
     {
-        var oauth = options.CurrentValue.OAuth;
-        return oauth is not null && oauth.IsValid();
+        var oauth = options.CurrentValue;
+        return oauth.Enabled;
     }
 
     public string BuildAuthorizeUrl()
@@ -57,8 +56,11 @@ internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptio
 
     private SlackOAuthOptions GetOptions()
     {
-        var oauth = options.CurrentValue.OAuth;
-        if (oauth is null || !oauth.IsValid())
+        var oauth = options.CurrentValue;
+        if (!oauth.Enabled)
+            throw new InvalidOperationException("Oauth is not enabled");
+
+        if (!oauth.IsValid())
             throw new InvalidOperationException("Oauth is not configured");
 
         return oauth;

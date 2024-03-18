@@ -6,7 +6,6 @@
     using CommandRouter.Integration.AspNetCore.Extensions;
     using Common.Features.Orders.Events;
     using Common.Features.Runs.Events;
-    using Configuration;
     using EventHandlers;
     using MediatR;
     using Microsoft.AspNetCore.Builder;
@@ -28,24 +27,27 @@
 
             services.AddCommandRouter();
 
+            // General required services
+            services.TryAddSingleton(TimeProvider.System);
             services.AddTransient<IStartupFilter, SlackStartupFilter>();
 
-            // Register our options and the options startup validator
-            services.AddOptions<SlackOptions>()
-                .Bind(configuration)
-                .ValidateOnStart();
-            services.AddSingleton<IValidateOptions<SlackOptions>, SlackOptionsValidator>();
-
+            // General slack services
             services.AddHttpClient<ISlackApiClient, SlackApiClient>();
-            services.AddScoped<ISlackAuthenticationService, SlackAuthenticationService>();
             services.AddScoped<ISlackService, SlackService>();
 
-            services.TryAddSingleton(TimeProvider.System);
+            // OAuth
+            services.AddOptions<SlackOAuthOptions>()
+                .Bind(configuration.GetSection("oauth"))
+                .ValidateOnStart();
+            services.AddSingleton<IValidateOptions<SlackOAuthOptions>, SlackOAuthOptions>();
+            services.AddScoped<ISlackAuthenticationService, SlackAuthenticationService>();
+
+            // Request verification
+            services.AddOptions<SignedSecretsRequestVerifierOptions>()
+                .Bind(configuration.GetSection("requestVerification"))
+                .ValidateOnStart();
+            services.AddSingleton<IValidateOptions<SignedSecretsRequestVerifierOptions>, SignedSecretsRequestVerifierOptions>();
             services.AddSingleton<ISlackRequestVerifier, SignedSecretsRequestVerifier>();
-            services.Configure<SignedSecretsRequestVerifierOptions>(o =>
-            {
-                o.SigningSecret = "todo";
-            });
 
             services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedHandler>();
             services.AddTransient<INotificationHandler<OrderPlacedEvent>, OrderEventHandler>();
