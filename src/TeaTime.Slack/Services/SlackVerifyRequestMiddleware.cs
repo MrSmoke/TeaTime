@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack;
+﻿namespace TeaTime.Slack.Services;
 
 using System;
 using System.Buffers;
@@ -7,15 +7,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Services;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false)]
-public class SlackVerifyRequestAttribute : Attribute;
-
-public class SlackMiddleware(RequestDelegate next, ISlackRequestVerifier requestVerifier, ILogger<SlackMiddleware> logger)
+public class SlackVerifyRequestMiddleware(RequestDelegate next,
+    ISlackRequestVerifier requestVerifier,
+    ILogger<SlackVerifyRequestMiddleware> logger)
 {
-    // 512Kb
-    private const int MaxLength = 512 * 1024;
+    // Max size of a request body
+    private const int MaxLength = 512 * 1024; // 512Kb
 
     public async Task InvokeAsync(HttpContext context)
     {

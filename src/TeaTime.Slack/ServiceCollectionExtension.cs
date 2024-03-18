@@ -56,7 +56,7 @@
 
         public static void UseSlack(this IApplicationBuilder builder)
         {
-            builder.UseMiddleware<SlackMiddleware>();
+            builder.UseMiddleware<SlackVerifyRequestMiddleware>();
         }
     }
 }
