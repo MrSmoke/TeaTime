@@ -21,20 +21,18 @@ namespace TeaTime.Slack.Controllers
     {
         private readonly ICommandRunner _commandRunner;
         private readonly ISlackService _slackService;
-        private readonly ISlackMessageVerifier _messageVerifier;
         private readonly ILogger<SlackController> _logger;
 
         public SlackController(ICommandRunner commandRunner,
             ISlackService slackService,
-            ISlackMessageVerifier messageVerifier,
             ILogger<SlackController> logger)
         {
             _commandRunner = commandRunner;
             _slackService = slackService;
-            _messageVerifier = messageVerifier;
             _logger = logger;
         }
 
+        [SlackVerifyRequest]
         [HttpPost("slash")]
         public async Task<IActionResult> SlashCommandHook(SlashCommand slashCommand)
         {
@@ -46,13 +44,7 @@ namespace TeaTime.Slack.Controllers
 
             if (string.IsNullOrWhiteSpace(slashCommand.Text))
             {
-                _logger.LogError("Slash command contains no text");
-                return Ok(ErrorStrings.General(), ResponseType.User);
-            }
-
-            if (!_messageVerifier.IsValid(slashCommand))
-            {
-                _logger.LogError("Bad verification token");
+                _logger.LogWarning("Slash command contains no text");
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
@@ -118,6 +110,7 @@ namespace TeaTime.Slack.Controllers
             return Ok(ErrorStrings.CommandFailed(), ResponseType.User);
         }
 
+        [SlackVerifyRequest]
         [HttpPost("interactive-messages")]
         public async Task<IActionResult> InteractiveMessageHook(MessageRequest request)
         {
@@ -137,12 +130,6 @@ namespace TeaTime.Slack.Controllers
             if (message == null)
             {
                 _logger.LogError("Failed to deserialize interactive message request");
-                return Ok(ErrorStrings.General(), ResponseType.User);
-            }
-
-            if (!_messageVerifier.IsValid(message))
-            {
-                _logger.LogError("Bad verification token");
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
