@@ -74,7 +74,7 @@ public class SlackVerifyRequestMiddleware(RequestDelegate next,
                 if (bytesRead > MaxLength)
                     throw new Exception("Body too big");
 
-                await destination.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, bytesRead), cancellationToken).ConfigureAwait(false);
+                await destination.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, bytesRead), cancellationToken);
             }
         }
         finally

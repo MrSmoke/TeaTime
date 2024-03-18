@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Models.ViewModels;
+    using Services;
     using static Constants;
 
     public class OAuthCallbackController(

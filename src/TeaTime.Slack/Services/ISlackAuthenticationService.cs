@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack;
+﻿namespace TeaTime.Slack.Services;
 
 using System.Threading;
 using System.Threading.Tasks;

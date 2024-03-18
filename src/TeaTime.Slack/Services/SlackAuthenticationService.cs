@@ -1,14 +1,14 @@
-﻿namespace TeaTime.Slack;
+﻿namespace TeaTime.Slack.Services;
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Client;
-using Configuration;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Client;
+using Configuration;
 using Models.Requests;
 using Models.Responses;
 
@@ -42,6 +42,8 @@ internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptio
 
     public Task<OAuthTokenResponse> GetOAuthTokenAsync(string code, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(code);
+
         var oauth = GetOptions();
 
         return slackApiClient.GetOAuthTokenAsync(new OAuthTokenRequest

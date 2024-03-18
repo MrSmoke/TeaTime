@@ -29,7 +29,6 @@
                 return true;
             }
 
-
             callbackData = null;
             return false;
         }

@@ -27,6 +27,8 @@ public class SignedSecretsRequestVerifier(
 
     public async Task<bool> VerifyAsync(HttpRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         if (!IsEnabled())
             return false;
 
@@ -49,8 +51,9 @@ public class SignedSecretsRequestVerifier(
         }
 
         // Read body and seek back to start
-        string requestBody;
         var bodyStream = request.Body;
+
+        string requestBody;
         using (var reader = new StreamReader(bodyStream, Encoding.UTF8, leaveOpen: true))
             requestBody = await reader.ReadToEndAsync(cancellationToken);
 
