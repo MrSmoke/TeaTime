@@ -8,10 +8,14 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Client;
+using Common.Abstractions;
 using Models.Requests;
 using Models.Responses;
 
-internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptionsMonitor<SlackOAuthOptions> options)
+internal class SlackAuthenticationService(
+    ISlackApiClient slackApiClient,
+    IUrlGenerator urlGenerator,
+    IOptionsMonitor<SlackOAuthOptions> options)
     : ISlackAuthenticationService
 {
     private static readonly string[] OAuthScopes =
@@ -32,11 +36,11 @@ internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptio
 
         const string baseUrl = "https://slack.com/oauth/v2/authorize";
 
-        return QueryHelpers.AddQueryString(baseUrl, new KeyValuePair<string, StringValues>[]
-        {
-            new("client_id", oauth.ClientId),
-            new("scope", OAuthScopes)
-        });
+        return QueryHelpers.AddQueryString(baseUrl,
+            new KeyValuePair<string, StringValues>[]
+            {
+                new("client_id", oauth.ClientId), new("scope", OAuthScopes), new("redirect_uri", GetRedirectUrl())
+            });
     }
 
     public Task<OAuthTokenResponse> GetOAuthTokenAsync(string code, CancellationToken cancellationToken = default)
@@ -49,10 +53,12 @@ internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptio
         {
             ClientId = oauth.ClientId,
             ClientSecret = oauth.ClientSecret,
-            RedirectUri = oauth.RedirectUri,
+            RedirectUri = GetRedirectUrl(),
             Code = code
         });
     }
+
+    private string GetRedirectUrl() => urlGenerator.CreateAbsoluteUrlByName(Constants.RouteNames.OauthCallback);
 
     private SlackOAuthOptions GetOptions()
     {

@@ -15,4 +15,9 @@ internal static class Constants
         internal const string WebhookUrl = "webhook:url";
         internal const string ChannelName = "webhook:channel_name";
     }
+
+    internal static class RouteNames
+    {
+        public const string OauthCallback = "SlackOauthCallback";
+    }
 }

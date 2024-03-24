@@ -16,7 +16,7 @@
         IDistributedHash hash)
         : Controller
     {
-        [Route("slack/callback")]
+        [Route("slack/callback", Name = RouteNames.OauthCallback)]
         public async Task<IActionResult> Callback(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
