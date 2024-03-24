@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Exceptions
+namespace TeaTime.Common.Exceptions
 {
     public class PermissionException : TeaTimeException
     {

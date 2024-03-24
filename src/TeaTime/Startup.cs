@@ -1,10 +1,9 @@
-﻿namespace TeaTime
+namespace TeaTime
 {
     using System;
     using Common;
     using Common.Abstractions;
     using Common.Cache;
-    using Common.Exceptions;
     using Common.Features.Runs;
     using Common.Features.Runs.Commands;
     using Common.Permissions;

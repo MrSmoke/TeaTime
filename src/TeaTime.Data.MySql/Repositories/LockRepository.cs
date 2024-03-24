@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories
 {
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
@@ -13,7 +13,7 @@
         {
             const string sql = "INSERT IGNORE INTO locks VALUES (@key)";
 
-            var rows = await ExecuteAsync(sql, new {key});
+            var rows = await ExecuteAsync(sql, new { key });
 
             return rows == 1;
         }

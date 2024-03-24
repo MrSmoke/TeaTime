@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Statistics
+namespace TeaTime.Common.Features.Statistics
 {
     using System.Threading;
     using System.Threading.Tasks;

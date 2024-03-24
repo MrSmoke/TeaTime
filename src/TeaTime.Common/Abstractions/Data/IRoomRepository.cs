@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Abstractions.Data
+namespace TeaTime.Common.Abstractions.Data
 {
     using System.Threading.Tasks;
     using Models.Data;

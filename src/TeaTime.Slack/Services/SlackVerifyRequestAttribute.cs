@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Services;
+namespace TeaTime.Slack.Services;
 
 using System;
 

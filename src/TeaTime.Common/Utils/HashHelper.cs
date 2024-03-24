@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Utils;
+namespace TeaTime.Common.Utils;
 
 using System;
 using System.Security.Cryptography;

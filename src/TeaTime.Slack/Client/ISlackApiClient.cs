@@ -1,8 +1,8 @@
-﻿namespace TeaTime.Slack.Client
+namespace TeaTime.Slack.Client
 {
     using System.Threading.Tasks;
-    using Models.Responses;
     using Models.Requests;
+    using Models.Responses;
 
     public interface ISlackApiClient
     {

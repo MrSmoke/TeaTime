@@ -74,7 +74,7 @@ namespace TeaTime.Common.Features.Orders
             var previousOptionId = existing.OptionId;
 
             //update
-            await _orderRepository.UpdateAsync(existing with {OptionId = request.OptionId});
+            await _orderRepository.UpdateAsync(existing with { OptionId = request.OptionId });
 
             //create event
             var evt = new OrderOptionChangedEvent

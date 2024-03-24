@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Commands
+namespace TeaTime.Slack.Commands
 {
     using System;
     using System.Linq;

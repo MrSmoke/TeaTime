@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.EventHandlers
+namespace TeaTime.Slack.EventHandlers
 {
     using System.Linq;
     using System.Threading;

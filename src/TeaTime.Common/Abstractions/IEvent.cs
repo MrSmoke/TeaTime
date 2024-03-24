@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Abstractions;
+namespace TeaTime.Common.Abstractions;
 
 using System;
 using MediatR;

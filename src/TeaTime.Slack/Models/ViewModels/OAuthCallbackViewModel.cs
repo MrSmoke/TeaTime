@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Models.ViewModels;
+namespace TeaTime.Slack.Models.ViewModels;
 
 public class OAuthCallbackViewModel(bool success)
 {

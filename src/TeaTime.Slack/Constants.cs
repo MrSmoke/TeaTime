@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack;
+namespace TeaTime.Slack;
 
 internal static class Constants
 {

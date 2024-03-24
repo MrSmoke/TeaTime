@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -22,7 +22,7 @@
         {
             const string sql = "SELECT id, username, displayName, createdDate FROM users WHERE id = @id";
 
-            return SingleOrDefaultAsync<User>(sql, new {id});
+            return SingleOrDefaultAsync<User>(sql, new { id });
         }
 
         public Task<IEnumerable<User>> GetManyAsync(IEnumerable<long> ids)

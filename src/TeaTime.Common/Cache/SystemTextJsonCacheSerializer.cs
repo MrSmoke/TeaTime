@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Cache
+namespace TeaTime.Common.Cache
 {
     using System;
     using System.Text.Json;

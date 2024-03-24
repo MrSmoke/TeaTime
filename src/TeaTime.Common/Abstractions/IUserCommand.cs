@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Abstractions;
+namespace TeaTime.Common.Abstractions;
 
 /// <summary>
 /// A command which is issued by a user

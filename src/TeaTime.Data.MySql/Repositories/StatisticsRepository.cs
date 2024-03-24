@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories
 {
     using System.Threading.Tasks;
     using Common.Abstractions.Data;

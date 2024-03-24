@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.RoomItemGroups.Commands;
+namespace TeaTime.Common.Features.RoomItemGroups.Commands;
 
 using Abstractions;
 

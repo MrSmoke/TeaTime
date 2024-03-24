@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Users
+namespace TeaTime.Common.Features.Users
 {
     using System.Threading;
     using System.Threading.Tasks;

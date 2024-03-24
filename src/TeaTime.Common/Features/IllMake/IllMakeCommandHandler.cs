@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.IllMake
+namespace TeaTime.Common.Features.IllMake
 {
     using System.Threading;
     using System.Threading.Tasks;

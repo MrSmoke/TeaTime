@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 namespace TeaTime.Slack.Models.Requests.InteractiveMessages
 {
     using Microsoft.AspNetCore.Mvc;

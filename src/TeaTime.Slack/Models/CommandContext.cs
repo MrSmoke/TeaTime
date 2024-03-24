@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Models;
+namespace TeaTime.Slack.Models;
 
 using Common.Models.Data;
 using Requests;

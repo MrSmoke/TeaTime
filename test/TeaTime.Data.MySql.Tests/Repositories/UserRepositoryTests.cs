@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql.Tests.Repositories;
+namespace TeaTime.Data.MySql.Tests.Repositories;
 
 using System.Threading.Tasks;
 using TeaTime.Common.Models.Data;

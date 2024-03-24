@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Controllers
+namespace TeaTime.Slack.Controllers
 {
     using System;
     using System.Collections.Generic;

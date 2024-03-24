@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Permissions
+namespace TeaTime.Common.Permissions
 {
     public sealed class PermissionCheckResult
     {

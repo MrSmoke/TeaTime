@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Commands
+namespace TeaTime.Slack.Commands
 {
     using System.Threading.Tasks;
     using CommandRouter.Attributes;
@@ -49,7 +49,7 @@
             var context = await GetContextAsync();
 
             var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(context.Room.Id, context.User.Id, name));
-            if(group == null)
+            if (group == null)
                 return Response(ErrorStrings.RemoveGroup_GroupInvalidName(name), ResponseType.User);
 
             var command = new DeleteRoomItemGroupCommand(

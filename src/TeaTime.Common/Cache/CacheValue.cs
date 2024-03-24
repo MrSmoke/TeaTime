@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Cache
+namespace TeaTime.Common.Cache
 {
     public class CacheValue<T>
     {

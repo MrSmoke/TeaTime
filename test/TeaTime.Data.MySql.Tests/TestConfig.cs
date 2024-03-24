@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql.Tests
+namespace TeaTime.Data.MySql.Tests
 {
     using System;
     using Microsoft.Extensions.Configuration;

@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack
+namespace TeaTime.Slack
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -23,7 +23,7 @@
             attachment.Actions.AddRange(actions.Take(maxButtons));
             attachments.Add(attachment);
 
-            if(actions.Count < maxButtons)
+            if (actions.Count < maxButtons)
                 return attachments;
 
             //Add any additional attachments
