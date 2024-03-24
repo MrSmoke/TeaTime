@@ -35,15 +35,15 @@ public class UrlGenerator(LinkGenerator linkGenerator,
     private (string Scheme, HostString Host) GetHost()
     {
         // Get self from config if it exists
-        var o = options.CurrentValue;
-        if (o.SelfUrl is not null)
+        var selfHost = options.CurrentValue.SelfHost;
+        if (selfHost is not null)
         {
             // Check if its the default port and if so don't include it
-            var host = o.SelfUrl.IsDefaultPort
-                ? new HostString(o.SelfUrl.Host)
-                : new HostString(o.SelfUrl.Host, o.SelfUrl.Port);
+            var host = selfHost.IsDefaultPort
+                ? new HostString(selfHost.Host)
+                : new HostString(selfHost.Host, selfHost.Port);
 
-            return (o.SelfUrl.Scheme, host);
+            return (selfHost.Scheme, host);
         }
 
         // Fallback to the  current request
