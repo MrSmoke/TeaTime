@@ -34,6 +34,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
         var room = new Room
         {
             Id = TestData.NewInt64(),
+            RoomCode = TestData.NewString(22),
             Name = TestData.NewString(),
             CreatedBy = user.Id,
             CreatedDate = TestData.MySqlNow()
