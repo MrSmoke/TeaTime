@@ -1,8 +1,8 @@
 namespace TeaTime.Common.Features.Users
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Abstractions.Data;
     using Commands;
     using MediatR;
@@ -11,9 +11,9 @@ namespace TeaTime.Common.Features.Users
     public class UserCommandHandler : IRequestHandler<CreateUserCommand>
     {
         private readonly IUserRepository _userRepository;
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _clock;
 
-        public UserCommandHandler(IUserRepository userRepository, ISystemClock clock)
+        public UserCommandHandler(IUserRepository userRepository, TimeProvider clock)
         {
             _userRepository = userRepository;
             _clock = clock;
@@ -25,7 +25,7 @@ namespace TeaTime.Common.Features.Users
             {
                 Id = request.Id,
                 Username = request.Username,
-                CreatedDate = _clock.UtcNow(),
+                CreatedDate = _clock.GetUtcNow(),
                 DisplayName = request.DisplayName
             };
 

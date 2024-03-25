@@ -1,8 +1,8 @@
 namespace TeaTime.Common.Features.IllMake
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Abstractions.Data;
     using Commands;
     using MediatR;
@@ -11,9 +11,9 @@ namespace TeaTime.Common.Features.IllMake
     public class IllMakeCommandHandler : IRequestHandler<IllMakeCommand>
     {
         private readonly IIllMakeRepository _repository;
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _clock;
 
-        public IllMakeCommandHandler(IIllMakeRepository repository, ISystemClock clock)
+        public IllMakeCommandHandler(IIllMakeRepository repository, TimeProvider clock)
         {
             _repository = repository;
             _clock = clock;
@@ -26,7 +26,7 @@ namespace TeaTime.Common.Features.IllMake
                 Id = request.Id,
                 RunId = request.RunId,
                 UserId = request.UserId,
-                CreatedDate = _clock.UtcNow()
+                CreatedDate = _clock.GetUtcNow()
             };
 
             //todo: event

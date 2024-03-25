@@ -1,5 +1,6 @@
 namespace TeaTime.Common.Features.Runs
 {
+    using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -17,13 +18,13 @@ namespace TeaTime.Common.Features.Runs
         private readonly IRunRepository _runRepository;
         private readonly IEventPublisher _eventPublisher;
         private readonly IRunnerRandomizer _randomizer;
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _clock;
         private readonly IIllMakeRepository _illMakeRepository;
 
         public RunCommandHandler(IRunRepository runRepository,
             IEventPublisher eventPublisher,
             IRunnerRandomizer randomizer,
-            ISystemClock clock,
+            TimeProvider clock,
             IIllMakeRepository illMakeRepository)
         {
             _runRepository = runRepository;
@@ -39,7 +40,7 @@ namespace TeaTime.Common.Features.Runs
             var run = new Run
             {
                 Id = request.Id,
-                CreatedDate = _clock.UtcNow(),
+                CreatedDate = _clock.GetUtcNow(),
                 GroupId = request.RoomGroupId,
                 RoomId = request.RoomId,
                 StartTime = request.StartTime,
@@ -76,7 +77,7 @@ namespace TeaTime.Common.Features.Runs
             {
                 RunId = request.Run.Id,
                 RunnerUserId = runnerUserId,
-                EndedTime = _clock.UtcNow()
+                EndedTime = _clock.GetUtcNow()
             };
 
             await _runRepository.CreateResultAsync(runResult);
