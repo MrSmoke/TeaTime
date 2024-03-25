@@ -1,48 +1,41 @@
-namespace TeaTime.Data.MySql
+namespace TeaTime.Data.MySql;
+
+using System;
+using Common;
+using EvolveDb;
+using Factories;
+using Microsoft.Extensions.Logging;
+
+public class MySqlServerVerificationStartupAction(
+    IMySqlConnectionFactory connectionFactory,
+    ILogger<MySqlServerVerificationStartupAction> logger)
+    : IStartupAction
 {
-    using System;
-    using Common;
-    using EvolveDb;
-    using Microsoft.Extensions.Logging;
+    public string Name => "MySQL Server Verification";
 
-    public class MySqlServerVerificationStartupAction : IStartupAction
+    public void Execute()
     {
-        private readonly IMySqlConnectionFactory _connectionFactory;
-        private readonly ILogger<MySqlServerVerificationStartupAction> _logger;
-
-        public string Name => "MySQL Server Verification";
-
-        public MySqlServerVerificationStartupAction(IMySqlConnectionFactory connectionFactory,
-            ILogger<MySqlServerVerificationStartupAction> logger)
+        try
         {
-            _connectionFactory = connectionFactory;
-            _logger = logger;
+            using var conn = connectionFactory.GetConnection();
+
+            conn.Open();
+
+            logger.LogInformation("MySQL connectivity OK!");
+
+            var evolve = new Evolve(conn, msg => logger.LogInformation(msg))
+            {
+                EmbeddedResourceAssemblies = new[] { typeof(MySqlServerVerificationStartupAction).Assembly },
+                IsEraseDisabled = true
+            };
+
+            evolve.Migrate();
         }
-
-        public void Execute()
+        catch (Exception ex)
         {
-            try
-            {
-                using var conn = _connectionFactory.GetConnection();
+            logger.LogError(ex, "Failed to connect to MySQL");
 
-                conn.Open();
-
-                _logger.LogInformation("MySQL connectivity OK!");
-
-                var evolve = new Evolve(conn, msg => _logger.LogInformation(msg))
-                {
-                    EmbeddedResourceAssemblies = new[] { typeof(MySqlServerVerificationStartupAction).Assembly },
-                    IsEraseDisabled = true
-                };
-
-                evolve.Migrate();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to connect to MySQL");
-
-                throw;
-            }
+            throw;
         }
     }
 }

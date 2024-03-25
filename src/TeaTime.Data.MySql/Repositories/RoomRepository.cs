@@ -1,29 +1,25 @@
-namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories;
+
+using System.Threading.Tasks;
+using Common.Abstractions.Data;
+using Common.Models.Data;
+using Factories;
+
+public class RoomRepository(IMySqlConnectionFactory factory) : BaseRepository(factory), IRoomRepository
 {
-    using System.Threading.Tasks;
-    using Common.Abstractions.Data;
-    using Common.Models.Data;
-
-    public class RoomRepository : BaseRepository, IRoomRepository
+    public Task CreateAsync(Room room)
     {
-        public RoomRepository(IMySqlConnectionFactory factory) : base(factory)
-        {
-        }
+        const string sql = "INSERT INTO rooms " +
+                           "(id, name, createdBy, createdDate) VALUES " +
+                           "(@id, @name, @createdBy, @createdDate)";
 
-        public Task CreateAsync(Room room)
-        {
-            const string sql = "INSERT INTO rooms " +
-                               "(id, name, createdBy, createdDate) VALUES " +
-                               "(@id, @name, @createdBy, @createdDate)";
+        return ExecuteAsync(sql, room);
+    }
 
-            return ExecuteAsync(sql, room);
-        }
+    public Task<Room?> GetAsync(long id)
+    {
+        const string sql = "SELECT id, name, createdBy, createdDate FROM rooms WHERE id = @id";
 
-        public Task<Room?> GetAsync(long id)
-        {
-            const string sql = "SELECT id, name, createdBy, createdDate FROM rooms WHERE id = @id";
-
-            return SingleOrDefaultAsync<Room>(sql, new { id });
-        }
+        return SingleOrDefaultAsync<Room>(sql, new { id });
     }
 }
