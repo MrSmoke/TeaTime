@@ -48,6 +48,7 @@ namespace TeaTime
 
             // Core
             services.TryAddSingleton(TimeProvider.System);
+            services.AddSingleton<IIdGenerator<string>, Base64GuidStringGenerator>();
             services.AddScoped<IEventPublisher, EventPublisher>();
             services.AddSingleton<IRunnerRandomizer, DefaultRunnerRandomizer>();
             services.AddSingleton<IRoomRunLockService, RoomRunLockService>();
