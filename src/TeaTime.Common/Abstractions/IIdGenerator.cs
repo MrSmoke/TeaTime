@@ -4,6 +4,6 @@ namespace TeaTime.Common.Abstractions
 
     public interface IIdGenerator<T>
     {
-        Task<T> GenerateAsync();
+        ValueTask<T> GenerateAsync();
     }
 }

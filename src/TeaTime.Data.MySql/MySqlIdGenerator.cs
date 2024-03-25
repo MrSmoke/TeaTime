@@ -7,10 +7,10 @@ using Repositories;
 
 public class MySqlIdGenerator(IMySqlConnectionFactory factory) : BaseRepository(factory), IIdGenerator<long>
 {
-    public Task<long> GenerateAsync()
+    public async ValueTask<long> GenerateAsync()
     {
         const string sql = "REPLACE INTO ids64 (stub) VALUES ('a'); SELECT LAST_INSERT_ID();";
 
-        return SingleOrDefaultAsync<long>(sql);
+        return await SingleOrDefaultAsync<long>(sql);
     }
 }

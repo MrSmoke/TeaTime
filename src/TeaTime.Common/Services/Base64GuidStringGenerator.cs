@@ -12,12 +12,12 @@ public class Base64GuidStringGenerator : IIdGenerator<string>
     // Converting a 16 byte guid to a base64 string will result in a 22 byte string
     private const int StringSize = 22;
 
-    public Task<string> GenerateAsync()
+    public ValueTask<string> GenerateAsync()
     {
         Span<byte> bytes = stackalloc byte[16];
         Guid.NewGuid().TryWriteBytes(bytes);
         var value = Base64UrlEncode(bytes);
-        return Task.FromResult(value);
+        return new ValueTask<string>(value);
     }
 
     private static string Base64UrlEncode(ReadOnlySpan<byte> input)
