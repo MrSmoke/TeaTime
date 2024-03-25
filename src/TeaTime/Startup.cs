@@ -9,6 +9,7 @@ namespace TeaTime
     using Common.Permissions;
     using Common.Services;
     using Data.MySql;
+    using Data.MySql.Factories;
     using MediatR;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
