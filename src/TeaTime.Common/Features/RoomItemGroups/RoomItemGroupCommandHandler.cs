@@ -1,8 +1,8 @@
 namespace TeaTime.Common.Features.RoomItemGroups
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Abstractions.Data;
     using Commands;
     using Common.Models.Data;
@@ -13,9 +13,9 @@ namespace TeaTime.Common.Features.RoomItemGroups
         IRequestHandler<DeleteRoomItemGroupCommand>
     {
         private readonly IOptionsRepository _optionsRepository;
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _clock;
 
-        public RoomItemGroupCommandHandler(IOptionsRepository optionsRepository, ISystemClock clock)
+        public RoomItemGroupCommandHandler(IOptionsRepository optionsRepository, TimeProvider clock)
         {
             _optionsRepository = optionsRepository;
             _clock = clock;
@@ -28,7 +28,7 @@ namespace TeaTime.Common.Features.RoomItemGroups
                 Id = request.Id,
                 Name = request.Name,
                 CreatedBy = request.UserId,
-                CreatedDate = _clock.UtcNow(),
+                CreatedDate = _clock.GetUtcNow(),
                 RoomId = request.RoomId
             };
 

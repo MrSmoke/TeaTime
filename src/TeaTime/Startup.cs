@@ -51,7 +51,6 @@ namespace TeaTime
             services.AddScoped<IEventPublisher, EventPublisher>();
             services.AddSingleton<IRunnerRandomizer, DefaultRunnerRandomizer>();
             services.AddSingleton<IRoomRunLockService, RoomRunLockService>();
-            services.AddSingleton<ISystemClock, DefaultSystemClock>();
             services.AddSingleton<IPermissionService, PermissionService>();
             services.AddSingleton<IUrlGenerator, UrlGenerator>();
             services.Configure<UrlGeneratorOptions>(_configuration);

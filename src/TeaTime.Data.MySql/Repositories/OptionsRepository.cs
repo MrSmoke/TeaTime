@@ -1,13 +1,13 @@
 namespace TeaTime.Data.MySql.Repositories;
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Common.Abstractions;
 using Common.Abstractions.Data;
 using Common.Models.Data;
 using Factories;
 
-public class OptionsRepository(IMySqlConnectionFactory factory, ISystemClock systemClock)
+public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider systemClock)
     : BaseRepository(factory), IOptionsRepository
 {
     private const string GroupSelectColumns = "id, name, roomId, createdBy, createdDate";
@@ -39,7 +39,7 @@ public class OptionsRepository(IMySqlConnectionFactory factory, ISystemClock sys
         return ExecuteAsync(sql, new
         {
             groupId,
-            now = systemClock.UtcNow().UtcDateTime
+            now = systemClock.GetUtcNow()
         });
     }
 
@@ -97,7 +97,7 @@ public class OptionsRepository(IMySqlConnectionFactory factory, ISystemClock sys
         return ExecuteAsync(sql, new
         {
             optionId,
-            now = systemClock.UtcNow().UtcDateTime
+            now = systemClock.GetUtcNow()
         });
     }
 
