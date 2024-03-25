@@ -5,7 +5,7 @@ using Common.Abstractions;
 using Factories;
 using Repositories;
 
-public class MySqlIdGenerator(IMySqlConnectionFactory factory) : BaseRepository(factory), IIdGenerator<long>
+public class MySqlLongIdGenerator(IMySqlConnectionFactory factory) : BaseRepository(factory), IIdGenerator<long>
 {
     public async ValueTask<long> GenerateAsync()
     {

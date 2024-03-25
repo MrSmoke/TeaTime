@@ -29,7 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IIllMakeRepository, IllMakeRepository>();
         services.AddSingleton<IStatisticsRepository, StatisticsRepository>();
 
-        services.AddSingleton<IIdGenerator<long>, MySqlIdGenerator>();
+        services.AddSingleton<IIdGenerator<long>, MySqlLongIdGenerator>();
         services.AddSingleton<IDistributedHash, MySqlDistributedHash>();
 
         services.AddTransient<IStartupAction, MySqlServerVerificationStartupAction>();
