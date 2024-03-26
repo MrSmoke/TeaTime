@@ -30,7 +30,7 @@ public abstract class BaseRepository(IMySqlConnectionFactory factory)
 
     protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object? obj = null, CancellationToken cancellationToken = default)
     {
-        var command = CreateCommandDefinition(sql, obj, cancellationToken: cancellationToken);
+        var command = CreateCommandDefinition(sql, obj, CommandFlags.Buffered, cancellationToken: cancellationToken);
         return GetConnection(conn => conn.QueryAsync<T>(command));
     }
 
