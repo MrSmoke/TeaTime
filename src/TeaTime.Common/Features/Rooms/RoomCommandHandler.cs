@@ -3,7 +3,6 @@ namespace TeaTime.Common.Features.Rooms
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Abstractions.Data;
     using Commands;
     using Events;
@@ -11,21 +10,22 @@ namespace TeaTime.Common.Features.Rooms
     using Models.Data;
 
     public class RoomCommandHandler(
-        IIdGenerator<string> stringIdGenerator,
         IRoomRepository roomRepository,
         IEventPublisher eventPublisher,
         TimeProvider clock)
-        : IRequestHandler<CreateRoomCommand>
+        : IRequestHandler<CreateRoomCommand>, IRequestHandler<SetRoomCodeCommand>
     {
         public async Task Handle(CreateRoomCommand request, CancellationToken cancellationToken)
         {
             var room = new Room
             {
                 Id = request.Id,
-                RoomCode = await stringIdGenerator.GenerateAsync(),
                 Name = request.Name,
                 CreatedBy = request.UserId,
-                CreatedDate = clock.GetUtcNow()
+                CreatedDate = clock.GetUtcNow(),
+
+                // Room codes need to be generated separately
+                RoomCode = null,
             };
 
             await roomRepository.CreateAsync(room);
@@ -39,6 +39,24 @@ namespace TeaTime.Common.Features.Rooms
             );
 
             await eventPublisher.PublishAsync(evt);
+        }
+
+        public async Task Handle(SetRoomCodeCommand request, CancellationToken cancellationToken)
+        {
+            // todo: exception
+            if (request.RoomCode.Length > 24)
+                throw new Exception("roomCode too long");
+
+            var room = await roomRepository.GetAsync(request.RoomId);
+
+            // todo: exception
+            if (room is null)
+                throw new Exception("unknown room");
+
+            await roomRepository.UpdateAsync(room with
+            {
+                RoomCode = request.RoomCode
+            });
         }
     }
 }

@@ -86,10 +86,9 @@ namespace TeaTime.Slack.Services
                 Id = command.Id,
                 Name = command.Name,
                 CreatedBy = userId,
+                RoomCode = null,
                 // todo: dunno this value *shrug*
                 CreatedDate = DateTimeOffset.MinValue,
-                // todo: dunno this value *shrug*
-                RoomCode = string.Empty
             };
         }
 

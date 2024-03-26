@@ -6,6 +6,7 @@ namespace TeaTime.Common.Abstractions.Data
     public interface IRoomRepository
     {
         Task CreateAsync(Room room);
+        Task UpdateAsync(Room room);
         Task<Room?> GetAsync(long id);
     }
 }

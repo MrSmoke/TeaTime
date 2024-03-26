@@ -10,5 +10,5 @@ public record Room : BaseNamedDataObject
     /// <summary>
     /// Unique room code that is used to access the room externally
     /// </summary>
-    public required string RoomCode { get; init; }
+    public required string? RoomCode { get; init; }
 }
