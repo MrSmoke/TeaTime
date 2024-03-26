@@ -12,6 +12,7 @@ namespace TeaTime.Slack.Services
     using Common.Features.RoomItemGroups.Queries;
     using Common.Features.Rooms.Commands;
     using Common.Features.Rooms.Queries;
+    using Common.Features.Runs.Queries;
     using Common.Features.Users.Commands;
     using Common.Features.Users.Queries;
     using Common.Models;

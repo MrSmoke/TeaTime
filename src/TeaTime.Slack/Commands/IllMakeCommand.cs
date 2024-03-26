@@ -5,6 +5,7 @@ namespace TeaTime.Slack.Commands
     using CommandRouter.Results;
     using Common.Abstractions;
     using Common.Features.Rooms.Queries;
+    using Common.Features.Runs.Queries;
     using MediatR;
     using Models.Responses;
     using Resources;

@@ -7,8 +7,9 @@ namespace TeaTime.Common.Features.Rooms
     using Models.Data;
     using Queries;
 
-    public class RoomsQueryHandler(IRoomRepository roomRepository)
-        : IRequestHandler<GetRoomQuery, Room?>, IRequestHandler<GetRoomByRoomCodeQuery, Room?>
+    public class RoomsQueryHandler(IRoomRepository roomRepository) :
+        IRequestHandler<GetRoomQuery, Room?>,
+        IRequestHandler<GetRoomByRoomCodeQuery, Room?>
     {
         public Task<Room?> Handle(GetRoomQuery request, CancellationToken cancellationToken)
         {

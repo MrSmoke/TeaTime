@@ -1,5 +1,6 @@
 namespace TeaTime.Data.MySql.Repositories;
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Abstractions.Data;
 using Common.Models.Data;
@@ -32,6 +33,25 @@ public class RunRepository(IMySqlConnectionFactory factory) : BaseRepository(fac
             "SELECT " + Columns + " FROM runs WHERE roomId = @roomId AND ended = 0 order by createdDate desc";
 
         return QueryFirstOrDefaultAsync<Run>(sql, new { roomId });
+    }
+
+    public Task<IEnumerable<Run>> GetManyByRoomId(long roomId, int limit = 10, bool? ended = null)
+    {
+        var sql = "SELECT " + Columns + " FROM runs WHERE roomId = @roomId";
+
+        // Ended filter
+        if (ended is not null)
+            sql += " AND ended = @ended";
+
+        sql += " ORDER BY createdDate desc" +
+               " LIMIT @limit";
+
+        return QueryAsync<Run>(sql, new
+        {
+            roomId,
+            limit,
+            ended
+        });
     }
 
     public Task UpdateAsync(Run run)

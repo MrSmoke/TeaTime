@@ -1,5 +1,6 @@
 namespace TeaTime.Common.Abstractions.Data
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Models.Data;
 
@@ -7,7 +8,7 @@ namespace TeaTime.Common.Abstractions.Data
     {
         Task CreateAsync(Run run);
         Task<Run?> GetAsync(long runId);
-        Task<Run?> GetCurrentRunAsync(long roomId);
+        Task<IEnumerable<Run>> GetManyByRoomId(long roomId, int limit = 10, bool? ended = null);
         Task UpdateAsync(Run run);
 
         Task CreateResultAsync(RunResult result);

@@ -10,6 +10,7 @@ namespace TeaTime.Slack.Commands
     using Common.Features.RoomItemGroups.Queries;
     using Common.Features.Rooms.Queries;
     using Common.Features.Runs.Commands;
+    using Common.Features.Runs.Queries;
     using Exceptions;
     using MediatR;
     using Models.Responses;
