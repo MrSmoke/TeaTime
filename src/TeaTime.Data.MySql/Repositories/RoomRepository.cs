@@ -29,4 +29,11 @@ public class RoomRepository(IMySqlConnectionFactory factory) : BaseRepository(fa
 
         return SingleOrDefaultAsync<Room>(sql, new { id });
     }
+
+    public Task<Room?> GetByRoomCodeAsync(string roomCode)
+    {
+        const string sql = "SELECT id, name, roomCode, createdBy, createdDate FROM rooms WHERE roomCode = @roomCode";
+
+        return SingleOrDefaultAsync<Room>(sql, new { roomCode });
+    }
 }

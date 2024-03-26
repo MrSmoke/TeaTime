@@ -7,18 +7,17 @@ namespace TeaTime.Common.Features.Rooms
     using Models.Data;
     using Queries;
 
-    public class RoomsQueryHandler : IRequestHandler<GetRoomQuery, Room?>
+    public class RoomsQueryHandler(IRoomRepository roomRepository)
+        : IRequestHandler<GetRoomQuery, Room?>, IRequestHandler<GetRoomByRoomCodeQuery, Room?>
     {
-        private readonly IRoomRepository _roomRepository;
-
-        public RoomsQueryHandler(IRoomRepository roomRepository)
-        {
-            _roomRepository = roomRepository;
-        }
-
         public Task<Room?> Handle(GetRoomQuery request, CancellationToken cancellationToken)
         {
-            return _roomRepository.GetAsync(request.RoomId);
+            return roomRepository.GetAsync(request.RoomId);
+        }
+
+        public Task<Room?> Handle(GetRoomByRoomCodeQuery request, CancellationToken cancellationToken)
+        {
+            return roomRepository.GetByRoomCodeAsync(request.RoomCode);
         }
     }
 }

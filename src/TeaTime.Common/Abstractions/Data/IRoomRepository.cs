@@ -8,5 +8,6 @@ namespace TeaTime.Common.Abstractions.Data
         Task CreateAsync(Room room);
         Task UpdateAsync(Room room);
         Task<Room?> GetAsync(long id);
+        Task<Room?> GetByRoomCodeAsync(string roomCode);
     }
 }
