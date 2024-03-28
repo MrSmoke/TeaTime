@@ -22,12 +22,12 @@
 
         protected Task<T?> SingleOrDefaultAsync<T>(string sql, object? obj = null)
         {
-            return GetConnection(conn => conn.QuerySingleOrDefaultAsync<T?>(sql, obj));
+            return GetConnection(conn => conn.QuerySingleOrDefaultAsync<T>(sql, obj));
         }
 
         protected Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? obj = null)
         {
-            return GetConnection(conn => conn.QueryFirstOrDefaultAsync<T?>(sql, obj));
+            return GetConnection(conn => conn.QueryFirstOrDefaultAsync<T>(sql, obj));
         }
 
         protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object? obj = null)

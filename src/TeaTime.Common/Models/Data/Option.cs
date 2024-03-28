@@ -1,9 +1,7 @@
-﻿namespace TeaTime.Common.Models.Data
-{
-    public class Option : BaseNamedDataObject
-    {
-        public long GroupId { get; set; }
+﻿namespace TeaTime.Common.Models.Data;
 
-        public long CreatedBy { get; set; }
-    }
+public record Option : BaseNamedDataObject
+{
+    public required long GroupId { get; init; }
+    public required long CreatedBy { get; init; }
 }

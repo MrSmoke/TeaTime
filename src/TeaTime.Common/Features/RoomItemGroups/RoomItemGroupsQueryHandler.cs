@@ -1,52 +1,60 @@
-﻿namespace TeaTime.Common.Features.RoomItemGroups
+﻿namespace TeaTime.Common.Features.RoomItemGroups;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using Extensions;
+using MediatR;
+using Models;
+using Queries;
+
+public class RoomItemGroupQueryHandler :
+    IRequestHandler<GetRoomItemGroupByNameQuery, RoomItemGroupModel?>,
+    IRequestHandler<GetRoomItemGroupQuery, RoomItemGroupModel?>
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using AutoMapper;
-    using Common.Models.Data;
-    using Extensions;
-    using MediatR;
-    using Models;
-    using Queries;
+    private readonly IOptionsRepository _optionsRepository;
 
-    public class RoomItemGroupQueryHandler :
-        IRequestHandler<GetRoomItemGroupByNameQuery, RoomItemGroupModel?>,
-        IRequestHandler<GetRoomItemGroupQuery, RoomItemGroupModel?>
+    public RoomItemGroupQueryHandler(IOptionsRepository optionsRepository)
     {
-        private readonly IOptionsRepository _optionsRepository;
-        private readonly IMapper _mapper;
+        _optionsRepository = optionsRepository;
+    }
 
-        public RoomItemGroupQueryHandler(IOptionsRepository optionsRepository, IMapper mapper)
+    public async Task<RoomItemGroupModel?> Handle(GetRoomItemGroupByNameQuery request,
+        CancellationToken cancellationToken)
+    {
+        var group = await _optionsRepository.GetGroupByNameAsync(request.RoomId, request.Name);
+        if (group == null)
+            return null;
+
+        var model = new RoomItemGroupModel
         {
-            _optionsRepository = optionsRepository;
-            _mapper = mapper;
-        }
+            Id = group.Id,
+            Name = group.Name,
+            CreatedBy = group.CreatedBy,
+            CreatedDate = group.CreatedDate,
+            RoomId = group.RoomId,
+            Options = (await _optionsRepository.GetOptionsByGroupIdAsync(group.Id)).AsReadOnlyList()
+        };
 
-        public async Task<RoomItemGroupModel?> Handle(GetRoomItemGroupByNameQuery request, CancellationToken cancellationToken)
+        return model;
+    }
+
+    public async Task<RoomItemGroupModel?> Handle(GetRoomItemGroupQuery request, CancellationToken cancellationToken)
+    {
+        var group = await _optionsRepository.GetGroupAsync(request.GroupId);
+        if (group == null)
+            return null;
+
+        var model = new RoomItemGroupModel
         {
-            var group = await _optionsRepository.GetGroupByNameAsync(request.RoomId, request.Name);
-            if (group == null)
-                return null;
+            Id = group.Id,
+            Name = group.Name,
+            CreatedBy = group.CreatedBy,
+            CreatedDate = group.CreatedDate,
+            RoomId = group.RoomId,
+            Options = (await _optionsRepository.GetOptionsByGroupIdAsync(group.Id)).AsReadOnlyList()
+        };
 
-            var model = _mapper.Map<RoomItemGroup, RoomItemGroupModel>(group);
-
-            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id)).AsReadOnlyList();
-
-            return model;
-        }
-
-        public async Task<RoomItemGroupModel?> Handle(GetRoomItemGroupQuery request, CancellationToken cancellationToken)
-        {
-            var group = await _optionsRepository.GetGroupAsync(request.GroupId);
-            if (group == null)
-                return null;
-
-            var model = _mapper.Map<RoomItemGroup, RoomItemGroupModel>(group);
-
-            model.Options = (await _optionsRepository.GetOptionsByGroupIdAsync(model.Id)).AsReadOnlyList();
-
-            return model;
-        }
+        return model;
     }
 }

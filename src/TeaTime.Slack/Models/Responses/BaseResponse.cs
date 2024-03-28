@@ -1,10 +1,9 @@
-﻿namespace TeaTime.Slack.Models.Responses
-{
-    public abstract class BaseResponse
-    {
-        public bool Ok { get; set; }
-        public string? Error { get; set; }
+﻿namespace TeaTime.Slack.Models.Responses;
 
-        public bool IsSuccess => Ok;
-    }
+public abstract class BaseResponse
+{
+    public bool Ok { get; set; }
+    public string? Error { get; set; }
+
+    public bool IsSuccess => Ok;
 }

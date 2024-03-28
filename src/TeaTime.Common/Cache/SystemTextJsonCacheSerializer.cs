@@ -20,17 +20,13 @@
 
         public byte[] Serialize(object value)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
+            ArgumentNullException.ThrowIfNull(value);
 
             return JsonSerializer.SerializeToUtf8Bytes(value, _jsonSerializerOptions);
         }
 
-        public T? Deserialize<T>(byte[] bytes)
+        public T? Deserialize<T>(ReadOnlySpan<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             return JsonSerializer.Deserialize<T>(bytes, _jsonSerializerOptions);
         }
     }

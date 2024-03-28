@@ -1,4 +1,5 @@
-﻿namespace TeaTime.Slack.Models.Requests
+﻿#nullable disable
+namespace TeaTime.Slack.Models.Requests
 {
     public class OAuthTokenRequest
     {

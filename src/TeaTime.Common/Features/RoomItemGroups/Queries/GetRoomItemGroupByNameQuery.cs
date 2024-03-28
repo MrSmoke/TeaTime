@@ -1,19 +1,6 @@
-﻿namespace TeaTime.Common.Features.RoomItemGroups.Queries
-{
-    using Abstractions;
-    using Models;
+﻿namespace TeaTime.Common.Features.RoomItemGroups.Queries;
 
-    public class GetRoomItemGroupByNameQuery : IUserQuery<RoomItemGroupModel?>
-    {
-        public long RoomId { get; }
-        public string Name { get; }
-        public long UserId { get; }
+using Abstractions;
+using Models;
 
-        public GetRoomItemGroupByNameQuery(long roomId, long userId, string name)
-        {
-            RoomId = roomId;
-            UserId = userId;
-            Name = name;
-        }
-    }
-}
+public record GetRoomItemGroupByNameQuery(long RoomId, long UserId, string Name) : IUserQuery<RoomItemGroupModel?>;

@@ -29,10 +29,10 @@
             var context = await GetContextAsync();
 
             var command = new CreateRoomItemGroupCommand(
-                id: await _idGenerator.GenerateAsync(),
-                roomId: context.Room.Id,
-                name: name,
-                userId: context.User.Id
+                Id: await _idGenerator.GenerateAsync(),
+                RoomId: context.Room.Id,
+                Name: name,
+                UserId: context.User.Id
             );
 
             await _mediator.Send(command);
@@ -53,8 +53,8 @@
                 return Response(ErrorStrings.RemoveGroup_GroupInvalidName(name), ResponseType.User);
 
             var command = new DeleteRoomItemGroupCommand(
-                groupId: group.Id,
-                userId: context.User.Id
+                GroupId: group.Id,
+                UserId: context.User.Id
             );
 
             await _mediator.Send(command);

@@ -1,34 +1,33 @@
-﻿namespace TeaTime.Common.Models.Data
+﻿namespace TeaTime.Common.Models.Data;
+
+using System;
+
+public record Run : BaseDataObject
 {
-    using System;
+    /// <summary>
+    /// The room in which the run is associated to
+    /// </summary>
+    public required long RoomId { get; init; }
 
-    public class Run : BaseDataObject
-    {
-        /// <summary>
-        /// The room in which the run is associated to
-        /// </summary>
-        public long RoomId { get; set; }
+    /// <summary>
+    /// The user who started the run
+    /// </summary>
+    public required long UserId { get; init; }
 
-        /// <summary>
-        /// The user who started the run
-        /// </summary>
-        public long UserId { get; set; }
+    public required long GroupId { get; init; }
 
-        public long GroupId { get; set; }
+    /// <summary>
+    /// The time the run was started
+    /// </summary>
+    public required DateTimeOffset StartTime { get; init; }
 
-        /// <summary>
-        /// The time the run was started
-        /// </summary>
-        public DateTimeOffset StartTime { get; set; }
+    /// <summary>
+    /// The end time of the run (optional)
+    /// </summary>
+    public DateTimeOffset? EndTime { get; init; }
 
-        /// <summary>
-        /// The end time of the run (optional)
-        /// </summary>
-        public DateTimeOffset? EndTime { get; set; }
-
-        /// <summary>
-        /// True if the run has ended
-        /// </summary>
-        public bool Ended { get; set; }
-    }
+    /// <summary>
+    /// True if the run has ended
+    /// </summary>
+    public bool Ended { get; init; }
 }

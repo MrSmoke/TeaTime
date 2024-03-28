@@ -1,14 +1,13 @@
-﻿namespace TeaTime.Common.Models.Data
+﻿namespace TeaTime.Common.Models.Data;
+
+using System;
+
+public abstract record BaseDataObject
 {
-    using System;
+    public required long Id { get; init; }
 
-    public abstract class BaseDataObject
-    {
-        public long Id { get; set; }
-
-        /// <summary>
-        /// The date the object was created
-        /// </summary>
-        public DateTimeOffset CreatedDate { get; set; }
-    }
+    /// <summary>
+    /// The date the object was created
+    /// </summary>
+    public required DateTimeOffset CreatedDate { get; init; }
 }

@@ -6,7 +6,7 @@
     using Common.Abstractions;
     using Common.Features.Links.Commands;
     using Common.Features.Links.Queries;
-    using Common.Features.Options;
+    using Common.Features.Options.Queries;
     using Common.Features.Orders.Commands;
     using Common.Features.Orders.Queries;
     using Common.Features.RoomItemGroups.Queries;
@@ -49,9 +49,9 @@
             //we need to create a new user
             var command = new CreateUserCommand
             (
-                id: await _idGenerator.GenerateAsync(),
-                username: "slack_" + userId,
-                displayName: name
+                Id: await _idGenerator.GenerateAsync(),
+                Username: "slack_" + userId,
+                DisplayName: name
             );
             await _mediator.Send(command);
 
@@ -80,9 +80,9 @@
 
             var command = new CreateRoomCommand
             (
-                id: await _idGenerator.GenerateAsync(),
-                name: channelName,
-                userId: userId
+                Id: await _idGenerator.GenerateAsync(),
+                Name: channelName,
+                UserId: userId
             );
 
             await _mediator.Send(command);
@@ -94,6 +94,7 @@
             {
                 Id = command.Id,
                 Name = command.Name,
+                CreatedBy = userId,
                 CreatedDate = DateTimeOffset.MinValue //dunno this value *shrug*
             };
         }
@@ -123,14 +124,22 @@
             if (run == null)
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
-            var group = await _mediator.Send(new GetRoomItemGroupQuery(roomId: run.RoomId, userId: userId, groupId: run.GroupId));
+            var group = await _mediator.Send(new GetRoomItemGroupQuery(
+                RoomId: run.RoomId,
+                UserId: userId,
+                GroupId: run.GroupId));
+
             if (group == null)
             {
-                _logger.LogWarning("Failed to find group {GroupId} in room {RoomId} for run {RunId}", run.GroupId, roomId, run.Id);
+                _logger.LogWarning("Failed to find group {GroupId} in room {RoomId} for run {RunId}",
+                    run.GroupId, roomId, run.Id);
+
                 throw new SlackTeaTimeException(ErrorStrings.General());
             }
 
-            var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.OrdinalIgnoreCase));
+            var option = group.Options
+                .FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.OrdinalIgnoreCase));
+
             if (option == null)
                 throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
@@ -140,11 +149,11 @@
         private async Task JoinRunAsync(long userId, long roomId, long optionId, CallbackData callbackData)
         {
             var run = await _mediator.Send(new GetCurrentRunQuery(roomId, userId));
-            if(run == null)
+            if (run == null)
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
             var option = await _mediator.Send(new GetOptionQuery(optionId));
-            if(option == null)
+            if (option == null)
                 throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
             await JoinRunInternalAsync(userId, run, optionId, callbackData);
@@ -163,10 +172,10 @@
             {
                 command = new CreateOrderCommand
                 (
-                    id: await _idGenerator.GenerateAsync(),
-                    runId: run.Id,
-                    userId: userId,
-                    optionId: optionId
+                    Id: await _idGenerator.GenerateAsync(),
+                    RunId: run.Id,
+                    UserId: userId,
+                    OptionId: optionId
                 );
             }
             else

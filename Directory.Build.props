@@ -1,6 +1,10 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <LangVersion>12</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AnalysisLevel>latest-Minimum</AnalysisLevel>
   </PropertyGroup>
 </Project>

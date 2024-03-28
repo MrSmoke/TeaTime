@@ -15,6 +15,13 @@ insert_final_newline = true
 indent_size = 4
 dotnet_sort_system_directives_first = true
 
+# Namespace settings
+csharp_style_namespace_declarations = file_scoped
+csharp_using_directive_placement = inside_namespace
+
+# Underscores from member names
+dotnet_diagnostic.CA1707.severity = none
+
 [*.{xml,config,*proj,nuspec,props,resx,targets,yml,tasks}]
 indent_size = 2
 

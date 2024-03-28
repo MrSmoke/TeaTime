@@ -1,9 +1,8 @@
-﻿namespace TeaTime.Common.Models.Data
+﻿namespace TeaTime.Common.Models.Data;
+
+public record Order : BaseDataObject
 {
-    public class Order : BaseDataObject
-    {
-        public long RunId { get; set; }
-        public long UserId { get; set; }
-        public long OptionId { get; set; }
-    }
+    public required long RunId { get; init; }
+    public required long UserId { get; init; }
+    public required long OptionId { get; init; }
 }

@@ -1,22 +1,42 @@
-﻿namespace TeaTime.Slack.Models.Responses
+﻿namespace TeaTime.Slack.Models.Responses;
+
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
+
+public class OAuthTokenResponse : BaseResponse
 {
-    using System.Text.Json.Serialization;
+    [JsonPropertyName("access_token")]
+    public string? AccessToken { get; set; }
 
-    public class OAuthTokenResponse : BaseResponse
+    [JsonPropertyName("scope")]
+    public string? Scope { get; set; }
+
+    [JsonPropertyName("team")]
+    public SlackTeam? Team { get; init; }
+
+    [JsonPropertyName("incoming_webhook")]
+    public OAuthTokenResponseIncomingWebhook? IncomingWebhook { get; set; }
+
+    [MemberNotNullWhen(true, nameof(AccessToken))]
+    [MemberNotNullWhen(true, nameof(Scope))]
+    [MemberNotNullWhen(true, nameof(Team))]
+    public bool ValidateProperties()
     {
-        [JsonPropertyName("access_token")]
-        public string AccessToken { get; set; }
+        return !string.IsNullOrWhiteSpace(AccessToken) &&
+               !string.IsNullOrWhiteSpace(Scope) &&
+               Team is not null;
+    }
 
-        [JsonPropertyName("scope")]
-        public string Scope { get; set; }
+    public object ToLogObject()
+    {
+        return new
+        {
+            AccessToken = Redact(AccessToken),
+            Scope,
+            TeamName = Redact(Team?.Name),
+            TeamId = Team?.Id
+        };
 
-        [JsonPropertyName("team_name")]
-        public string TeamName { get; set; }
-
-        [JsonPropertyName("team_id")]
-        public string TeamId { get; set; }
-
-        [JsonPropertyName("incoming_webhook")]
-        public OAuthTokenResponseIncomingWebhook? IncomingWebhook { get; set; }
+        static string? Redact(string? value) => string.IsNullOrWhiteSpace(value) ? value : "***";
     }
 }

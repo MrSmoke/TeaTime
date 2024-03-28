@@ -1,10 +1,9 @@
-﻿namespace TeaTime.Common.Features.RoomItemGroups.Models
-{
-    using System.Collections.Generic;
-    using Common.Models.Data;
+﻿namespace TeaTime.Common.Features.RoomItemGroups.Models;
 
-    public class RoomItemGroupModel : RoomItemGroup
-    {
-        public IReadOnlyList<Option> Options { get; set; } = new List<Option>();
-    }
+using System.Collections.Generic;
+using Common.Models.Data;
+
+public record RoomItemGroupModel : RoomItemGroup
+{
+    public IReadOnlyList<Option> Options { get; init; } = new List<Option>();
 }

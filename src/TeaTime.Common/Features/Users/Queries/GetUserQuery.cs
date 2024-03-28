@@ -1,15 +1,6 @@
-﻿namespace TeaTime.Common.Features.Users.Queries
-{
-    using Abstractions;
-    using Models.Data;
+﻿namespace TeaTime.Common.Features.Users.Queries;
 
-    public class GetUserQuery : IQuery<User?>
-    {
-        public long UserId { get; }
+using Abstractions;
+using Models.Data;
 
-        public GetUserQuery(long userId)
-        {
-            UserId = userId;
-        }
-    }
-}
+public record GetUserQuery(long UserId) : IQuery<User?>;

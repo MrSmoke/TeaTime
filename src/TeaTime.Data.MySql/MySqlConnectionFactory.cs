@@ -9,8 +9,7 @@
 
         public MySqlConnectionFactory(MySqlConnectionOptions options)
         {
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
+            ArgumentNullException.ThrowIfNull(options);
 
             _connectionString = GetConnectionString(options);
         }
@@ -22,17 +21,18 @@
 
         private static string GetConnectionString(MySqlConnectionOptions options)
         {
-            static string GetOption(string key, string? value)
-                => string.IsNullOrWhiteSpace(value) ? string.Empty : key + "=" + value + ";";
-
             return string.Concat(
                 GetOption("host", options.Host),
                 GetOption("port", options.Port.ToString()),
                 GetOption("username", options.Username),
                 GetOption("password", options.Password),
                 GetOption("database", options.Database),
-                "UseAffectedRows=true"
+                "UseAffectedRows=true;",
+                "DateTimeKind=utc;"
             );
+
+            static string GetOption(string key, string? value)
+                => string.IsNullOrWhiteSpace(value) ? string.Empty : key + "=" + value + ";";
         }
     }
 }

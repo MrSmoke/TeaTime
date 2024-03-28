@@ -1,5 +1,6 @@
 namespace TeaTime.Common.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -21,33 +22,61 @@ namespace TeaTime.Common.Tests
 
             var orders = new List<OrderModel>
             {
-                new OrderModel
+                new()
                 {
                     User = new User
                     {
-                        Id = 5
-                    }
+                        Id = 5,
+                        Username = "test",
+                        CreatedDate = DateTimeOffset.UtcNow,
+                        DisplayName = "display test"
+                    },
+                    Id = 1,
+                    Option = null!,
+                    Run = null!,
+                    CreatedDate = DateTimeOffset.UtcNow
                 },
-                new OrderModel
+                new()
                 {
                     User = new User
                     {
-                        Id = 6
-                    }
+                        Id = 6,
+                        Username = "test",
+                        CreatedDate = DateTimeOffset.UtcNow,
+                        DisplayName = "display test"
+                    },
+                    Id = 2,
+                    Option = null!,
+                    Run = null!,
+                    CreatedDate = DateTimeOffset.UtcNow
                 },
-                new OrderModel
+                new()
                 {
                     User = new User
                     {
-                        Id = 7
-                    }
+                        Id = 7,
+                        Username = "test",
+                        CreatedDate = DateTimeOffset.UtcNow,
+                        DisplayName = "display test"
+                    },
+                    Id = 3,
+                    Option = null!,
+                    Run = null!,
+                    CreatedDate = DateTimeOffset.UtcNow
                 },
-                new OrderModel
+                new()
                 {
                     User = new User
                     {
-                        Id = 8
-                    }
+                        Id = 8,
+                        Username = "test",
+                        CreatedDate = DateTimeOffset.UtcNow,
+                        DisplayName = "display test"
+                    },
+                    Id = 4,
+                    Option = null!,
+                    Run = null!,
+                    CreatedDate = DateTimeOffset.UtcNow
                 }
             };
 

@@ -12,4 +12,4 @@ public record RunEndedEvent
     DateTimeOffset EndedTime,
     long RunnerUserId,
     IEnumerable<OrderModel> Orders
-) : Event;
+) : BaseEvent;

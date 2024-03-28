@@ -1,53 +1,45 @@
-﻿namespace TeaTime.Controllers
+﻿namespace TeaTime.Controllers;
+
+using System.Threading.Tasks;
+using Common.Features.Statistics.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using ViewModels;
+
+public class HomeController(ISender mediator) : Controller
 {
-    using System.Threading.Tasks;
-    using Common.Features.Statistics.Queries;
-    using MediatR;
-    using Microsoft.AspNetCore.Mvc;
-    using ViewModels;
-
-    public class HomeController : Controller
+    [Route(""), HttpGet, HttpHead]
+    public async Task<IActionResult> Index()
     {
-        private readonly IMediator _mediator;
+        var totals = await mediator.Send(new GetGlobalTotalsQuery());
 
-        public HomeController(IMediator mediator)
+        var viewModel = new IndexViewModel
         {
-            _mediator = mediator;
-        }
+            TotalOrdersMade = totals.OrdersMade,
+            TotalEndedRuns = totals.RunsEnded
+        };
 
-        [Route("")]
-        public async Task<IActionResult> Index()
+        return View(viewModel);
+    }
+
+    [HttpGet("privacy")]
+    public IActionResult Privacy()
+    {
+        return View();
+    }
+
+    [HttpGet("contact")]
+    public IActionResult Contact()
+    {
+        return View();
+    }
+
+    [Route("ErrorStatusCode")]
+    public IActionResult ErrorStatusCode(int code)
+    {
+        return View(new ErrorViewModel
         {
-            var totals = await _mediator.Send(new GetGlobalTotalsQuery());
-
-            var viewModel = new IndexViewModel
-            {
-                TotalOrdersMade = totals.OrdersMade,
-                TotalEndedRuns = totals.RunsEnded
-            };
-
-            return View(viewModel);
-        }
-
-        [Route("privacy")]
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [Route("contact")]
-        public IActionResult Contact()
-        {
-            return View();
-        }
-
-        [Route("ErrorStatusCode")]
-        public IActionResult ErrorStatusCode(int code)
-        {
-            return View(new ErrorViewModel
-            {
-                StatusCode = code
-            });
-        }
+            StatusCode = code
+        });
     }
 }

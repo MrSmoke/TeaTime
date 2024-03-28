@@ -29,6 +29,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solutio
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Build", "_Build", "{690D4AEC-1B64-4877-B3EF-4BF7DF23E81A}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dev-release.yaml = .github\workflows\dev-release.yaml
+		.github\workflows\master-release.yaml = .github\workflows\master-release.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

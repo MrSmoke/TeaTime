@@ -1,23 +1,52 @@
-﻿namespace TeaTime.Data.MySql.Tests
+﻿namespace TeaTime.Data.MySql.Tests;
+
+using System;
+using System.Threading.Tasks;
+using Dapper;
+using Microsoft.Extensions.Logging.Abstractions;
+using Xunit;
+
+public class DatabaseFixture : IAsyncLifetime
 {
-    using System;
-    using Dapper;
+    public IMySqlConnectionFactory ConnectionFactory { get; } =
+        new MySqlConnectionFactory(TestConfig.ConnectionOptions);
 
-    public class DatabaseFixture : IDisposable
+    public async Task InitializeAsync()
     {
-        public readonly IMySqlConnectionFactory ConnectionFactory;
+        await using var conn = ConnectionFactory.GetConnection();
 
-        public DatabaseFixture()
-        {
-            ConnectionFactory = new MySqlConnectionFactory(TestConfig.ConnectionOptions);
+        if (string.IsNullOrEmpty(TestConfig.ConnectionOptions.Database))
+            throw new Exception("No database defined in config");
 
-            using var conn = ConnectionFactory.GetConnection();
+        // Delete old tables to start fresh
+        const string sql = "SET FOREIGN_KEY_CHECKS = 0;" +
+                           "drop table if exists changelog;" +
+                           "drop table if exists hashes;" +
+                           "drop table if exists ids64;" +
+                           "drop table if exists illmakes;" +
+                           "drop table if exists links;" +
+                           "drop table if exists locks;" +
+                           "drop table if exists option_groups;" +
+                           "drop table if exists options;" +
+                           "drop table if exists orders;" +
+                           "drop table if exists rooms;" +
+                           "drop table if exists run_results;" +
+                           "drop table if exists runs;" +
+                           "drop table if exists users;" +
+                           "SET FOREIGN_KEY_CHECKS = 1";
 
-            conn.Execute($"create schema if not exits {TestConfig.Schema}");
-        }
+        await conn.ExecuteAsync(sql);
 
-        public void Dispose()
-        {
-        }
+        // Do database migrations against new schema
+        // todo: We shouldn't be calling MySqlServerVerificationStartupAction
+        var migration = new MySqlServerVerificationStartupAction(ConnectionFactory,
+            new NullLogger<MySqlServerVerificationStartupAction>());
+
+        migration.Execute();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 }

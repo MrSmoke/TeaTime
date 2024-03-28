@@ -2,6 +2,7 @@
   "mysql": {
     "host": "localhost",
     "password": "password",
-    "username": "root"
+    "username": "root",
+    "database": "teatime_test"
   }
 }

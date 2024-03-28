@@ -1,11 +1,10 @@
-﻿namespace TeaTime.Common.Models.Domain
-{
-    using Data;
+﻿namespace TeaTime.Common.Models.Domain;
 
-    public class OrderModel : BaseDataObject
-    {
-        public Run? Run { get; set; }
-        public User? User { get; set; }
-        public Option? Option { get; set; }
-    }
+using Data;
+
+public record OrderModel : BaseDataObject
+{
+    public required Run Run { get; init; }
+    public required User? User { get; init; }
+    public required Option? Option { get; init; }
 }

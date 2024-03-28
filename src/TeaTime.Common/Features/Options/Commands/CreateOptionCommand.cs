@@ -1,20 +1,5 @@
-﻿namespace TeaTime.Common.Features.Options.Commands
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.Options.Commands;
 
-    public class CreateOptionCommand : IUserCommand
-    {
-        public long Id { get; }
-        public long UserId { get; }
-        public long GroupId { get; }
-        public string Name { get; }
+using Abstractions;
 
-        public CreateOptionCommand(long id, long userId, long groupId, string name)
-        {
-            Id = id;
-            UserId = userId;
-            GroupId = groupId;
-            Name = name;
-        }
-    }
-}
+public record CreateOptionCommand(long Id, long UserId, long GroupId, string Name) : IUserCommand;

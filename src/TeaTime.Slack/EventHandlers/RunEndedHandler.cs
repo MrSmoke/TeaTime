@@ -11,6 +11,7 @@
     using Common.Features.Runs.Events;
     using Common.Models;
     using MediatR;
+    using Microsoft.Extensions.Logging;
     using Models.Responses;
     using Resources;
 
@@ -19,18 +20,26 @@
         private readonly ISlackApiClient _slackApiClient;
         private readonly ILinkRepository _linkRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ILogger<RunEndedHandler> _logger;
 
-        public RunEndedHandler(ISlackApiClient slackApiClient, ILinkRepository linkRepository, IUserRepository userRepository)
+        public RunEndedHandler(ISlackApiClient slackApiClient,
+            ILinkRepository linkRepository,
+            IUserRepository userRepository,
+            ILogger<RunEndedHandler> logger)
         {
             _slackApiClient = slackApiClient;
             _linkRepository = linkRepository;
             _userRepository = userRepository;
+            _logger = logger;
         }
 
         public async Task Handle(RunEndedEvent notification, CancellationToken cancellationToken)
         {
             if (!notification.TryGetCallbackState(out var callbackData))
+            {
+                _logger.LogWarning("RunEndedNotification did not contain any callback data");
                 return;
+            }
 
             var orders = notification.Orders.ToList();
 

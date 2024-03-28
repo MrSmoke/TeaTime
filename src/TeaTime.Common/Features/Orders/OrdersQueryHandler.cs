@@ -5,6 +5,7 @@ namespace TeaTime.Common.Features.Orders
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Data;
+    using Exceptions;
     using MediatR;
     using Models.Data;
     using Models.Domain;
@@ -31,9 +32,11 @@ namespace TeaTime.Common.Features.Orders
         public async Task<IEnumerable<OrderModel>> Handle(GetRunOrdersQuery request,
             CancellationToken cancellationToken)
         {
-            var runTask = _runRepository.GetAsync(request.RunId);
+            var run = await _runRepository.GetAsync(request.RunId);
+            if (run is null)
+                throw new TeaTimeException($"Unknown RunId {request.RunId}");
 
-            var orders = (await _orderRepository.GetOrdersAsync(request.RunId)).ToList();
+            var orders = (await _orderRepository.GetOrdersAsync(run.Id)).ToList();
             if (orders.Count == 0)
                 return new List<OrderModel>();
 
@@ -43,20 +46,14 @@ namespace TeaTime.Common.Features.Orders
             var userDict = (await users).ToDictionary(k => k.Id);
             var optionsDict = (await options).ToDictionary(k => k.Id);
 
-            var models = new List<OrderModel>();
-            foreach (var order in orders)
+            return orders.Select(order => new OrderModel
             {
-                models.Add(new OrderModel
-                {
-                    Id = order.Id,
-                    CreatedDate = order.CreatedDate,
-                    Run = await runTask,
-                    User = userDict[order.UserId],
-                    Option = optionsDict[order.OptionId]
-                });
-            }
-
-            return models;
+                Id = order.Id,
+                CreatedDate = order.CreatedDate,
+                Run = run,
+                User = userDict.GetValueOrDefault(order.UserId),
+                Option = optionsDict.GetValueOrDefault(order.OptionId)
+            });
         }
 
         public async Task<Order?> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)

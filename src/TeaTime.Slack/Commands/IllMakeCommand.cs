@@ -31,9 +31,9 @@
                 return Response(ErrorStrings.IllMake_RunNotStarted(), ResponseType.User);
 
             var command = new Common.Features.IllMake.Commands.IllMakeCommand(
-                id: await _idGenerator.GenerateAsync(),
-                runId: run.Id,
-                userId: context.User.Id
+                Id: await _idGenerator.GenerateAsync(),
+                RunId: run.Id,
+                UserId: context.User.Id
             );
 
             await _mediator.Send(command);

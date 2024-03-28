@@ -5,6 +5,6 @@
 
     public interface IEventPublisher
     {
-        Task PublishAsync<T>(T @event) where T : IEvent;
+        Task PublishAsync<T>(T eventModel) where T : IEvent;
     }
 }

@@ -29,11 +29,12 @@ namespace TeaTime.Slack.Client
                 {"client_id", request.ClientId},
                 {"client_secret", request.ClientSecret},
                 {"code", request.Code},
+                {"grant_type", "authorization_code"},
                 {"redirect_uri", request.RedirectUri},
             };
 
             using var content = new FormUrlEncodedContent(formData);
-            using var response = await _httpClient.PostAsync("https://slack.com/api/oauth.access", content);
+            using var response = await _httpClient.PostAsync("https://slack.com/api/oauth.v2.access", content);
 
             return await response.Content.ReadFromJsonAsync<OAuthTokenResponse>() ?? new OAuthTokenResponse();
         }

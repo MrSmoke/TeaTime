@@ -4,7 +4,6 @@ namespace TeaTime.Common.Features.Orders
     using System.Threading.Tasks;
     using Abstractions;
     using Abstractions.Data;
-    using AutoMapper;
     using Commands;
     using Events;
     using MediatR;
@@ -17,27 +16,30 @@ namespace TeaTime.Common.Features.Orders
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ISystemClock _clock;
-        private readonly IMapper _mapper;
         private readonly IEventPublisher _eventPublisher;
         private readonly ILogger<OrderCommandHandler> _logger;
 
         public OrderCommandHandler(IOrderRepository orderRepository,
             ISystemClock clock,
-            IMapper mapper,
             IEventPublisher eventPublisher,
             ILogger<OrderCommandHandler> logger)
         {
             _orderRepository = orderRepository;
             _clock = clock;
-            _mapper = mapper;
             _eventPublisher = eventPublisher;
             _logger = logger;
         }
 
         public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            var order = _mapper.Map<CreateOrderCommand, Order>(request);
-            order.CreatedDate = _clock.UtcNow();
+            var order = new Order
+            {
+                Id = request.Id,
+                CreatedDate = _clock.UtcNow(),
+                OptionId = request.OptionId,
+                RunId = request.RunId,
+                UserId = request.UserId
+            };
 
             await _orderRepository.CreateAsync(order);
 
@@ -72,8 +74,7 @@ namespace TeaTime.Common.Features.Orders
             var previousOptionId = existing.OptionId;
 
             //update
-            existing.OptionId = request.OptionId;
-            await _orderRepository.UpdateAsync(existing);
+            await _orderRepository.UpdateAsync(existing with {OptionId = request.OptionId});
 
             //create event
             var evt = new OrderOptionChangedEvent
