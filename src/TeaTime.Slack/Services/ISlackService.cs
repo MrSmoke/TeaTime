@@ -4,6 +4,7 @@
     using Common.Models.Data;
     using Models.Requests;
     using Models.Requests.InteractiveMessages;
+    using Models.Responses;
 
     public interface ISlackService
     {
@@ -12,5 +13,7 @@
 
         Task JoinRunAsync(SlashCommand slashCommand, string optionName);
         Task JoinRunAsync(MessageRequestPayload requestPayload);
+
+        Task InstallAsync(OAuthTokenResponse response);
     }
 }

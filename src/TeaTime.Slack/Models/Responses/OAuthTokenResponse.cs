@@ -1,31 +1,20 @@
 ﻿namespace TeaTime.Slack.Models.Responses;
 
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 public class OAuthTokenResponse : BaseResponse
 {
     [JsonPropertyName("access_token")]
-    public string? AccessToken { get; set; }
+    public required string AccessToken { get; init; }
 
     [JsonPropertyName("scope")]
-    public string? Scope { get; set; }
+    public required string Scope { get; init; }
 
     [JsonPropertyName("team")]
-    public SlackTeam? Team { get; init; }
+    public required SlackTeam Team { get; init; }
 
     [JsonPropertyName("incoming_webhook")]
-    public OAuthTokenResponseIncomingWebhook? IncomingWebhook { get; set; }
-
-    [MemberNotNullWhen(true, nameof(AccessToken))]
-    [MemberNotNullWhen(true, nameof(Scope))]
-    [MemberNotNullWhen(true, nameof(Team))]
-    public bool ValidateProperties()
-    {
-        return !string.IsNullOrWhiteSpace(AccessToken) &&
-               !string.IsNullOrWhiteSpace(Scope) &&
-               Team is not null;
-    }
+    public required IncomingWebhook IncomingWebhook { get; init; }
 
     public object ToLogObject()
     {
@@ -33,8 +22,10 @@ public class OAuthTokenResponse : BaseResponse
         {
             AccessToken = Redact(AccessToken),
             Scope,
-            TeamName = Redact(Team?.Name),
-            TeamId = Team?.Id
+            TeamName = Redact(Team.Name),
+            TeamId = Team.Id,
+            IncomingWebhook.ChannelId,
+            IncomingWebhook.Channel
         };
 
         static string? Redact(string? value) => string.IsNullOrWhiteSpace(value) ? value : "***";

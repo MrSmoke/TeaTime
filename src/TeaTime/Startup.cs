@@ -4,7 +4,6 @@
     using Common;
     using Common.Abstractions;
     using Common.Cache;
-    using Common.Exceptions;
     using Common.Features.Runs;
     using Common.Features.Runs.Commands;
     using Common.Permissions;
@@ -14,6 +13,7 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Slack;
 
     public class Startup
@@ -46,6 +46,7 @@
             services.AddSlack(mvcBuilder, _configuration.GetSection("slack"));
 
             // Core
+            services.TryAddSingleton(TimeProvider.System);
             services.AddScoped<IEventPublisher, EventPublisher>();
             services.AddSingleton<IRunnerRandomizer, DefaultRunnerRandomizer>();
             services.AddSingleton<IRoomRunLockService, RoomRunLockService>();
