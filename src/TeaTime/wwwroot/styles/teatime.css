@@ -18,12 +18,20 @@
 /*
  Set bulma variables
  */
+.title
+{
+    /* Reduce weight from extra bold to bold */
+    --bulma-title-weight: var(--bulma-weight-bold);
+}
+
 .footer
 {
+    /* Reduce padding to smaller value */
     --bulma-footer-padding: 1.5rem;
 }
 
-.navbar.is-transparent
+.footer .navbar.is-transparent
 {
+    /* Make buttons have the same colour as the footer */
     --bulma-navbar-background-color: transparent;
 }
