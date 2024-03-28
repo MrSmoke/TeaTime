@@ -4,7 +4,7 @@
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using Models.Responses;
+    using Models.OAuth;
     using Models.ViewModels;
     using Services;
     using static Constants;

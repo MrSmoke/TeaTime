@@ -1,6 +1,7 @@
-﻿namespace TeaTime.Slack.Models.Responses;
+﻿namespace TeaTime.Slack.Models.OAuth;
 
 using System.Text.Json.Serialization;
+using Responses;
 
 public class OAuthTokenResponse : BaseResponse
 {
@@ -15,19 +16,4 @@ public class OAuthTokenResponse : BaseResponse
 
     [JsonPropertyName("incoming_webhook")]
     public required IncomingWebhook IncomingWebhook { get; init; }
-
-    public object ToLogObject()
-    {
-        return new
-        {
-            AccessToken = Redact(AccessToken),
-            Scope,
-            TeamName = Redact(Team.Name),
-            TeamId = Team.Id,
-            IncomingWebhook.ChannelId,
-            IncomingWebhook.Channel
-        };
-
-        static string? Redact(string? value) => string.IsNullOrWhiteSpace(value) ? value : "***";
-    }
 }

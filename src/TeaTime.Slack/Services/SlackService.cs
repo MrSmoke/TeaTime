@@ -22,9 +22,9 @@
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Models;
+    using Models.OAuth;
     using Models.Requests;
     using Models.Requests.InteractiveMessages;
-    using Models.Responses;
     using Resources;
 
     internal class SlackService(ISender mediator,

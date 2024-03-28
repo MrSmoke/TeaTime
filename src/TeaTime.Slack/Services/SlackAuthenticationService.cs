@@ -9,8 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Client;
 using Common.Abstractions;
-using Models.Requests;
-using Models.Responses;
+using Models.OAuth;
 
 internal class SlackAuthenticationService(
     ISlackApiClient slackApiClient,
