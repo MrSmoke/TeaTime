@@ -1,11 +1,9 @@
-﻿#nullable disable
-namespace TeaTime.Slack.Models.Requests
+﻿namespace TeaTime.Slack.Models.Requests;
+
+public class OAuthTokenRequest
 {
-    public class OAuthTokenRequest
-    {
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string Code { get; set; }
-        public string RedirectUri { get; set; }
-    }
+    public required string ClientId { get; set; }
+    public required string ClientSecret { get; set; }
+    public required string Code { get; set; }
+    public required string RedirectUri { get; set; }
 }

@@ -11,7 +11,7 @@
 
         [MemberNotNullWhen(true, nameof(ClientId))]
         [MemberNotNullWhen(true, nameof(ClientSecret))]
-        public bool IsValid() => !string.IsNullOrWhiteSpace(ClientId) && !string.IsNullOrWhiteSpace(ClientSecret);
+        public bool IsValid() => Validate(null, this).Succeeded;
 
         public ValidateOptionsResult Validate(string? name, SlackOAuthOptions options)
         {
