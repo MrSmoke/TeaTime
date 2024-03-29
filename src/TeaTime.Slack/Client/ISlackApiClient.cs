@@ -2,7 +2,7 @@
 {
     using System.Threading.Tasks;
     using Models.OAuth;
-    using Models.Responses;
+    using Models.SlashCommands;
 
     public interface ISlackApiClient
     {

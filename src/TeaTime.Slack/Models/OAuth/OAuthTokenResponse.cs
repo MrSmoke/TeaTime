@@ -1,7 +1,6 @@
 ﻿namespace TeaTime.Slack.Models.OAuth;
 
 using System.Text.Json.Serialization;
-using Responses;
 
 public class OAuthTokenResponse : BaseResponse
 {

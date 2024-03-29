@@ -2,9 +2,9 @@
 {
     using System.Threading.Tasks;
     using Common.Models.Data;
+    using Models.InteractiveMessages;
     using Models.OAuth;
-    using Models.Requests;
-    using Models.Requests.InteractiveMessages;
+    using Models.SlashCommands;
 
     public interface ISlackService
     {

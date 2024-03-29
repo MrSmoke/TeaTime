@@ -22,9 +22,9 @@
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Models;
+    using Models.InteractiveMessages;
     using Models.OAuth;
-    using Models.Requests;
-    using Models.Requests.InteractiveMessages;
+    using Models.SlashCommands;
     using Resources;
 
     internal class SlackService(ISender mediator,
@@ -36,6 +36,9 @@
     {
         public async Task<User> GetOrCreateUser(string userId, string name)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
             var id = await mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, userId));
             if (id > 0)
             {
@@ -68,6 +71,12 @@
 
         public async Task<Room> GetOrCreateRoom(string channelId, string channelName, long userId)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(channelId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(channelName);
+
+            if (userId == default)
+                throw new ArgumentException("value cannot be empty", nameof(userId));
+
             var roomId = await mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, channelId));
             if (roomId > 0)
             {
@@ -98,6 +107,9 @@
 
         public async Task JoinRunAsync(SlashCommand slashCommand, string optionName)
         {
+            ArgumentNullException.ThrowIfNull(slashCommand);
+            ArgumentNullException.ThrowIfNull(optionName);
+
             var user = await GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
             var room = await GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, user.Id);
 
@@ -106,6 +118,8 @@
 
         public async Task JoinRunAsync(MessageRequestPayload requestPayload)
         {
+            ArgumentNullException.ThrowIfNull(requestPayload);
+
             var user = await GetOrCreateUser(requestPayload.User.Id, requestPayload.User.Name);
             var room = await GetOrCreateRoom(requestPayload.Channel.Id, requestPayload.Channel.Name, user.Id);
 
@@ -117,6 +131,8 @@
 
         public async Task InstallAsync(OAuthTokenResponse response)
         {
+            ArgumentNullException.ThrowIfNull(response);
+
             // Ensure data is correct
             if (string.IsNullOrEmpty(response.Team.Id))
                 throw new InvalidOperationException("TeamId cannot be empty");

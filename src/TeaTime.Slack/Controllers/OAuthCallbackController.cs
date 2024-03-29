@@ -5,8 +5,8 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Models.OAuth;
-    using Models.ViewModels;
     using Services;
+    using ViewModels;
     using static Constants;
 
     public class OAuthCallbackController(

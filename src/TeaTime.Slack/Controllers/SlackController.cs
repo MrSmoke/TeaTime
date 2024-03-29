@@ -10,9 +10,8 @@ namespace TeaTime.Slack.Controllers
     using Exceptions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using Models.Requests;
-    using Models.Requests.InteractiveMessages;
-    using Models.Responses;
+    using Models.InteractiveMessages;
+    using Models.SlashCommands;
     using Resources;
     using Services;
 
