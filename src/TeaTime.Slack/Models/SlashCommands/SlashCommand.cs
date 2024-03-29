@@ -61,5 +61,5 @@ public class SlashCommand
     /// The name of the channel the message was sent in
     /// </summary>
     [FromForm(Name = "channel_name")]
-    public string? ChannelName { get; set; }
+    public required string ChannelName { get; set; }
 }

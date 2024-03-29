@@ -77,7 +77,7 @@
                     messageBuilder.Append('\n');
             }
 
-            var data = new SlashCommandResponse(messageBuilder.ToString(), ResponseType.Channel);
+            var data = new SlashCommandResponse(messageBuilder.ToString());
 
             await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl, data);
         }

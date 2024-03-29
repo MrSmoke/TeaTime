@@ -4,12 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-public class SlashCommandResponse(string? text, ResponseType responseType)
+public class SlashCommandResponse(string? text = null, ResponseType responseType = ResponseType.Channel)
 {
-    public SlashCommandResponse() : this(null, SlashCommands.ResponseType.Channel)
-    {
-    }
-
     public string? Text { get; init; } = text;
 
     [JsonPropertyName("replace_original")]
