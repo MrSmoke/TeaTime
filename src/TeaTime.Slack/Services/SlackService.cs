@@ -137,14 +137,7 @@
             if (string.IsNullOrEmpty(response.Team.Id))
                 throw new InvalidOperationException("TeamId cannot be empty");
 
-            if (string.IsNullOrEmpty(response.IncomingWebhook.Url))
-                throw new InvalidOperationException("IncomingWebhookUrl cannot be empty");
-
-            if (string.IsNullOrEmpty(response.IncomingWebhook.ChannelId))
-                throw new InvalidOperationException("IncomingWebhookChannelId cannot be empty");
-
             var hashKey = "slack:" + response.Team.Id;
-            var channelKey = hashKey + ":" + response.IncomingWebhook.ChannelId;
 
             // Store base data for the whole team
             await hash.SetAsync(hashKey, new List<HashEntry>
@@ -152,13 +145,6 @@
                 new(Constants.FieldKeys.TeamName, response.Team.Name),
                 new(Constants.FieldKeys.AccessToken, response.AccessToken),
                 new(Constants.FieldKeys.InstallTime, timeProvider.GetUtcNow().ToString("O"))
-            });
-
-            // Store channel specific data
-            await hash.SetAsync(channelKey, new List<HashEntry>
-            {
-                new(Constants.FieldKeys.WebhookUrl, response.IncomingWebhook.Url),
-                new(Constants.FieldKeys.ChannelName, response.IncomingWebhook.Channel)
             });
         }
 
