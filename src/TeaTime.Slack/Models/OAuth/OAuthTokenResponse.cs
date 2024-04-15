@@ -12,7 +12,4 @@ public class OAuthTokenResponse : BaseResponse
 
     [JsonPropertyName("team")]
     public required SlackTeam Team { get; init; }
-
-    [JsonPropertyName("incoming_webhook")]
-    public required IncomingWebhook IncomingWebhook { get; init; }
 }

@@ -54,7 +54,7 @@
             try
             {
                 await slackService.InstallAsync(response);
-                return View(OAuthCallbackViewModel.Ok(response.Team.Name, response.IncomingWebhook.Channel));
+                return View(OAuthCallbackViewModel.Ok(response.Team.Name));
             }
             catch (Exception ex)
             {
