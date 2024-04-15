@@ -17,11 +17,7 @@ internal class SlackAuthenticationService(
     IOptionsMonitor<SlackOAuthOptions> optionsMonitor)
     : ISlackAuthenticationService
 {
-    private static readonly string[] OAuthScopes =
-    [
-        "commands",
-        "incoming-webhook"
-    ];
+    private static readonly StringValues Scopes = string.Join(',', Constants.OAuthScopes);
 
     public bool OAuthEnabled() => optionsMonitor.CurrentValue.Enabled;
 
@@ -34,7 +30,7 @@ internal class SlackAuthenticationService(
         return QueryHelpers.AddQueryString(baseUrl, new KeyValuePair<string, StringValues>[]
         {
             new("client_id", oauth.ClientId),
-            new("scope", OAuthScopes),
+            new("scope", Scopes),
             new("redirect_uri", GetRedirectUrl())
         });
     }

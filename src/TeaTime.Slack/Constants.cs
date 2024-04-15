@@ -20,4 +20,10 @@ internal static class Constants
     {
         public const string OauthCallback = "SlackOauthCallback";
     }
+
+    internal static readonly string[] OAuthScopes =
+    [
+        "commands",
+        "incoming-webhook"
+    ];
 }
