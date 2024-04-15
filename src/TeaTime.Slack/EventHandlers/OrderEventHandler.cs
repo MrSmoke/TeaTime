@@ -10,7 +10,7 @@
     using Common.Models;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using Models.Responses;
+    using Models.SlashCommands;
     using Resources;
 
     public class OrderEventHandler :
