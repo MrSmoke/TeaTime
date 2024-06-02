@@ -8,4 +8,4 @@ public record OrderPlacedEvent
     long RunId,
     long UserId,
     long OptionId
-) : Event;
+) : BaseEvent;

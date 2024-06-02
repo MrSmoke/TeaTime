@@ -1,17 +1,6 @@
-﻿namespace TeaTime.Common.Features.Orders.Queries
-{
-    using Abstractions;
-    using Models.Data;
+﻿namespace TeaTime.Common.Features.Orders.Queries;
 
-    public class GetUserOrderQuery : IUserQuery<Order?>
-    {
-        public long UserId { get; }
-        public long RunId { get; }
+using Abstractions;
+using Models.Data;
 
-        public GetUserOrderQuery(long runId, long userId)
-        {
-            RunId = runId;
-            UserId = userId;
-        }
-    }
-}
+public record GetUserOrderQuery(long RunId, long UserId) : IUserQuery<Order?>;

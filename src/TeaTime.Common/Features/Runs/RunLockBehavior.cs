@@ -48,10 +48,11 @@
         private async Task ProcessAsync(EndRunCommand request, CancellationToken cancellationToken)
         {
             //delete lock
-            var deleted = await _lockService.DeleteLockAsync(request.RoomId);
-            if (!deleted)
-                throw new RunEndException("There is no active run in this room",
-                    RunEndException.RunEndExceptionReason.NoActiveRun);
+            if (await _lockService.DeleteLockAsync(request.Run.RoomId))
+                return;
+
+            throw new RunEndException("There is no active run in this room",
+                RunEndException.RunEndExceptionReason.NoActiveRun);
         }
     }
 }

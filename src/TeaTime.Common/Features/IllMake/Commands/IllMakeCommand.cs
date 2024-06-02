@@ -1,18 +1,5 @@
-﻿namespace TeaTime.Common.Features.IllMake.Commands
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.IllMake.Commands;
 
-    public class IllMakeCommand : BaseCommand, IUserCommand
-    {
-        public long Id { get; }
-        public long RunId { get; }
-        public long UserId { get; }
+using Abstractions;
 
-        public IllMakeCommand(long id, long runId, long userId)
-        {
-            Id = id;
-            RunId = runId;
-            UserId = userId;
-        }
-    }
-}
+public record IllMakeCommand(long Id, long RunId, long UserId) : BaseCommand, IUserCommand;

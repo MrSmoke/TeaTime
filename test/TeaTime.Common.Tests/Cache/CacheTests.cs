@@ -130,7 +130,7 @@
             Assert.Null(await cache.GetAsync<string>(nameof(SetAsync_Sliding)));
         }
 
-        private static IDistributedCache GetDistributedCache()
+        private static MemoryDistributedCache GetDistributedCache()
         {
             var options = new MemoryDistributedCacheOptions();
 

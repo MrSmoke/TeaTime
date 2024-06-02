@@ -1,26 +1,11 @@
-﻿namespace TeaTime.Common.Features.Runs.Commands
-{
-    using System.Collections.Generic;
-    using Abstractions;
-    using Models.Domain;
+namespace TeaTime.Common.Features.Runs.Commands;
 
-    /// <summary>
-    /// The command to end a run
-    /// </summary>
-    public class EndRunCommand : BaseCommand, IUserCommand
-    {
-        public long RunId { get; }
-        public long RoomId { get; }
-        public long UserId { get; }
+using System.Collections.Generic;
+using Abstractions;
+using Models.Data;
+using Models.Domain;
 
-        public IEnumerable<OrderModel> Orders { get; }
-
-        public EndRunCommand(long runId, long roomId, long userId, IEnumerable<OrderModel> orders)
-        {
-            RunId = runId;
-            RoomId = roomId;
-            UserId = userId;
-            Orders = orders;
-        }
-    }
-}
+/// <summary>
+/// The command to end a run
+/// </summary>
+public record EndRunCommand(Run Run, long UserId, IEnumerable<OrderModel> Orders) : BaseCommand, IUserCommand;

@@ -1,4 +1,5 @@
-﻿namespace TeaTime.Slack.Models
+﻿#nullable disable
+namespace TeaTime.Slack.Models
 {
     internal class CallbackData
     {

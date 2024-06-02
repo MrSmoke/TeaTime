@@ -1,8 +1,7 @@
-﻿namespace TeaTime.Slack.Controllers
+namespace TeaTime.Slack.Controllers
 {
     using System;
     using System.Collections.Generic;
-    using System.Text.Json;
     using System.Threading.Tasks;
     using CommandRouter;
     using CommandRouter.Exceptions;
@@ -11,31 +10,29 @@
     using Exceptions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using Models.Requests;
-    using Models.Requests.InteractiveMessages;
-    using Models.Responses;
+    using Models.InteractiveMessages;
+    using Models.SlashCommands;
     using Resources;
     using Services;
 
     [Route("slack")]
-    public class SlackController : Controller
+    public class SlackController : ControllerBase
     {
         private readonly ICommandRunner _commandRunner;
         private readonly ISlackService _slackService;
-        private readonly ISlackMessageVerifier _messageVerifier;
         private readonly ILogger<SlackController> _logger;
 
-        public SlackController(ICommandRunner commandRunner, ISlackService slackService,
-            ISlackMessageVerifier messageVerifier, ILogger<SlackController> logger)
+        public SlackController(ICommandRunner commandRunner,
+            ISlackService slackService,
+            ILogger<SlackController> logger)
         {
             _commandRunner = commandRunner;
             _slackService = slackService;
-            _messageVerifier = messageVerifier;
             _logger = logger;
         }
 
-        [HttpPost]
-        [Route("slash")]
+        [SlackVerifyRequest]
+        [HttpPost("slash")]
         public async Task<IActionResult> SlashCommandHook(SlashCommand slashCommand)
         {
             if (slashCommand == null)
@@ -44,15 +41,9 @@
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
-            if (string.IsNullOrWhiteSpace(slashCommand.Command))
+            if (string.IsNullOrWhiteSpace(slashCommand.Text))
             {
-                _logger.LogError("Slash command contains no command");
-                return Ok(ErrorStrings.General(), ResponseType.User);
-            }
-
-            if (!_messageVerifier.IsValid(slashCommand))
-            {
-                _logger.LogError("Bad verification token");
+                _logger.LogWarning("Slash command contains no text");
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
@@ -62,7 +53,7 @@
             {
                 var result = await _commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
                 {
-                    {Constants.SlashCommand, slashCommand}
+                    {Constants.CommandContextKeys.SlashCommand, slashCommand}
                 });
 
                 Response.ContentType = "application/json";
@@ -118,8 +109,8 @@
             return Ok(ErrorStrings.CommandFailed(), ResponseType.User);
         }
 
-        [HttpPost]
-        [Route("interactive-messages")]
+        [SlackVerifyRequest]
+        [HttpPost("interactive-messages")]
         public async Task<IActionResult> InteractiveMessageHook(MessageRequest request)
         {
             if (request == null)
@@ -138,12 +129,6 @@
             if (message == null)
             {
                 _logger.LogError("Failed to deserialize interactive message request");
-                return Ok(ErrorStrings.General(), ResponseType.User);
-            }
-
-            if (!_messageVerifier.IsValid(message))
-            {
-                _logger.LogError("Bad verification token");
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
@@ -170,7 +155,7 @@
             }
         }
 
-        private IActionResult Ok(string message, ResponseType responseType)
+        private OkObjectResult Ok(string message, ResponseType responseType)
         {
             return Ok(new SlashCommandResponse(message, responseType));
         }

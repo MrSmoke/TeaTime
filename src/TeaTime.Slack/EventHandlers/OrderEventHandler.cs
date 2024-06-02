@@ -10,7 +10,7 @@
     using Common.Models;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using Models.Responses;
+    using Models.SlashCommands;
     using Resources;
 
     public class OrderEventHandler :
@@ -70,7 +70,7 @@
             return null;
         }
 
-        private async Task SendMessage(Event evt, string message, ResponseType responseType)
+        private async Task SendMessage(BaseEvent evt, string message, ResponseType responseType)
         {
             if (!evt.TryGetCallbackState(out var callbackData))
                 return;

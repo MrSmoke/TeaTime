@@ -1,6 +1,6 @@
 ﻿namespace TeaTime.Slack.Models;
 
 using Common.Models.Data;
-using Requests;
+using SlashCommands;
 
 public record CommandContext(SlashCommand Command, User User, Room Room);

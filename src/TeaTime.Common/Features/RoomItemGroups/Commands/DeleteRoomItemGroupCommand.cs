@@ -1,16 +1,5 @@
-﻿namespace TeaTime.Common.Features.RoomItemGroups.Commands
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.RoomItemGroups.Commands;
 
-    public class DeleteRoomItemGroupCommand : BaseCommand, IUserCommand
-    {
-        public long GroupId { get; }
-        public long UserId { get; }
+using Abstractions;
 
-        public DeleteRoomItemGroupCommand(long groupId, long userId)
-        {
-            GroupId = groupId;
-            UserId = userId;
-        }
-    }
-}
+public record DeleteRoomItemGroupCommand(long GroupId, long UserId) : BaseCommand, IUserCommand;

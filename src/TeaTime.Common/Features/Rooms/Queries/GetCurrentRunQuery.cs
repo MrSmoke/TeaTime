@@ -1,17 +1,6 @@
-﻿namespace TeaTime.Common.Features.Rooms.Queries
-{
-    using Abstractions;
-    using Models.Data;
+﻿namespace TeaTime.Common.Features.Rooms.Queries;
 
-    public class GetCurrentRunQuery : IUserQuery<Run?>
-    {
-        public long RoomId { get; }
-        public long UserId { get; }
+using Abstractions;
+using Models.Data;
 
-        public GetCurrentRunQuery(long roomId, long userId)
-        {
-            RoomId = roomId;
-            UserId = userId;
-        }
-    }
-}
+public record GetCurrentRunQuery(long RoomId, long UserId) : IUserQuery<Run?>;

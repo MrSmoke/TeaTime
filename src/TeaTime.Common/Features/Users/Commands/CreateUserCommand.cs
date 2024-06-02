@@ -1,18 +1,5 @@
-﻿namespace TeaTime.Common.Features.Users.Commands
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.Users.Commands;
 
-    public class CreateUserCommand : ICommand
-    {
-        public long Id { get; set; }
-        public string Username { get; set; }
-        public string DisplayName { get; set; }
+using Abstractions;
 
-        public CreateUserCommand(long id, string username, string displayName)
-        {
-            Id = id;
-            Username = username;
-            DisplayName = displayName;
-        }
-    }
-}
+public record CreateUserCommand(long Id, string Username, string DisplayName) : ICommand;

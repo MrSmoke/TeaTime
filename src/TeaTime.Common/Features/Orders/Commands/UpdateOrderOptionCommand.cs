@@ -1,18 +1,5 @@
-﻿namespace TeaTime.Common.Features.Orders.Commands
-{
-    using Abstractions;
+﻿namespace TeaTime.Common.Features.Orders.Commands;
 
-    public class UpdateOrderOptionCommand : BaseCommand, IUserCommand
-    {
-        public long OrderId { get; }
-        public long UserId { get; }
-        public long OptionId { get; }
+using Abstractions;
 
-        public UpdateOrderOptionCommand(long orderId, long userId, long optionId)
-        {
-            OrderId = orderId;
-            UserId = userId;
-            OptionId = optionId;
-        }
-    }
-}
+public record UpdateOrderOptionCommand(long OrderId, long UserId, long OptionId) : BaseCommand, IUserCommand;

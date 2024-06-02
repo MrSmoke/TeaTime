@@ -1,8 +1,5 @@
-﻿namespace TeaTime.Common.Abstractions
-{
-    using MediatR;
+﻿namespace TeaTime.Common.Abstractions;
 
-    public interface ICommand : IRequest
-    {
-    }
-}
+using MediatR;
+
+public interface ICommand : IRequest;

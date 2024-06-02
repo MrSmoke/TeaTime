@@ -1,10 +1,9 @@
-﻿namespace TeaTime.Common.Models.Data
+﻿namespace TeaTime.Common.Models.Data;
+
+public record Room : BaseNamedDataObject
 {
-    public class Room : BaseNamedDataObject
-    {
-        /// <summary>
-        /// The id of the user who created this room
-        /// </summary>
-        public long CreatedBy { get; set; }
-    }
+    /// <summary>
+    /// The id of the user who created this room
+    /// </summary>
+    public required long CreatedBy { get; init; }
 }

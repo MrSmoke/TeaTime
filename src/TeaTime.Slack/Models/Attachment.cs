@@ -1,4 +1,5 @@
-﻿namespace TeaTime.Slack.Models
+﻿#nullable disable
+namespace TeaTime.Slack.Models
 {
     using System.Collections.Generic;
     using System.Text.Json.Serialization;
