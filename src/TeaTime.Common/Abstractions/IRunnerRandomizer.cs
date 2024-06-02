@@ -1,11 +1,11 @@
-﻿namespace TeaTime.Common.Abstractions
-{
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Models.Domain;
+﻿namespace TeaTime.Common.Abstractions;
 
-    public interface IRunnerRandomizer
-    {
-        Task<long> GetRunnerUserId(IEnumerable<OrderModel> orders);
-    }
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Models.Domain;
+
+public interface IRunnerRandomizer
+{
+    ValueTask<long> GetRunnerUserIdAsync(IEnumerable<OrderModel> orders, CancellationToken cancellationToken = default);
 }
