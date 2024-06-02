@@ -13,26 +13,26 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 
 ### Commands
 
-| Description | Command |
-| ---- | ------- |
-| Show a list of available commands | `/teatime help` |
-| Start a new round | `/teatime {group}` |
-| Join a round | `/teatime join {option}` |
-| End a round | `/teatime end` |
-| Volunteer to make the round | `/teatime illmake` |
+| Description                       | Command                  |
+|-----------------------------------|--------------------------|
+| Show a list of available commands | `/teatime help`          |
+| Start a new round                 | `/teatime {group}`       |
+| Join a round                      | `/teatime join {option}` |
+| End a round                       | `/teatime end`           |
+| Volunteer to make the round       | `/teatime illmake`       |
 
 #### Groups
 
-| Description | Command |
-| ---- | ------- |
-| Add a group | `/teatime groups add {name}` |
+| Description    | Command                         |
+|----------------|---------------------------------|
+| Add a group    | `/teatime groups add {name}`    |
 | Remove a group | `/teatime groups remove {name}` |
 
 #### Options
 
-| Description | Command |
-| ---- | ------- |
-| Add a new option for a group | `/teatime options add {group} {name}` |
+| Description                   | Command                                  |
+|-------------------------------|------------------------------------------|
+| Add a new option for a group  | `/teatime options add {group} {name}`    |
 | Remove an option from a group | `/teatime options remove {group} {name}` |
 
 ### Example Usage
@@ -98,15 +98,20 @@ An example `docker-compose.yml`
 version: '3'
 services:
   web:
-    image: "dockdockcontainer/teatime:latest"
+    image: dockdockcontainer/teatime:latest
     restart: always
     ports:
      - "80:80"
     environment:
-      SLACK__VERIFICATIONTOKEN: helloworld
+      SELFHOST: https://demo.example
       MYSQL__HOST: localhost
       MYSQL__USERNAME: username
       MYSQL__PASSWORD: password
+      SLACK__OAUTH__ENABLED: true
+      SLACK__OAUTH__CLIENTID: demoid
+      SLACK__OAUTH__CLIENTSECRET: demosecret
+      SLACK__REQUESTVERIFICATION__ENABLED: true
+      SLACK__REQUESTVERIFICATION__SIGNINGSECRET: secret
 ```
 
 #### Supported tags
@@ -116,14 +121,19 @@ services:
 
 #### Environment Variables
 
-| Variable | Required |  Description |
-| ---- | ---- | ---- |
-| SLACK__VERIFICATIONTOKEN | **true** | The verification token used to verify slack messages |
-| MYSQL__HOST | **true** | The mysql server host |
-| MYSQL__PORT | *false* (default `3306`) | The mysql server port |
-| MYSQL__USERNAME | **true** | The mysql users username |
-| MYSQL__PASSWORD | **true** | The mysql users password |
-| MYSQL__DATABASE | *false* (default `teatime`) | The mysql database |
+| Variable                                  | Required                  | Description                                                                                                                                               |
+|-------------------------------------------|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| SELFHOST                                  | false                     | The host of the TeaTime application including the scheme, host and port. If not set, this will be generated from the request. Eg `https://runteatime.com` |
+| MYSQL__HOST                               | **true**                  | The mysql server host.                                                                                                                                    |
+| MYSQL__PORT                               | false (default `3306`)    | The mysql server port.                                                                                                                                    |
+| MYSQL__USERNAME                           | **true**                  | The mysql users username.                                                                                                                                 |
+| MYSQL__PASSWORD                           | **true**                  | The mysql users password.                                                                                                                                 |
+| MYSQL__DATABASE                           | false (default `teatime`) | The mysql database.                                                                                                                                       |
+| SLACK__OAUTH__ENABLED                     | false (default `false`)   | Set to `true` to enable the "Add to Slack" button".                                                                                                       |
+| SLACK__OAUTH__CLIENTID                    | **true** *if enabled*     | The "Client ID" for the Slack app.                                                                                                                        |
+| SLACK__OAUTH__CLIENTSECRET                | **true** *if enabled*     | The "Client Secret" for the Slack app.                                                                                                                    |
+| SLACK__REQUESTVERIFICATION__ENABLED       | false (default `false`)   | Set to `true` to enable Slack request verification                                                                                                        |
+| SLACK__REQUESTVERIFICATION__SIGNINGSECRET | **true** *if enabled*     | The "Signing Secret" for the Slack app.                                                                                                                   |
 
 ## License
 

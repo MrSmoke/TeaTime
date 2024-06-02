@@ -8,23 +8,18 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Client;
-using Models.Requests;
-using Models.Responses;
+using Common.Abstractions;
+using Models.OAuth;
 
-internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptionsMonitor<SlackOAuthOptions> options)
+internal class SlackAuthenticationService(
+    ISlackApiClient slackApiClient,
+    IUrlGenerator urlGenerator,
+    IOptionsMonitor<SlackOAuthOptions> optionsMonitor)
     : ISlackAuthenticationService
 {
-    private static readonly string[] OAuthScopes =
-    [
-        "commands",
-        "incoming-webhook"
-    ];
+    private static readonly StringValues Scopes = string.Join(',', Constants.OAuthScopes);
 
-    public bool OAuthEnabled()
-    {
-        var oauth = options.CurrentValue;
-        return oauth.Enabled;
-    }
+    public bool OAuthEnabled() => optionsMonitor.CurrentValue.Enabled;
 
     public string BuildAuthorizeUrl()
     {
@@ -35,7 +30,8 @@ internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptio
         return QueryHelpers.AddQueryString(baseUrl, new KeyValuePair<string, StringValues>[]
         {
             new("client_id", oauth.ClientId),
-            new("scope", OAuthScopes)
+            new("scope", Scopes),
+            new("redirect_uri", GetRedirectUrl())
         });
     }
 
@@ -47,22 +43,24 @@ internal class SlackAuthenticationService(ISlackApiClient slackApiClient, IOptio
 
         return slackApiClient.GetOAuthTokenAsync(new OAuthTokenRequest
         {
-            ClientId = oauth.ClientId,
-            ClientSecret = oauth.ClientSecret,
-            RedirectUri = oauth.RedirectUri,
+            ClientId = oauth.ClientId ?? throw new InvalidOperationException("ClientId missing"),
+            ClientSecret = oauth.ClientSecret ?? throw new InvalidOperationException("ClientSecret missing"),
+            RedirectUri = GetRedirectUrl(),
             Code = code
         });
     }
 
+    private string GetRedirectUrl() => urlGenerator.CreateAbsoluteUrlByName(Constants.RouteNames.OauthCallback);
+
     private SlackOAuthOptions GetOptions()
     {
-        var oauth = options.CurrentValue;
-        if (!oauth.Enabled)
+        var options = optionsMonitor.CurrentValue;
+        if (!options.Enabled)
             throw new InvalidOperationException("Oauth is not enabled");
 
-        if (!oauth.IsValid())
+        if (!options.IsValid())
             throw new InvalidOperationException("Oauth is not configured");
 
-        return oauth;
+        return options;
     }
 }

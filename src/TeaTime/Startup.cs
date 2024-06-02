@@ -13,6 +13,7 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Slack;
 
     public class Startup
@@ -28,9 +29,11 @@
         {
             // Add framework services.
             var mvcBuilder = services.AddControllersWithViews();
+            services.AddHttpContextAccessor();
 
             services.AddTransient<IStartupFilter, StartupActionFilter>();
 
+            // Register our data services
             RegisterDataLayer(services);
 
             // add caching
@@ -39,20 +42,24 @@
             services.AddSingleton<ICache, Cache>();
             services.AddSingleton<ICacheSerializer, SystemTextJsonCacheSerializer>();
 
+            // Add Slack support
             services.AddSlack(mvcBuilder, _configuration.GetSection("slack"));
 
+            // Core
+            services.TryAddSingleton(TimeProvider.System);
             services.AddScoped<IEventPublisher, EventPublisher>();
-
             services.AddSingleton<IRunnerRandomizer, DefaultRunnerRandomizer>();
             services.AddSingleton<IRoomRunLockService, RoomRunLockService>();
             services.AddSingleton<ISystemClock, DefaultSystemClock>();
             services.AddSingleton<IPermissionService, PermissionService>();
+            services.AddSingleton<IUrlGenerator, UrlGenerator>();
+            services.Configure<UrlGeneratorOptions>(_configuration);
 
             // Register the pipelines manually so we can define order
             // - Check permissions first
             // - Then run PreProcessors
-            // - run the lock behaviour, this should be the last behaviour aside from caching
-            // - finally run the cache behaviour. Im putting this last for now just so everything else runs all the time
+            // - Finally, run the cache layer before hitting the actual implementations
+            // - Run the lock behaviour, this should be the last behaviour aside from caching
             services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(PermissionBehavior<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandPreProcessorBehavior<,>));
             services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(CacheBehaviour<,>));
@@ -65,23 +72,17 @@
             {
                 o.RegisterServicesFromAssemblyContaining<ICommand>();
             });
-
-            // Run Lock should be last behavior to run
         }
 
         private void RegisterDataLayer(IServiceCollection services)
         {
             var mysqlOptions = _configuration.GetSection("mysql").Get<MySqlConnectionOptions>();
-            if (mysqlOptions != null)
-            {
-                mysqlOptions.Validate();
+            if (mysqlOptions == null)
+                throw new Exception("No database has been configured");
 
-                services.AddMySql(mysqlOptions);
+            mysqlOptions.Validate();
 
-                return;
-            }
-
-            throw new Exception("No database has been configured");
+            services.AddMySql(mysqlOptions);
         }
     }
 }

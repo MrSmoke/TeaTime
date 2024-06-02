@@ -1,4 +1,4 @@
-﻿@{
+@{
     var pageTitle = "TeaTime";
     var viewDataTitle = ViewData["Title"] as string;
 
@@ -9,7 +9,7 @@
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,50 +18,17 @@
     <link rel="icon" type="image/png" href="/images/firetruck.png" />
 
     <environment include="Development">
-        <link rel="stylesheet" href="~/libs/bulma/bulma.css" />
+        <link rel="stylesheet" href="~/libs/bulma/1.0.1/bulma.css" />
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css"
+        <link rel="stylesheet"
+              href="~/libs/bulma/1.0.1/bulma.min.css"
+              integrity="sha512-dF4b2QV/0kq+qlwefqCyb+edbWZ63ihXhE4A2Pju3u4QyaeFzMChqincJsKYwghbclpLE92jPb9yaz/LQ8aNlg=="
               crossorigin="anonymous"
-              integrity="sha256-8B1OaG0zT7uYA572S2xOxWACq9NXYPQ+U5kHPV1bJN4=" />
+              referrerpolicy="no-referrer" />
     </environment>
 
-    <style>
-        html, body
-        {
-            height: 100%;
-        }
-
-        body
-        {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .site-content
-        {
-            flex: 1 0 auto;
-        }
-
-        .footer
-        {
-            flex-shrink: 0;
-        }
-
-        /*
-         Bulma overrides
-         */
-        .footer
-        {
-            padding: 1.5rem;
-        }
-
-        .navbar.is-transparent
-        {
-             background-color: transparent;
-             background-image: none;
-        }
-    </style>
+    <link rel="stylesheet" asp-append-version="true" href="/styles/teatime.css">
 </head>
 <body>
 <div class="site-content">
@@ -73,9 +40,9 @@
         <div class="level">
             <div class="level-left">
                 <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
-                    <a class="navbar-item" href="/">Home</a>
-                    <a class="navbar-item" href="/privacy">Privacy</a>
-                    <a class="navbar-item" href="/contact">Contact</a>
+                    <a asp-controller="Home" asp-action="Index" class="navbar-item">Home</a>
+                    <a asp-controller="Home" asp-action="Privacy" class="navbar-item">Privacy</a>
+                    <a asp-controller="Home" asp-action="Contact" class="navbar-item">Contact</a>
                     <a class="navbar-item" href="https://github.com/MrSmoke/TeaTime">GitHub</a>
                 </nav>
             </div>
@@ -86,6 +53,6 @@
     </div>
 </footer>
 
-@RenderSection("Scripts", required: false)
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

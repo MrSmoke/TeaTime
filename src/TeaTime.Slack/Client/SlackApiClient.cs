@@ -4,19 +4,13 @@ namespace TeaTime.Slack.Client
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using System.Text.Json;
     using System.Threading.Tasks;
-    using Models.Responses;
-    using Models.Requests;
+    using Models.OAuth;
+    using Models.SlashCommands;
 
-    internal class SlackApiClient : ISlackApiClient
+    internal class SlackApiClient(HttpClient httpClient) : ISlackApiClient
     {
-        private readonly HttpClient _httpClient;
-
-        public SlackApiClient(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
         public Task PostResponseAsync(string callbackUrl, SlashCommandResponse response)
         {
             return PostAsync(callbackUrl, response);
@@ -34,14 +28,17 @@ namespace TeaTime.Slack.Client
             };
 
             using var content = new FormUrlEncodedContent(formData);
-            using var response = await _httpClient.PostAsync("https://slack.com/api/oauth.v2.access", content);
+            using var response = await httpClient.PostAsync("https://slack.com/api/oauth.v2.access", content);
 
-            return await response.Content.ReadFromJsonAsync<OAuthTokenResponse>() ?? new OAuthTokenResponse();
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<OAuthTokenResponse>() ??
+                   throw new JsonException("Response returned null when a type was expected");
         }
 
         private async Task<HttpStatusCode> PostAsync(string url, object body)
         {
-            using var response = await _httpClient.PostAsJsonAsync(url, body);
+            using var response = await httpClient.PostAsJsonAsync(url, body);
 
             //todo: log errors
             return response.StatusCode;

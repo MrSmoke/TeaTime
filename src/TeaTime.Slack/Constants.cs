@@ -12,7 +12,15 @@ internal static class Constants
         internal const string TeamName = "team_name";
         internal const string AccessToken = "access_token";
         internal const string InstallTime = "install_time";
-        internal const string WebhookUrl = "webhook:url";
-        internal const string ChannelName = "webhook:channel_name";
     }
+
+    internal static class RouteNames
+    {
+        public const string OauthCallback = "SlackOauthCallback";
+    }
+
+    internal static readonly string[] OAuthScopes =
+    [
+        "commands"
+    ];
 }

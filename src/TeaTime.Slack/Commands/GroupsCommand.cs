@@ -7,7 +7,7 @@
     using Common.Features.RoomItemGroups.Commands;
     using Common.Features.RoomItemGroups.Queries;
     using MediatR;
-    using Models.Responses;
+    using Models.SlashCommands;
     using Resources;
     using Services;
 

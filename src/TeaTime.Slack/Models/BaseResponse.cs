@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Models.Responses;
+﻿namespace TeaTime.Slack.Models;
 
 public abstract class BaseResponse
 {

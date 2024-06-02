@@ -2,7 +2,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Models.Responses;
+using Models.OAuth;
 
 public interface ISlackAuthenticationService
 {
