@@ -3,6 +3,7 @@ namespace TeaTime.Data.MySql.Tests;
 using System;
 using System.Threading.Tasks;
 using Dapper;
+using Factories;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 

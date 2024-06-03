@@ -1,47 +1,43 @@
-namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Common.Abstractions.Data;
+using Common.Models.Data;
+using Factories;
+
+public class OrderRepository(IMySqlConnectionFactory factory) : BaseRepository(factory), IOrderRepository
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Common.Abstractions.Data;
-    using Common.Models.Data;
+    private const string SelectColumns = "id, runId, userId, optionId, createdDate";
 
-    public class OrderRepository : BaseRepository, IOrderRepository
+    public Task CreateAsync(Order order)
     {
-        private const string SelectColumns = "id, runId, userId, optionId, createdDate";
+        const string sql = "INSERT INTO orders " +
+                           "(id, runId, userId, optionId, createdDate) VALUES " +
+                           "(@id, @runId, @userId, @optionId, @createdDate)";
 
-        public OrderRepository(IMySqlConnectionFactory factory) : base(factory)
-        {
-        }
+        return ExecuteAsync(sql, order);
+    }
 
-        public Task CreateAsync(Order order)
-        {
-            const string sql = "INSERT INTO orders " +
-                               "(id, runId, userId, optionId, createdDate) VALUES " +
-                               "(@id, @runId, @userId, @optionId, @createdDate)";
+    public Task UpdateAsync(Order order)
+    {
+        //todo: update modified date (also add modified date)
+        const string sql = "UPDATE orders SET optionId = @optionId WHERE id = @id";
 
-            return ExecuteAsync(sql, order);
-        }
+        return ExecuteAsync(sql, order);
+    }
 
-        public Task UpdateAsync(Order order)
-        {
-            //todo: update modified date (also add modified date)
-            const string sql = "UPDATE orders SET optionId = @optionId WHERE id = @id";
+    public Task<Order?> GetAsync(long id)
+    {
+        const string sql = "SELECT " + SelectColumns + " FROM orders where id = @id";
 
-            return ExecuteAsync(sql, order);
-        }
+        return SingleOrDefaultAsync<Order>(sql, new { id });
+    }
 
-        public Task<Order?> GetAsync(long id)
-        {
-            const string sql = "SELECT " + SelectColumns + " FROM orders where id = @id";
+    public Task<IEnumerable<Order>> GetOrdersAsync(long runId)
+    {
+        const string sql = "SELECT " + SelectColumns + " FROM orders where runId = @runId";
 
-            return SingleOrDefaultAsync<Order>(sql, new { id });
-        }
-
-        public Task<IEnumerable<Order>> GetOrdersAsync(long runId)
-        {
-            const string sql = "SELECT " + SelectColumns + " FROM orders where runId = @runId";
-
-            return QueryAsync<Order>(sql, new { runId });
-        }
+        return QueryAsync<Order>(sql, new { runId });
     }
 }

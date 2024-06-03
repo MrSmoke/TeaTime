@@ -1,8 +1,8 @@
 namespace TeaTime.Common.Features.Options
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Abstractions.Data;
     using Commands;
     using MediatR;
@@ -12,10 +12,10 @@ namespace TeaTime.Common.Features.Options
         IRequestHandler<CreateOptionCommand>,
         IRequestHandler<DeleteOptionCommand>
     {
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _clock;
         private readonly IOptionsRepository _optionsRepository;
 
-        public OptionsCommandHandler(ISystemClock clock, IOptionsRepository optionsRepository)
+        public OptionsCommandHandler(TimeProvider clock, IOptionsRepository optionsRepository)
         {
             _clock = clock;
             _optionsRepository = optionsRepository;
@@ -28,7 +28,7 @@ namespace TeaTime.Common.Features.Options
                 Id = request.Id,
                 Name = request.Name,
                 CreatedBy = request.UserId,
-                CreatedDate = _clock.UtcNow(),
+                CreatedDate = _clock.GetUtcNow(),
                 GroupId = request.GroupId
             };
 

@@ -1,56 +1,52 @@
-namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories;
+
+using System.Threading.Tasks;
+using Common.Abstractions.Data;
+using Common.Models.Data;
+using Factories;
+
+public class RunRepository(IMySqlConnectionFactory factory) : BaseRepository(factory), IRunRepository
 {
-    using System.Threading.Tasks;
-    using Common.Abstractions.Data;
-    using Common.Models.Data;
+    private const string Columns = "id, roomId, userId, groupId, startTime, endTime, ended, createdDate";
 
-    public class RunRepository : BaseRepository, IRunRepository
+    public Task CreateAsync(Run run)
     {
-        private const string Columns = "id, roomId, userId, groupId, startTime, endTime, ended, createdDate";
+        const string sql = "INSERT INTO runs " +
+                           "(" + Columns + ") VALUES " +
+                           "(@id, @roomId, @userId, @groupId, @startTime, @endTime, @ended, @createdDate)";
 
-        public RunRepository(IMySqlConnectionFactory factory) : base(factory)
-        {
-        }
+        return ExecuteAsync(sql, run);
+    }
 
-        public Task CreateAsync(Run run)
-        {
-            const string sql = "INSERT INTO runs " +
-                               "(" + Columns + ") VALUES " +
-                               "(@id, @roomId, @userId, @groupId, @startTime, @endTime, @ended, @createdDate)";
+    public Task<Run?> GetAsync(long runId)
+    {
+        const string sql =
+            "SELECT " + Columns + " FROM runs WHERE id = @runId";
 
-            return ExecuteAsync(sql, run);
-        }
+        return SingleOrDefaultAsync<Run>(sql, new { runId });
+    }
 
-        public Task<Run?> GetAsync(long runId)
-        {
-            const string sql =
-                "SELECT " + Columns + " FROM runs WHERE id = @runId";
+    public Task<Run?> GetCurrentRunAsync(long roomId)
+    {
+        const string sql =
+            "SELECT " + Columns + " FROM runs WHERE roomId = @roomId AND ended = 0 order by createdDate desc";
 
-            return SingleOrDefaultAsync<Run>(sql, new { runId });
-        }
+        return QueryFirstOrDefaultAsync<Run>(sql, new { roomId });
+    }
 
-        public Task<Run?> GetCurrentRunAsync(long roomId)
-        {
-            const string sql =
-                "SELECT " + Columns + " FROM runs WHERE roomId = @roomId AND ended = 0 order by createdDate desc";
+    public Task UpdateAsync(Run run)
+    {
+        const string sql = "UPDATE runs SET ended = @ended WHERE id = @id";
 
-            return QueryFirstOrDefaultAsync<Run>(sql, new { roomId });
-        }
+        return ExecuteAsync(sql, run);
+    }
 
-        public Task UpdateAsync(Run run)
-        {
-            const string sql = "UPDATE runs SET ended = @ended WHERE id = @id";
+    public Task CreateResultAsync(RunResult result)
+    {
+        const string sql = "INSERT INTO run_results " +
+                           "(runId, runnerUserId, endedTime) VALUES " +
+                           "(@runId, @runnerUserId, @endedTime)";
 
-            return ExecuteAsync(sql, run);
-        }
-
-        public Task CreateResultAsync(RunResult result)
-        {
-            const string sql = "INSERT INTO run_results " +
-                               "(runId, runnerUserId, endedTime) VALUES " +
-                               "(@runId, @runnerUserId, @endedTime)";
-
-            return ExecuteAsync(sql, result);
-        }
+        return ExecuteAsync(sql, result);
     }
 }
