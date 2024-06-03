@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Models.Data;
+namespace TeaTime.Common.Models.Data;
 
 public record Order : BaseDataObject
 {

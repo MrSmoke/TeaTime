@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Models.SlashCommands;
+namespace TeaTime.Slack.Models.SlashCommands;
 
 public enum ResponseType
 {

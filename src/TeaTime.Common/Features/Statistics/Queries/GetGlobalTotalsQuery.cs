@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Statistics.Queries;
+namespace TeaTime.Common.Features.Statistics.Queries;
 
 using System;
 using Abstractions;

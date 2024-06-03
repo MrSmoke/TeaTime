@@ -46,7 +46,7 @@ namespace TeaTime.Slack.Commands
             if (roomItemGroup == null)
                 return Response(ErrorStrings.StartRun_GroupInvalidName(group), ResponseType.User);
 
-            if(!roomItemGroup.Options.Any())
+            if (!roomItemGroup.Options.Any())
                 return Response(ErrorStrings.StartRun_GroupNoOptions(roomItemGroup.Name), ResponseType.User);
 
             var command = new StartRunCommand(

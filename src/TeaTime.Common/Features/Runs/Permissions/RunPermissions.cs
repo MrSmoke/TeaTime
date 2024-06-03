@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Runs.Permissions
+namespace TeaTime.Common.Features.Runs.Permissions
 {
     using System.Threading.Tasks;
     using Abstractions;

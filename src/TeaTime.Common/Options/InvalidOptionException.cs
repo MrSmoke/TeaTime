@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Options
+namespace TeaTime.Common.Options
 {
     using System;
 

@@ -1,4 +1,4 @@
-﻿namespace TeaTime;
+namespace TeaTime;
 
 using Common.Abstractions;
 using Common.Exceptions;

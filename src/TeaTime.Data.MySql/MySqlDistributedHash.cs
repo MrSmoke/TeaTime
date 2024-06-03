@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql
+namespace TeaTime.Data.MySql
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -41,7 +41,7 @@
         {
             const string sql = "SELECT Field, Value FROM hashes WHERE `Key` = @key";
 
-            return QueryAsync<HashEntry>(sql, new {key});
+            return QueryAsync<HashEntry>(sql, new { key });
         }
 
         public Task<string?> GetValueAsync(string key, string field)

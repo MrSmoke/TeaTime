@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories
 {
     using System.Threading.Tasks;
     using Common.Abstractions.Data;
@@ -26,7 +26,7 @@
             const string sql =
                 "SELECT " + Columns + " FROM runs WHERE id = @runId";
 
-            return SingleOrDefaultAsync<Run>(sql, new {runId});
+            return SingleOrDefaultAsync<Run>(sql, new { runId });
         }
 
         public Task<Run?> GetCurrentRunAsync(long roomId)

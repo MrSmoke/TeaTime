@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.RoomItemGroups.EventHandlers
+namespace TeaTime.Common.Features.RoomItemGroups.EventHandlers
 {
     using System.Threading;
     using System.Threading.Tasks;
@@ -13,7 +13,7 @@
         private readonly IMediator _mediator;
         private readonly IIdGenerator<long> _idGenerator;
 
-        private static readonly string[] DefaultItemNames = {"Earl Grey", "English Breakfast"};
+        private static readonly string[] DefaultItemNames = { "Earl Grey", "English Breakfast" };
 
         public RoomCreatedEventHandler(IMediator mediator, IIdGenerator<long> idGenerator)
         {

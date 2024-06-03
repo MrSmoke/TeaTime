@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -34,14 +34,14 @@
         {
             const string sql = "SELECT " + SelectColumns + " FROM orders where id = @id";
 
-            return SingleOrDefaultAsync<Order>(sql, new {id});
+            return SingleOrDefaultAsync<Order>(sql, new { id });
         }
 
         public Task<IEnumerable<Order>> GetOrdersAsync(long runId)
         {
             const string sql = "SELECT " + SelectColumns + " FROM orders where runId = @runId";
 
-            return QueryAsync<Order>(sql, new {runId});
+            return QueryAsync<Order>(sql, new { runId });
         }
     }
 }

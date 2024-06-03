@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Models
+namespace TeaTime.Common.Models
 {
     public enum LinkType
     {

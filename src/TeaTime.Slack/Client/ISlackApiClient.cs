@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Client
+namespace TeaTime.Slack.Client
 {
     using System.Threading.Tasks;
     using Models.OAuth;

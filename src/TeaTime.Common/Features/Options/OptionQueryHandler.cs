@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Options
+namespace TeaTime.Common.Features.Options
 {
     using System.Threading;
     using System.Threading.Tasks;

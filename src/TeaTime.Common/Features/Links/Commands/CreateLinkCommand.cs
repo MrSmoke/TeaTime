@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Links.Commands;
+namespace TeaTime.Common.Features.Links.Commands;
 
 using Abstractions;
 using Models;

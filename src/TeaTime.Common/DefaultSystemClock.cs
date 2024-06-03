@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common
+namespace TeaTime.Common
 {
     using System;
     using Abstractions;

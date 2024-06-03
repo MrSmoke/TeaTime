@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Rooms
+namespace TeaTime.Common.Features.Rooms
 {
     using System.Threading;
     using System.Threading.Tasks;

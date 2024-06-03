@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -53,7 +53,7 @@
                                " FROM option_groups " +
                                " WHERE id = @groupId AND deleted = 0";
 
-            return SingleOrDefaultAsync<RoomItemGroup>(sql, new {groupId});
+            return SingleOrDefaultAsync<RoomItemGroup>(sql, new { groupId });
         }
 
         public Task<RoomItemGroup?> GetGroupByNameAsync(long roomId, string name)
@@ -62,7 +62,7 @@
                                " FROM option_groups" +
                                " WHERE roomId = @roomId AND name = @name AND deleted = 0";
 
-            return SingleOrDefaultAsync<RoomItemGroup>(sql, new {roomId, name});
+            return SingleOrDefaultAsync<RoomItemGroup>(sql, new { roomId, name });
         }
 
         public Task CreateAsync(Option option)
@@ -120,7 +120,7 @@
                                " FROM options" +
                                " WHERE groupId = @groupId AND deleted = 0";
 
-            return QueryAsync<Option>(sql, new {groupId});
+            return QueryAsync<Option>(sql, new { groupId });
         }
     }
 }

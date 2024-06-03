@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Data.MySql
+namespace TeaTime.Data.MySql
 {
     using System;
     using MySqlConnector;

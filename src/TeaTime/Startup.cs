@@ -1,4 +1,4 @@
-﻿namespace TeaTime
+namespace TeaTime
 {
     using System;
     using Common;

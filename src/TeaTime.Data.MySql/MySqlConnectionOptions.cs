@@ -12,7 +12,7 @@ namespace TeaTime.Data.MySql
 
         public void Validate()
         {
-            if(string.IsNullOrWhiteSpace(Host))
+            if (string.IsNullOrWhiteSpace(Host))
                 throw new InvalidOptionException(nameof(Host), "MySql host has not been set");
 
             if (string.IsNullOrWhiteSpace(Database))

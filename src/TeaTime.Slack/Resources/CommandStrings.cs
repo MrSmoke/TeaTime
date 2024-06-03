@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Resources
+namespace TeaTime.Slack.Resources
 {
     internal static class CommandStrings
     {

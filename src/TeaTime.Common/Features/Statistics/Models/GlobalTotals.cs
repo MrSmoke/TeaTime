@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Statistics.Models
+namespace TeaTime.Common.Features.Statistics.Models
 {
     public class GlobalTotals
     {

@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Users.Commands;
+namespace TeaTime.Common.Features.Users.Commands;
 
 using Abstractions;
 

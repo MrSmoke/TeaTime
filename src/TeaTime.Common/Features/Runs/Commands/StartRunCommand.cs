@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Runs.Commands;
+namespace TeaTime.Common.Features.Runs.Commands;
 
 using System;
 using Abstractions;
