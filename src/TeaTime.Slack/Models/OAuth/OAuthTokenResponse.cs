@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Models.OAuth;
+namespace TeaTime.Slack.Models.OAuth;
 
 using System.Text.Json.Serialization;
 

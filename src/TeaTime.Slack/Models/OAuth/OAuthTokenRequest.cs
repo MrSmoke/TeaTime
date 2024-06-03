@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Models.OAuth;
+namespace TeaTime.Slack.Models.OAuth;
 
 public class OAuthTokenRequest
 {
