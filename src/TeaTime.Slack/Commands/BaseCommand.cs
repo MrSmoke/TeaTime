@@ -5,8 +5,7 @@ namespace TeaTime.Slack.Commands
     using CommandRouter.Results;
     using Common.Models.Data;
     using Models;
-    using Models.Requests;
-    using Models.Responses;
+    using Models.SlashCommands;
     using Services;
 
     public abstract class BaseCommand(ISlackService slackService) : Command

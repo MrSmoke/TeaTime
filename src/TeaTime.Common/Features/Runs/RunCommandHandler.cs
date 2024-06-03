@@ -63,7 +63,7 @@ namespace TeaTime.Common.Features.Runs
         //End run
         public async Task Handle(EndRunCommand request, CancellationToken cancellationToken)
         {
-            var runnerUserId = await GetRunner(request);
+            var runnerUserId = await GetRunnerAsync(request, cancellationToken);
 
             //update run
             await _runRepository.UpdateAsync(request.Run with
@@ -97,18 +97,18 @@ namespace TeaTime.Common.Features.Runs
             await _eventPublisher.PublishAsync(evt);
         }
 
-        private async Task<long> GetRunner(EndRunCommand command)
+        private async Task<long> GetRunnerAsync(EndRunCommand command, CancellationToken cancellationToken)
         {
             //todo: dont tie illmake in with this handler directly...kinda gross
             var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.Run.Id);
 
-            var illMakeUser = illMakeResults.MaxBy(o => o.CreatedDate);
+            var illMake = illMakeResults.MaxBy(o => o.CreatedDate);
 
-            if (illMakeUser is not null)
-                return illMakeUser.Id;
+            if (illMake is not null)
+                return illMake.UserId;
 
             //random runner
-            return await _randomizer.GetRunnerUserId(command.Orders);
+            return await _randomizer.GetRunnerUserIdAsync(command.Orders, cancellationToken);
         }
     }
 }

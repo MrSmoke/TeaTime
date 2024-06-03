@@ -9,7 +9,7 @@ namespace TeaTime.Slack.Commands
     using Common.Features.Options.Commands;
     using Common.Features.RoomItemGroups.Queries;
     using MediatR;
-    using Models.Responses;
+    using Models.SlashCommands;
     using Resources;
     using Services;
 

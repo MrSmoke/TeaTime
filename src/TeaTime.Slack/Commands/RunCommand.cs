@@ -11,7 +11,7 @@ namespace TeaTime.Slack.Commands
     using Common.Features.Runs.Commands;
     using Exceptions;
     using MediatR;
-    using Models.Responses;
+    using Models.SlashCommands;
     using Resources;
     using Services;
 

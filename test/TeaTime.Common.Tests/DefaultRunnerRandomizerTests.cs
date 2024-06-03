@@ -84,7 +84,7 @@ namespace TeaTime.Common.Tests
 
             for (var i = 0; i < 200; i++)
             {
-                results.Add(await randomizer.GetRunnerUserId(orders));
+                results.Add(await randomizer.GetRunnerUserIdAsync(orders));
             }
 
             Assert.Equal(orders.Count, results.Distinct().Count());

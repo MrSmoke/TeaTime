@@ -13,14 +13,14 @@ using Microsoft.Extensions.Options;
 
 public class SignedSecretsRequestVerifier(
     TimeProvider timeProvider,
-    IOptionsMonitor<SignedSecretsRequestVerifierOptions> options,
+    IOptionsMonitor<SignedSecretsRequestVerifierOptions> optionsMonitor,
     ILogger<SignedSecretsRequestVerifier> logger) : ISlackRequestVerifier
 {
     private const string SignatureHeaderKey = "x-slack-signature";
     private const string TimestampHeaderKey = "x-slack-request-timestamp";
     private const string VersionNumber = "v0";
 
-    public bool IsEnabled() => options.CurrentValue.Enabled;
+    public bool IsEnabled() => optionsMonitor.CurrentValue.Enabled;
 
     public async Task<bool> VerifyAsync(HttpRequest request, CancellationToken cancellationToken = default)
     {
@@ -64,22 +64,18 @@ public class SignedSecretsRequestVerifier(
         ArgumentNullException.ThrowIfNull(signature);
         ArgumentNullException.ThrowIfNull(requestBody);
 
+        var options = GetOptions();
         var now = timeProvider.GetUtcNow().ToUnixTimeSeconds();
 
-        var optionValue = options.CurrentValue;
-
-        if (now - timestamp > optionValue.ClockSkew.TotalSeconds)
+        if (now - timestamp > options.ClockSkew.TotalSeconds)
         {
             logger.LogWarning("Request verification failed. Too much time has passed since timestamp");
             return false;
         }
 
-        // This shouldn't be null (options validation) but just in case
-        if (optionValue.SigningSecret is null)
-            return false;
-
         // todo: store the bytes and use OnChange to update
-        var keyBytes = Encoding.UTF8.GetBytes(optionValue.SigningSecret);
+        var signingSecret = options.SigningSecret ?? throw new InvalidOperationException("SigningSecret missing");
+        var keyBytes = Encoding.UTF8.GetBytes(signingSecret);
 
         // Hash our data
         var signatureString = VersionNumber + ':' + timestamp + ':' + requestBody;
@@ -110,4 +106,17 @@ public class SignedSecretsRequestVerifier(
     }
 
     private void LogFailure(string reason) => logger.LogWarning("Request verification failed. {Reason}", reason);
+
+    private SignedSecretsRequestVerifierOptions GetOptions()
+    {
+        var options = optionsMonitor.CurrentValue;
+
+        if (!options.Enabled)
+            throw new InvalidOperationException("Request Verification is not enabled");
+
+        if (!options.IsValid())
+            throw new InvalidOperationException("Request Verification is not configured");
+
+        return options;
+    }
 }

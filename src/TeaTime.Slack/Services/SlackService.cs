@@ -1,9 +1,11 @@
 namespace TeaTime.Slack.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Common.Abstractions;
+    using Common.Collections;
     using Common.Features.Links.Commands;
     using Common.Features.Links.Queries;
     using Common.Features.Options.Queries;
@@ -20,43 +22,41 @@ namespace TeaTime.Slack.Services
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Models;
-    using Models.Requests;
-    using Models.Requests.InteractiveMessages;
+    using Models.InteractiveMessages;
+    using Models.OAuth;
+    using Models.SlashCommands;
     using Resources;
 
-    internal class SlackService : ISlackService
+    internal class SlackService(ISender mediator,
+        IIdGenerator<long> idGenerator,
+        IDistributedHash hash,
+        TimeProvider timeProvider,
+        ILogger<SlackService> logger)
+        : ISlackService
     {
-        private readonly IMediator _mediator;
-        private readonly IIdGenerator<long> _idGenerator;
-        private readonly ILogger<SlackService> _logger;
-
-        public SlackService(IMediator mediator, IIdGenerator<long> idGenerator, ILogger<SlackService> logger)
-        {
-            _mediator = mediator;
-            _idGenerator = idGenerator;
-            _logger = logger;
-        }
-
         public async Task<User> GetOrCreateUser(string userId, string name)
         {
-            var id = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, userId));
+            ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+            var id = await mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, userId));
             if (id > 0)
             {
-                return await _mediator.Send(new GetUserQuery(id.Value)) ??
+                return await mediator.Send(new GetUserQuery(id.Value)) ??
                        throw new InvalidOperationException($"Failed to get user {id.Value}");
             }
 
             //we need to create a new user
             var command = new CreateUserCommand
             (
-                Id: await _idGenerator.GenerateAsync(),
+                Id: await idGenerator.GenerateAsync(),
                 Username: "slack_" + userId,
                 DisplayName: name
             );
-            await _mediator.Send(command);
+            await mediator.Send(command);
 
             //add link
-            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, userId));
+            await mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, userId));
 
             //this is not great because its not really a proper entity model, but it will do for now
             //we shouldn't query here because the command COULD eventually be eventual consistency
@@ -71,24 +71,30 @@ namespace TeaTime.Slack.Services
 
         public async Task<Room> GetOrCreateRoom(string channelId, string channelName, long userId)
         {
-            var roomId = await _mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, channelId));
+            ArgumentException.ThrowIfNullOrWhiteSpace(channelId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(channelName);
+
+            if (userId == default)
+                throw new ArgumentException("value cannot be empty", nameof(userId));
+
+            var roomId = await mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, channelId));
             if (roomId > 0)
             {
-                return await _mediator.Send(new GetRoomQuery(roomId.Value)) ??
+                return await mediator.Send(new GetRoomQuery(roomId.Value)) ??
                        throw new InvalidOperationException($"Failed to get room {roomId.Value}");
             }
 
             var command = new CreateRoomCommand
             (
-                Id: await _idGenerator.GenerateAsync(),
+                Id: await idGenerator.GenerateAsync(),
                 Name: channelName,
                 UserId: userId
             );
 
-            await _mediator.Send(command);
+            await mediator.Send(command);
 
             //add link
-            await _mediator.Send(new CreateLinkCommand(command.Id, LinkType.Room, channelId));
+            await mediator.Send(new CreateLinkCommand(command.Id, LinkType.Room, channelId));
 
             return new Room
             {
@@ -101,6 +107,9 @@ namespace TeaTime.Slack.Services
 
         public async Task JoinRunAsync(SlashCommand slashCommand, string optionName)
         {
+            ArgumentNullException.ThrowIfNull(slashCommand);
+            ArgumentNullException.ThrowIfNull(optionName);
+
             var user = await GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
             var room = await GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, user.Id);
 
@@ -109,6 +118,8 @@ namespace TeaTime.Slack.Services
 
         public async Task JoinRunAsync(MessageRequestPayload requestPayload)
         {
+            ArgumentNullException.ThrowIfNull(requestPayload);
+
             var user = await GetOrCreateUser(requestPayload.User.Id, requestPayload.User.Name);
             var room = await GetOrCreateRoom(requestPayload.Channel.Id, requestPayload.Channel.Name, user.Id);
 
@@ -118,20 +129,39 @@ namespace TeaTime.Slack.Services
             await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData());
         }
 
+        public async Task InstallAsync(OAuthTokenResponse response)
+        {
+            ArgumentNullException.ThrowIfNull(response);
+
+            // Ensure data is correct
+            if (string.IsNullOrEmpty(response.Team.Id))
+                throw new InvalidOperationException("TeamId cannot be empty");
+
+            var hashKey = "slack:" + response.Team.Id;
+
+            // Store base data for the whole team
+            await hash.SetAsync(hashKey, new List<HashEntry>
+            {
+                new(Constants.FieldKeys.TeamName, response.Team.Name),
+                new(Constants.FieldKeys.AccessToken, response.AccessToken),
+                new(Constants.FieldKeys.InstallTime, timeProvider.GetUtcNow().ToString("O"))
+            });
+        }
+
         private async Task JoinRunAsync(long userId, long roomId, string optionName, CallbackData callbackData)
         {
-            var run = await _mediator.Send(new GetCurrentRunQuery(roomId, userId));
+            var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId));
             if (run == null)
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
-            var group = await _mediator.Send(new GetRoomItemGroupQuery(
+            var group = await mediator.Send(new GetRoomItemGroupQuery(
                 RoomId: run.RoomId,
                 UserId: userId,
                 GroupId: run.GroupId));
 
             if (group == null)
             {
-                _logger.LogWarning("Failed to find group {GroupId} in room {RoomId} for run {RunId}",
+                logger.LogWarning("Failed to find group {GroupId} in room {RoomId} for run {RunId}",
                     run.GroupId, roomId, run.Id);
 
                 throw new SlackTeaTimeException(ErrorStrings.General());
@@ -148,11 +178,11 @@ namespace TeaTime.Slack.Services
 
         private async Task JoinRunAsync(long userId, long roomId, long optionId, CallbackData callbackData)
         {
-            var run = await _mediator.Send(new GetCurrentRunQuery(roomId, userId));
+            var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId));
             if (run == null)
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
-            var option = await _mediator.Send(new GetOptionQuery(optionId));
+            var option = await mediator.Send(new GetOptionQuery(optionId));
             if (option == null)
                 throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
@@ -167,12 +197,12 @@ namespace TeaTime.Slack.Services
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded());
 
             //check if we need to join or update
-            var existingOrder = await _mediator.Send(new GetUserOrderQuery(run.Id, userId));
+            var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, userId));
             if (existingOrder == null)
             {
                 command = new CreateOrderCommand
                 (
-                    Id: await _idGenerator.GenerateAsync(),
+                    Id: await idGenerator.GenerateAsync(),
                     RunId: run.Id,
                     UserId: userId,
                     OptionId: optionId
@@ -186,7 +216,7 @@ namespace TeaTime.Slack.Services
 
             command.AddCallbackState(callbackData);
 
-            await _mediator.Send(command);
+            await mediator.Send(command);
         }
     }
 }

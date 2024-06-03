@@ -3,8 +3,8 @@ namespace TeaTime.Slack
     using System.Diagnostics.CodeAnalysis;
     using Common.Abstractions;
     using Models;
-    using Models.Requests;
-    using Models.Requests.InteractiveMessages;
+    using Models.InteractiveMessages;
+    using Models.SlashCommands;
 
     internal static class Extensions
     {

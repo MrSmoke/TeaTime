@@ -6,7 +6,7 @@ namespace TeaTime.Slack.Commands
     using Common.Abstractions;
     using Common.Features.Rooms.Queries;
     using MediatR;
-    using Models.Responses;
+    using Models.SlashCommands;
     using Resources;
     using Services;
 

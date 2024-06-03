@@ -1,6 +1,7 @@
 namespace TeaTime.Slack.Services;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 
 public class SignedSecretsRequestVerifierOptions : IValidateOptions<SignedSecretsRequestVerifierOptions>
@@ -8,6 +9,9 @@ public class SignedSecretsRequestVerifierOptions : IValidateOptions<SignedSecret
     public TimeSpan ClockSkew { get; set; } = TimeSpan.FromSeconds(10);
     public string? SigningSecret { get; set; }
     public bool Enabled { get; set; } = true;
+
+    [MemberNotNullWhen(true, nameof(SigningSecret))]
+    public bool IsValid() => Validate(null, this).Succeeded;
 
     public ValidateOptionsResult Validate(string? name, SignedSecretsRequestVerifierOptions options)
     {

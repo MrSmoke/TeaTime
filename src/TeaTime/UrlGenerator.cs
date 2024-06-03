@@ -38,7 +38,7 @@ public class UrlGenerator(LinkGenerator linkGenerator,
         var selfHost = options.CurrentValue.SelfHost;
         if (selfHost is not null)
         {
-            // Check if its the default port and if so don't include it
+            // Check if it's the default port and if so don't include it
             var host = selfHost.IsDefaultPort
                 ? new HostString(selfHost.Host)
                 : new HostString(selfHost.Host, selfHost.Port);
@@ -46,7 +46,7 @@ public class UrlGenerator(LinkGenerator linkGenerator,
             return (selfHost.Scheme, host);
         }
 
-        // Fallback to the  current request
+        // Fallback to the current request
         var httpContext = httpContextAccessor.HttpContext;
         if (httpContext is not null)
             return (httpContext.Request.Scheme, httpContext.Request.Host);

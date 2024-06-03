@@ -13,6 +13,7 @@ namespace TeaTime
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Slack;
 
     public class Startup
@@ -45,6 +46,7 @@ namespace TeaTime
             services.AddSlack(mvcBuilder, _configuration.GetSection("slack"));
 
             // Core
+            services.TryAddSingleton(TimeProvider.System);
             services.AddScoped<IEventPublisher, EventPublisher>();
             services.AddSingleton<IRunnerRandomizer, DefaultRunnerRandomizer>();
             services.AddSingleton<IRoomRunLockService, RoomRunLockService>();

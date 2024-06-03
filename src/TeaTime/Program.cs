@@ -13,6 +13,9 @@ using Slack;
 
 public static class Program
 {
+    // todo: Move to config
+    public static readonly string ContactEmail = "contact@runteatime.com";
+
     public static readonly string Version =
         typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
         throw new InvalidOperationException("Failed to get version info");
