@@ -8,6 +8,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Slack;
 
@@ -27,6 +31,9 @@ public static class Program
         // Configure host
         builder.Configuration.AddEnvironmentVariables("TEATIME_");
         builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+
+        // Configure OpenTelemetry
+        ConfigureOpenTelemetry(builder);
 
         // Register services
         var startup = new Startup(builder.Configuration);
@@ -61,5 +68,48 @@ public static class Program
 
         // Run
         app.Run();
+    }
+
+    private static void ConfigureOpenTelemetry(WebApplicationBuilder builder)
+    {
+        var tracingOtlpEndpoint = builder.Configuration["OTLP_ENDPOINT_URL"];
+        var otel = builder.Services.AddOpenTelemetry();
+
+        // Configure OpenTelemetry Resources with the application name
+        otel.ConfigureResource(resource => resource.AddService(serviceName: builder.Environment.ApplicationName));
+
+        // Setup OtlpExporer
+        otel.UseOtlpExporter();
+
+        // Metrics
+        otel.WithMetrics(metrics =>
+        {
+            // Add meters
+            metrics.AddAspNetCoreInstrumentation()
+                .AddMeter("Microsoft.AspNetCore.Hosting")
+                .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+                .AddMeter("MySqlConnector");
+
+            // Setup export
+            if (builder.Environment.IsDevelopment())
+            {
+                metrics.AddConsoleExporter();
+            }
+        });
+
+        // Tracing
+        otel.WithTracing(tracing =>
+        {
+            // Setup sources
+            tracing.AddAspNetCoreInstrumentation();
+            tracing.AddHttpClientInstrumentation();
+            tracing.AddSource("MySqlConnector");
+
+            // Setup export
+            if (builder.Environment.IsDevelopment())
+            {
+                tracing.AddConsoleExporter();
+            }
+        });
     }
 }
