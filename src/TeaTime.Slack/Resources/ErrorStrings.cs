@@ -53,6 +53,10 @@ namespace TeaTime.Slack.Resources
         internal static string JoinRun_RunEnded() => "Failed to join round. Round has already ended";
 
 
+        // leave run
+        internal static string LeaveRun_NoOrder() => "";
+
+
         //End run
         internal static string EndRun_RunNotStarted() =>
             "Cannot end round. There is no TeaTime running. " + CommandStrings.StartRound;
@@ -64,7 +68,7 @@ namespace TeaTime.Slack.Resources
             "Cannot end round. You must join this round before ending it! " + CommandStrings.JoinRound;
 
 
-        //Ill Make
+        //I'll Make
         internal static string IllMake_RunNotStarted() =>
             "Cannot run illmake. There is no TeaTime running. " + CommandStrings.StartRound;
 

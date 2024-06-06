@@ -41,9 +41,6 @@ namespace TeaTime.Slack.Commands
             return StringResult(SlackJsonSerializer.Serialize(response));
         }
 
-        protected static ICommandResult Ok()
-        {
-            return new StringResult("");
-        }
+        protected static ICommandResult Empty { get; } = new StringResult(string.Empty);
     }
 }

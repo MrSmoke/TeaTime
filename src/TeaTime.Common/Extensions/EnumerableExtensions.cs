@@ -2,6 +2,7 @@ namespace TeaTime.Common.Extensions;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 public static class EnumerableExtensions
@@ -39,6 +40,6 @@ public static class EnumerableExtensions
         if (source is IReadOnlyList<T> list)
             return list;
 
-        return source.ToList();
+        return new ReadOnlyCollection<T>(source.ToList());
     }
 }

@@ -11,5 +11,7 @@ namespace TeaTime.Common.Abstractions.Data
         Task<Order?> GetAsync(long id);
 
         Task<IEnumerable<Order>> GetOrdersAsync(long runId);
+
+        Task<bool> DeleteAsync(long id);
     }
 }

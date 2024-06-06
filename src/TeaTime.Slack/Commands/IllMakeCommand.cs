@@ -38,11 +38,7 @@ namespace TeaTime.Slack.Commands
 
             await _mediator.Send(command);
 
-            return Response(new SlashCommandResponse
-            {
-                Text = ResponseStrings.IllMake(context.Command.UserId),
-                Type = ResponseType.Channel
-            });
+            return Response(ResponseStrings.IllMake(context.Command.UserId), ResponseType.Channel);
         }
     }
 }

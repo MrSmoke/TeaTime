@@ -12,7 +12,8 @@ namespace TeaTime.Common.Features.Orders
 
     public class OrderCommandHandler :
         IRequestHandler<CreateOrderCommand>,
-        IRequestHandler<UpdateOrderOptionCommand>
+        IRequestHandler<UpdateOrderOptionCommand>,
+        IRequestHandler<DeleteOrderCommand>
     {
         private readonly IOrderRepository _orderRepository;
         private readonly TimeProvider _clock;
@@ -89,6 +90,15 @@ namespace TeaTime.Common.Features.Orders
             };
 
             await _eventPublisher.PublishAsync(evt);
+        }
+
+        public async Task Handle(DeleteOrderCommand request, CancellationToken cancellationToken)
+        {
+            // If we return false, then nothing was deleted, so dont publish an event
+            if (!await _orderRepository.DeleteAsync(request.Order.Id))
+                return;
+
+            await _eventPublisher.PublishAsync(new OrderDeletedEvent(request.Order));
         }
     }
 }
