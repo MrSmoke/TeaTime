@@ -16,7 +16,8 @@ public class OrderCommandHandler(
     IEventPublisher eventPublisher,
     ILogger<OrderCommandHandler> logger) :
     IRequestHandler<CreateOrderCommand>,
-    IRequestHandler<UpdateOrderOptionCommand>
+    IRequestHandler<UpdateOrderOptionCommand>,
+    IRequestHandler<DeleteOrderCommand>
 {
     public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
@@ -77,5 +78,14 @@ public class OrderCommandHandler(
         };
 
         await eventPublisher.PublishAsync(evt, cancellationToken);
+    }
+
+    public async Task Handle(DeleteOrderCommand request, CancellationToken cancellationToken)
+    {
+        // If we return false, then nothing was deleted, so dont publish an event
+        if (!await orderRepository.DeleteAsync(request.Order.Id, cancellationToken))
+            return;
+
+        await eventPublisher.PublishAsync(new OrderDeletedEvent(request.Order), cancellationToken);
     }
 }

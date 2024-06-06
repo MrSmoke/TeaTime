@@ -53,6 +53,10 @@ internal static class ErrorStrings
     internal static string JoinRun_RunEnded() => "Failed to join round. Round has already ended";
 
 
+    // leave run
+    internal static string LeaveRun_NoOrder() => "";
+
+
     //End run
     internal static string EndRun_RunNotStarted() =>
         "Cannot end round. There is no TeaTime running. " + CommandStrings.StartRound;

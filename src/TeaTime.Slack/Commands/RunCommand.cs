@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CommandRouter.Attributes;
 using CommandRouter.Results;
 using Common.Abstractions;
+using Common.Features.Orders.Commands;
 using Common.Features.Orders.Queries;
 using Common.Features.RoomItemGroups.Queries;
 using Common.Features.Rooms.Queries;
@@ -78,6 +79,25 @@ public class RunCommand(
             logger.LogInformation("Join run rejected: {Message}", e.Message);
             return Response(e.Message, ResponseType.User);
         }
+    }
+
+    public async Task<ICommandResult> Leave()
+    {
+        var context = await GetContextAsync();
+
+        var run = await mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
+        if (run == null)
+            return Response(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User);
+
+        var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, context.User.Id));
+        if (existingOrder is null)
+            return Response(ErrorStrings.LeaveRun_NoOrder(), ResponseType.User);
+
+        var command = new DeleteOrderCommand(existingOrder, context.User.Id);
+
+        await mediator.Send(command);
+
+        return Ok();
     }
 
     [Command("end")]
