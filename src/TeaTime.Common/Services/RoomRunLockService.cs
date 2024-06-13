@@ -1,44 +1,36 @@
-namespace TeaTime.Common.Services
+namespace TeaTime.Common.Services;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions;
+using Abstractions.Data;
+using Microsoft.Extensions.Logging;
+
+public class RoomRunLockService(ILockRepository lockRepository, ILogger<RoomRunLockService> logger)
+    : IRoomRunLockService
 {
-    using System.Threading.Tasks;
-    using Abstractions;
-    using Abstractions.Data;
-    using Microsoft.Extensions.Logging;
-
-    public class RoomRunLockService : IRoomRunLockService
+    public async Task<bool> CreateLockAsync(long roomId, CancellationToken cancellationToken = default)
     {
-        private readonly ILockRepository _lockRepository;
-        private readonly ILogger<RoomRunLockService> _logger;
+        var key = GetLockKey(roomId);
+        var result = await lockRepository.CreateLockAsync(key);
 
-        public RoomRunLockService(ILockRepository lockRepository, ILogger<RoomRunLockService> logger)
-        {
-            _lockRepository = lockRepository;
-            _logger = logger;
-        }
+        logger.LogDebug("Create run lock for room {RoomId} with key {Key} result = {Result}", roomId, key, result);
 
-        public async Task<bool> CreateLockAsync(long roomId)
-        {
-            var key = GetLockKey(roomId);
-            var result = await _lockRepository.CreateLockAsync(key);
+        return result;
+    }
 
-            _logger.LogDebug("Create run lock for room {RoomId} with key {Key} result = {Result}", roomId, key, result);
+    public async Task<bool> DeleteLockAsync(long roomId, CancellationToken cancellationToken = default)
+    {
+        var key = GetLockKey(roomId);
+        var result = await lockRepository.DeleteLockAsync(key);
 
-            return result;
-        }
+        logger.LogDebug("Delete run lock for room {RoomId} with key {Key} result = {Result}", roomId, key, result);
 
-        public async Task<bool> DeleteLockAsync(long roomId)
-        {
-            var key = GetLockKey(roomId);
-            var result = await _lockRepository.DeleteLockAsync(key);
+        return result;
+    }
 
-            _logger.LogDebug("Delete run lock for room {RoomId} with key {Key} result = {Result}", roomId, key, result);
-
-            return result;
-        }
-
-        private static string GetLockKey(long roomId)
-        {
-            return "room" + roomId + ":run";
-        }
+    private static string GetLockKey(long roomId)
+    {
+        return "room" + roomId + ":run";
     }
 }

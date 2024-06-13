@@ -29,6 +29,8 @@ public static class Program
         builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
         // Register services
+        builder.Services.AddHealthChecks();
+
         var startup = new Startup(builder.Configuration);
         startup.ConfigureServices(builder.Services);
 
@@ -39,6 +41,8 @@ public static class Program
         {
             ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
         });
+
+        app.UseHealthChecks("/_health");
 
         if (app.Environment.IsDevelopment())
         {
