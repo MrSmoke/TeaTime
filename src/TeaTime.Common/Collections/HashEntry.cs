@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Collections
+namespace TeaTime.Common.Collections
 {
     using System.Collections.Generic;
 

@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Runs.Events;
+namespace TeaTime.Common.Features.Runs.Events;
 
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Exceptions
+namespace TeaTime.Slack.Exceptions
 {
     using Common.Exceptions;
 

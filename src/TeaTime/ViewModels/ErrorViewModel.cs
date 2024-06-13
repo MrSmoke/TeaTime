@@ -1,4 +1,4 @@
-﻿namespace TeaTime.ViewModels
+namespace TeaTime.ViewModels
 {
     public class ErrorViewModel
     {

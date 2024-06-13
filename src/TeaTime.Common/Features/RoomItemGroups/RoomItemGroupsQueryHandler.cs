@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.RoomItemGroups;
+namespace TeaTime.Common.Features.RoomItemGroups;
 
 using System.Threading;
 using System.Threading.Tasks;

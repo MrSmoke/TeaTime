@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Models.SlashCommands;
+namespace TeaTime.Slack.Models.SlashCommands;
 
 using System;
 using System.Collections.Generic;

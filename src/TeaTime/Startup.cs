@@ -1,4 +1,4 @@
-﻿namespace TeaTime
+namespace TeaTime
 {
     using System;
     using Common;
@@ -9,6 +9,7 @@
     using Common.Permissions;
     using Common.Services;
     using Data.MySql;
+    using Data.MySql.Factories;
     using MediatR;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -50,7 +51,6 @@
             services.AddScoped<IEventPublisher, EventPublisher>();
             services.AddSingleton<IRunnerRandomizer, DefaultRunnerRandomizer>();
             services.AddSingleton<IRoomRunLockService, RoomRunLockService>();
-            services.AddSingleton<ISystemClock, DefaultSystemClock>();
             services.AddSingleton<IPermissionService, PermissionService>();
             services.AddSingleton<IUrlGenerator, UrlGenerator>();
             services.Configure<UrlGeneratorOptions>(_configuration);

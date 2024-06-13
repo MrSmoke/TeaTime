@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Tests.Cache
+namespace TeaTime.Common.Tests.Cache
 {
     using System;
     using System.Threading;

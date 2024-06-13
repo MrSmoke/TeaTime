@@ -1,6 +1,7 @@
-﻿namespace TeaTime.Data.MySql.Tests
+namespace TeaTime.Data.MySql.Tests
 {
     using System;
+    using Factories;
     using Microsoft.Extensions.Configuration;
 
     public static class TestConfig

@@ -1,47 +1,43 @@
-﻿namespace TeaTime.Data.MySql.Repositories
+namespace TeaTime.Data.MySql.Repositories;
+
+using System.Threading.Tasks;
+using Common.Abstractions.Data;
+using Common.Models;
+using Factories;
+
+public class LinkRepository(IMySqlConnectionFactory factory) : BaseRepository(factory), ILinkRepository
 {
-    using System.Threading.Tasks;
-    using Common.Abstractions.Data;
-    using Common.Models;
-
-    public class LinkRepository : BaseRepository, ILinkRepository
+    public async Task<long?> GetObjectId(string link, LinkType linkType)
     {
-        public LinkRepository(IMySqlConnectionFactory factory) : base(factory)
+        const string sql = "SELECT objectId FROM links WHERE linkType = @linkType AND link = @link";
+
+        return await SingleOrDefaultAsync<long>(sql, new
         {
-        }
+            linkType,
+            link
+        });
+    }
 
-        public async Task<long?> GetObjectId(string link, LinkType linkType)
+    public Task Add(long objectId, LinkType linkType, string link)
+    {
+        const string sql = "INSERT INTO links (link, linkType, objectId) VALUES (@link, @linkType, @objectId)";
+
+        return ExecuteAsync(sql, new
         {
-            const string sql = "SELECT objectId FROM links WHERE linkType = @linkType AND link = @link";
+            link,
+            linkType,
+            objectId
+        });
+    }
 
-            return await SingleOrDefaultAsync<long>(sql, new
-            {
-                linkType,
-                link
-            });
-        }
+    public Task<string?> GetLinkAsync(long objectId, LinkType linkType)
+    {
+        const string sql = "SELECT link FROM links WHERE linkType = @linkType AND objectId = @objectId";
 
-        public Task Add(long objectId, LinkType linkType, string link)
+        return SingleOrDefaultAsync<string>(sql, new
         {
-            const string sql = "INSERT INTO links (link, linkType, objectId) VALUES (@link, @linkType, @objectId)";
-
-            return ExecuteAsync(sql, new
-            {
-                link,
-                linkType,
-                objectId
-            });
-        }
-
-        public Task<string?> GetLinkAsync(long objectId, LinkType linkType)
-        {
-            const string sql = "SELECT link FROM links WHERE linkType = @linkType AND objectId = @objectId";
-
-            return SingleOrDefaultAsync<string>(sql, new
-            {
-                linkType,
-                objectId
-            });
-        }
+            linkType,
+            objectId
+        });
     }
 }

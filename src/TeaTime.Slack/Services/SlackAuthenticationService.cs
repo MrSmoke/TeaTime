@@ -1,14 +1,14 @@
-﻿namespace TeaTime.Slack.Services;
+namespace TeaTime.Slack.Services;
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Client;
+using Common.Abstractions;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Client;
-using Common.Abstractions;
 using Models.OAuth;
 
 internal class SlackAuthenticationService(

@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Tests
+namespace TeaTime.Slack.Tests
 {
     using System;
     using System.Collections.Generic;

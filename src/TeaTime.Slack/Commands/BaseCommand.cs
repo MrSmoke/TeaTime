@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Commands
+namespace TeaTime.Slack.Commands
 {
     using System.Threading.Tasks;
     using CommandRouter.Commands;
@@ -29,7 +29,7 @@
             return slackService.GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, userId);
         }
 
-        protected SlashCommand GetCommand() => (SlashCommand) Context.Items[Constants.CommandContextKeys.SlashCommand];
+        protected SlashCommand GetCommand() => (SlashCommand)Context.Items[Constants.CommandContextKeys.SlashCommand];
 
         protected ICommandResult Response(string? text, ResponseType responseType)
         {

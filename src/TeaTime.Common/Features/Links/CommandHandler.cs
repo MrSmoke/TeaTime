@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Links
+namespace TeaTime.Common.Features.Links
 {
     using System.Threading;
     using System.Threading.Tasks;

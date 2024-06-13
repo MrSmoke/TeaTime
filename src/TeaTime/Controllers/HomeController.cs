@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Controllers;
+namespace TeaTime.Controllers;
 
 using System.Threading.Tasks;
 using Common.Features.Statistics.Queries;

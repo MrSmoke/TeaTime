@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Services;
+namespace TeaTime.Common.Services;
 
 using System.Collections.Generic;
 using System.Linq;

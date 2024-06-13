@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Rooms.Events;
+namespace TeaTime.Common.Features.Rooms.Events;
 
 using Abstractions;
 

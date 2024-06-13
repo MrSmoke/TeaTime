@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack
+namespace TeaTime.Slack
 {
     using System;
     using System.Reflection;

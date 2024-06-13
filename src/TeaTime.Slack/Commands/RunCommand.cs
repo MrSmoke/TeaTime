@@ -1,5 +1,6 @@
 namespace TeaTime.Slack.Commands
 {
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using CommandRouter.Attributes;
@@ -19,12 +20,12 @@ namespace TeaTime.Slack.Commands
     {
         private readonly IMediator _mediator;
         private readonly IIdGenerator<long> _idGenerator;
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _clock;
         private readonly ISlackService _slackService;
 
         public RunCommand(IMediator mediator,
             IIdGenerator<long> idGenerator,
-            ISystemClock clock,
+            TimeProvider clock,
             ISlackService slackService) : base(slackService)
         {
             _mediator = mediator;
@@ -46,15 +47,17 @@ namespace TeaTime.Slack.Commands
             if (roomItemGroup == null)
                 return Response(ErrorStrings.StartRun_GroupInvalidName(group), ResponseType.User);
 
-            if(!roomItemGroup.Options.Any())
+            if (!roomItemGroup.Options.Any())
                 return Response(ErrorStrings.StartRun_GroupNoOptions(roomItemGroup.Name), ResponseType.User);
 
-            var command = new StartRunCommand(
+            var command = new StartRunCommand
+            (
                 Id: await _idGenerator.GenerateAsync(),
                 UserId: context.User.Id,
                 RoomId: context.Room.Id,
                 RoomGroupId: roomItemGroup.Id,
-                StartTime: _clock.UtcNow());
+                StartTime: _clock.GetUtcNow()
+            );
 
             await _mediator.Send(command);
 

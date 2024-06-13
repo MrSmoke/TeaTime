@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.RoomItemGroups.Queries;
+namespace TeaTime.Common.Features.RoomItemGroups.Queries;
 
 using Abstractions;
 using Models;

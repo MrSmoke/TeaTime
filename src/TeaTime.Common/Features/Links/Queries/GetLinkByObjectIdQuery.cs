@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Links.Queries;
+namespace TeaTime.Common.Features.Links.Queries;
 
 using Abstractions;
 using Models;

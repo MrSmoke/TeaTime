@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.Runs
+namespace TeaTime.Common.Features.Runs
 {
     using System.Linq;
     using System.Threading;

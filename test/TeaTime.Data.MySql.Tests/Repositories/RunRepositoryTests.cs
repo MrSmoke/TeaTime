@@ -1,7 +1,7 @@
-﻿namespace TeaTime.Data.MySql.Tests.Repositories;
+namespace TeaTime.Data.MySql.Tests.Repositories;
 
+using System;
 using System.Threading.Tasks;
-using Common;
 using Common.Models.Data;
 using MySql.Repositories;
 using Xunit;
@@ -40,7 +40,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
         };
         await roomRepo.CreateAsync(room);
 
-        var optionRepo = new OptionsRepository(_databaseFixture.ConnectionFactory, new DefaultSystemClock());
+        var optionRepo = new OptionsRepository(_databaseFixture.ConnectionFactory, TimeProvider.System);
         var group = new RoomItemGroup
         {
             Id = TestData.NewInt64(),

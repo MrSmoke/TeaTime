@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Models.Domain;
+namespace TeaTime.Common.Models.Domain;
 
 using Data;
 

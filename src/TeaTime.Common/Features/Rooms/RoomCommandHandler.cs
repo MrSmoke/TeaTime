@@ -1,8 +1,8 @@
-﻿namespace TeaTime.Common.Features.Rooms
+namespace TeaTime.Common.Features.Rooms
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Abstractions.Data;
     using Commands;
     using Events;
@@ -13,11 +13,11 @@
     {
         private readonly IRoomRepository _roomRepository;
         private readonly IEventPublisher _eventPublisher;
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _clock;
 
         public RoomCommandHandler(IRoomRepository roomRepository,
             IEventPublisher eventPublisher,
-            ISystemClock clock)
+            TimeProvider clock)
         {
             _roomRepository = roomRepository;
             _eventPublisher = eventPublisher;
@@ -31,7 +31,7 @@
                 Id = request.Id,
                 Name = request.Name,
                 CreatedBy = request.UserId,
-                CreatedDate = _clock.UtcNow()
+                CreatedDate = _clock.GetUtcNow()
             };
 
             await _roomRepository.CreateAsync(room);

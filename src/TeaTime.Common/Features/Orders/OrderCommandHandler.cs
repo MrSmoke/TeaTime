@@ -1,8 +1,8 @@
 namespace TeaTime.Common.Features.Orders
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Abstractions.Data;
     using Commands;
     using Events;
@@ -15,12 +15,12 @@ namespace TeaTime.Common.Features.Orders
         IRequestHandler<UpdateOrderOptionCommand>
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _clock;
         private readonly IEventPublisher _eventPublisher;
         private readonly ILogger<OrderCommandHandler> _logger;
 
         public OrderCommandHandler(IOrderRepository orderRepository,
-            ISystemClock clock,
+            TimeProvider clock,
             IEventPublisher eventPublisher,
             ILogger<OrderCommandHandler> logger)
         {
@@ -35,7 +35,7 @@ namespace TeaTime.Common.Features.Orders
             var order = new Order
             {
                 Id = request.Id,
-                CreatedDate = _clock.UtcNow(),
+                CreatedDate = _clock.GetUtcNow(),
                 OptionId = request.OptionId,
                 RunId = request.RunId,
                 UserId = request.UserId
@@ -74,7 +74,7 @@ namespace TeaTime.Common.Features.Orders
             var previousOptionId = existing.OptionId;
 
             //update
-            await _orderRepository.UpdateAsync(existing with {OptionId = request.OptionId});
+            await _orderRepository.UpdateAsync(existing with { OptionId = request.OptionId });
 
             //create event
             var evt = new OrderOptionChangedEvent

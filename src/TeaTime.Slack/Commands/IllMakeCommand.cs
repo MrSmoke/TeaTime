@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Commands
+namespace TeaTime.Slack.Commands
 {
     using System.Threading.Tasks;
     using CommandRouter.Attributes;
@@ -27,7 +27,7 @@
             var context = await GetContextAsync();
 
             var run = await _mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
-            if(run == null)
+            if (run == null)
                 return Response(ErrorStrings.IllMake_RunNotStarted(), ResponseType.User);
 
             var command = new Common.Features.IllMake.Commands.IllMakeCommand(

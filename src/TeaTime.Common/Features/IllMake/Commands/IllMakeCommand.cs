@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Common.Features.IllMake.Commands;
+namespace TeaTime.Common.Features.IllMake.Commands;
 
 using Abstractions;
 

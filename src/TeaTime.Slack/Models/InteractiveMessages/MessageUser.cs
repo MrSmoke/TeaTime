@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 namespace TeaTime.Slack.Models.InteractiveMessages
 {
     public class MessageUser
