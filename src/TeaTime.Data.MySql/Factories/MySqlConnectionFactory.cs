@@ -28,7 +28,8 @@ public class MySqlConnectionFactory : IMySqlConnectionFactory
             GetOption("password", options.Password),
             GetOption("database", options.Database),
             "UseAffectedRows=true;",
-            "DateTimeKind=utc;"
+            "DateTimeKind=utc;",
+            "MinimumPoolSize=1"
         );
 
         static string GetOption(string key, string? value)
