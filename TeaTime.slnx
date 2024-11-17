@@ -1,0 +1,23 @@
+﻿<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="test\TeaTime.Common.Tests\TeaTime.Common.Tests.csproj" />
+    <Project Path="test\TeaTime.Data.MySql.Tests\TeaTime.Data.MySql.Tests.csproj" />
+    <Project Path="test\TeaTime.Slack.Tests\TeaTime.Slack.Tests.csproj" />
+  </Folder>
+  <Folder Name="/_Build/">
+    <File Path=".github\workflows\dev-release.yaml" />
+    <File Path=".github\workflows\master-release.yaml" />
+  </Folder>
+  <Folder Name="/_Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path=".dockerignore" />
+    <File Path="Dockerfile" />
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Project Path="src\TeaTime.Common\TeaTime.Common.csproj" />
+  <Project Path="src\TeaTime.Data.MySql\TeaTime.Data.MySql.csproj" />
+  <Project Path="src\TeaTime.Slack\TeaTime.Slack.csproj" />
+  <Project Path="src\TeaTime\TeaTime.csproj" />
+</Solution>
