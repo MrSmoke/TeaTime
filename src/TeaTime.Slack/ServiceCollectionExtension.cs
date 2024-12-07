@@ -3,6 +3,7 @@ namespace TeaTime.Slack
     using System;
     using System.Reflection;
     using Client;
+    using CommandRouter.Extensions;
     using CommandRouter.Integration.AspNetCore.Extensions;
     using Common.Features.Orders.Events;
     using Common.Features.Runs.Events;
@@ -25,7 +26,7 @@ namespace TeaTime.Slack
             //Add current assembly controllers
             mvcBuilder.AddApplicationPart(Assembly);
 
-            services.AddCommandRouter();
+            services.AddCommandRouterForAssembly(Assembly);
 
             // General required services
             services.TryAddSingleton(TimeProvider.System);
