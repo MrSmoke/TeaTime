@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandRouter" Version="1.0.0-beta6" />
-    <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-beta3" />
+    <PackageReference Include="CommandRouter" Version="1.0.0-rc1" />
+    <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-rc1" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.0" />
   </ItemGroup>
 
