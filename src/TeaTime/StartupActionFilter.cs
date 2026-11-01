@@ -1,36 +1,29 @@
-namespace TeaTime
+namespace TeaTime;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Common;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
+
+public class StartupActionFilter(IEnumerable<IStartupAction> actions, ILogger<StartupActionFilter> logger)
+    : IStartupFilter
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Common;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.Logging;
+    private readonly IStartupAction[] _actions = actions.ToArray();
 
-    public class StartupActionFilter : IStartupFilter
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
     {
-        private readonly IReadOnlyCollection<IStartupAction> _actions;
-        private readonly ILogger<StartupActionFilter> _logger;
+        logger.LogDebug("Running {Count} startup actions", _actions.Length);
 
-        public StartupActionFilter(IEnumerable<IStartupAction> actions, ILogger<StartupActionFilter> logger)
+        foreach (var action in _actions)
         {
-            _actions = actions.ToList();
-            _logger = logger;
+            logger.LogDebug("Running startup action: {StartupActionName}", action.Name);
+
+            action.Execute();
         }
 
-        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
-        {
-            _logger.LogDebug("Running {Count} startup actions", _actions.Count);
-
-            foreach (var action in _actions)
-            {
-                _logger.LogDebug("Running startup action: {StartupActionName}", action.Name);
-
-                action.Execute();
-            }
-
-            return next;
-        }
+        return next;
     }
 }
