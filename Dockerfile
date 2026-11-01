@@ -7,7 +7,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 # Copy in csproj so we can restore
 WORKDIR /build
-COPY TeaTime.sln TeaTime.sln
+COPY TeaTime.slnx TeaTime.slnx
 COPY Directory.Build.props Directory.Build.props
 COPY ["src/TeaTime/TeaTime.csproj", "src/TeaTime/"]
 COPY ["src/TeaTime.Data.MySql/TeaTime.Data.MySql.csproj", "src/TeaTime.Data.MySql/"]
