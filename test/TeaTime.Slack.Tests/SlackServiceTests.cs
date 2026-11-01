@@ -167,6 +167,6 @@ public class SlackServiceTests
         User = new InteractionUser { Id = "U1", Username = "steve" },
         Channel = new InteractionChannel { Id = "C1", Name = "general" },
         ResponseUrl = responseUrl,
-        Actions = [new BlockAction { Type = "button", ActionId = actionId, Value = "1" }]
+        Actions = [new BlockAction { ActionId = actionId, Value = "1" }]
     };
 }

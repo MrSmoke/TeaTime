@@ -139,13 +139,13 @@ namespace TeaTime.Slack.Controllers
             }
             catch (JsonException e)
             {
-                logger.LogError(e, "Failed to deserialize interaction payload");
+                logger.LogError(e, "Failed to deserialise interaction payload");
                 return Ok();
             }
 
             if (payload == null)
             {
-                logger.LogError("Interaction payload deserialized to null");
+                logger.LogError("Interaction payload deserialised to null");
                 return Ok();
             }
 

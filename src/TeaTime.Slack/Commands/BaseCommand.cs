@@ -21,9 +21,7 @@ namespace TeaTime.Slack.Commands
 
         private Task<User> GetOrCreateUser(SlashCommand slashCommand)
         {
-#pragma warning disable CS0618 // Read while Slack still sends it; GetOrCreateUser falls back when missing
-            return slackService.GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
-#pragma warning restore CS0618
+            return slackService.GetOrCreateUser(slashCommand.UserId, slashCommand.GetUserName());
         }
 
         private Task<Room> GetOrCreateRoom(SlashCommand slashCommand, long userId)

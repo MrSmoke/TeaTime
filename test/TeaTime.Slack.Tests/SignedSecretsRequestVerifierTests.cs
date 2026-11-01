@@ -62,6 +62,15 @@ public class SignedSecretsRequestVerifierTests
         Assert.True(await VerifyAsync(Sign(ts, Body), ts, Body));
     }
 
+    [Fact]
+    public async Task ExtremeTimestamp_FailsWithoutThrowing()
+    {
+        // now - timestamp wraps to long.MinValue, which Math.Abs can't negate
+        var ts = Now.ToUnixTimeSeconds() + long.MinValue;
+
+        Assert.False(await VerifyAsync(Sign(ts, Body), ts, Body));
+    }
+
     private static string Sign(long timestamp, string body)
     {
         var hash = HMACSHA256.HashData(Encoding.UTF8.GetBytes(Secret), Encoding.UTF8.GetBytes($"v0:{timestamp}:{body}"));

@@ -22,18 +22,6 @@ public class BlockActionsPayload
     [JsonPropertyName("team")]
     public InteractionTeam? Team { get; init; }
 
-    [JsonPropertyName("enterprise")]
-    public InteractionEnterprise? Enterprise { get; init; }
-
-    [JsonPropertyName("api_app_id")]
-    public string? ApiAppId { get; init; }
-
-    [JsonPropertyName("trigger_id")]
-    public string? TriggerId { get; init; }
-
-    [JsonPropertyName("container")]
-    public InteractionContainer? Container { get; init; }
-
     [JsonPropertyName("channel")]
     public InteractionChannel? Channel { get; init; }
 
@@ -57,27 +45,12 @@ public class InteractionUser
 
     [JsonPropertyName("name")]
     public string? Name { get; init; }
-
-    [JsonPropertyName("team_id")]
-    public string? TeamId { get; init; }
 }
 
 public class InteractionTeam
 {
     [JsonPropertyName("id")]
     public required string Id { get; init; }
-
-    [JsonPropertyName("domain")]
-    public string? Domain { get; init; }
-}
-
-public class InteractionEnterprise
-{
-    [JsonPropertyName("id")]
-    public required string Id { get; init; }
-
-    [JsonPropertyName("name")]
-    public string? Name { get; init; }
 }
 
 public class InteractionChannel
@@ -89,35 +62,11 @@ public class InteractionChannel
     public string? Name { get; init; }
 }
 
-public class InteractionContainer
-{
-    [JsonPropertyName("type")]
-    public required string Type { get; init; }
-
-    [JsonPropertyName("message_ts")]
-    public string? MessageTs { get; init; }
-
-    [JsonPropertyName("channel_id")]
-    public string? ChannelId { get; init; }
-
-    [JsonPropertyName("is_ephemeral")]
-    public bool? IsEphemeral { get; init; }
-}
-
 public class BlockAction
 {
-    [JsonPropertyName("type")]
-    public required string Type { get; init; }
-
     [JsonPropertyName("action_id")]
     public required string ActionId { get; init; }
 
-    [JsonPropertyName("block_id")]
-    public string? BlockId { get; init; }
-
     [JsonPropertyName("value")]
     public string? Value { get; init; }
-
-    [JsonPropertyName("action_ts")]
-    public string? ActionTs { get; init; }
 }

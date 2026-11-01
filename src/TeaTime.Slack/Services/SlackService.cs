@@ -113,9 +113,7 @@ namespace TeaTime.Slack.Services
             ArgumentNullException.ThrowIfNull(slashCommand);
             ArgumentNullException.ThrowIfNull(optionName);
 
-#pragma warning disable CS0618 // Read while Slack still sends it; GetOrCreateUser falls back when missing
-            var user = await GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
-#pragma warning restore CS0618
+            var user = await GetOrCreateUser(slashCommand.UserId, slashCommand.GetUserName());
             var room = await GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, user.Id);
 
             await JoinRunAsync(user.Id, room.Id, optionName, slashCommand.ToCallbackData());
@@ -134,7 +132,7 @@ namespace TeaTime.Slack.Services
 
             try
             {
-                await JoinRunAsync(requestPayload);
+                await JoinRunAsync(requestPayload, requestPayload.ResponseUrl);
             }
             catch (SlackTeaTimeException e)
             {
@@ -158,7 +156,7 @@ namespace TeaTime.Slack.Services
             return slackApiClient.PostResponseAsync(responseUrl, new SlashCommandResponse(message, ResponseType.User));
         }
 
-        private async Task JoinRunAsync(BlockActionsPayload requestPayload)
+        private async Task JoinRunAsync(BlockActionsPayload requestPayload, string responseUrl)
         {
             var channel = requestPayload.Channel;
             if (channel is null)
@@ -176,7 +174,7 @@ namespace TeaTime.Slack.Services
             var user = await GetOrCreateUser(requestPayload.User.Id, usersName);
             var room = await GetOrCreateRoom(channel.Id, channel.Name, user.Id);
 
-            await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData());
+            await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData(responseUrl));
         }
 
         private static bool IsJoinAction(BlockAction action) =>

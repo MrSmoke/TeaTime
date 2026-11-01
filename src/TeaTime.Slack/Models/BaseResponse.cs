@@ -13,8 +13,5 @@ public abstract class BaseResponse
     [JsonPropertyName("error")]
     public string? Error { get; set; }
 
-    [JsonPropertyName("warning")]
-    public string? Warning { get; set; }
-
     public bool IsSuccess => Ok;
 }

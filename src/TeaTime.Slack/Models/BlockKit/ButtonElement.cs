@@ -7,8 +7,6 @@ using System.Text.Json.Serialization;
 /// </summary>
 public class ButtonElement
 {
-    public const int MaxTextLength = 75;
-
     [JsonPropertyName("type")]
     public string Type { get; } = "button";
 
@@ -23,10 +21,4 @@ public class ButtonElement
 
     [JsonPropertyName("value")]
     public string? Value { get; init; }
-
-    /// <summary>
-    /// <c>primary</c> or <c>danger</c>; omit for the default style
-    /// </summary>
-    [JsonPropertyName("style")]
-    public string? Style { get; init; }
 }

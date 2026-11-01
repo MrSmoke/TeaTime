@@ -69,30 +69,6 @@ public class SlashCommand
     [FromForm(Name = "team_id")]
     public string? TeamId { get; set; }
 
-    [FromForm(Name = "team_domain")]
-    public string? TeamDomain { get; set; }
-
-    /// <summary>
-    /// Only present when the workspace is part of an Enterprise organisation
-    /// </summary>
-    [FromForm(Name = "enterprise_id")]
-    public string? EnterpriseId { get; set; }
-
-    /// <summary>
-    /// Only present when the workspace is part of an Enterprise organisation
-    /// </summary>
-    [FromForm(Name = "enterprise_name")]
-    public string? EnterpriseName { get; set; }
-
-    /// <summary>
-    /// Short-lived ID that can be used to open a modal
-    /// </summary>
-    [FromForm(Name = "trigger_id")]
-    public string? TriggerId { get; set; }
-
-    [FromForm(Name = "api_app_id")]
-    public string? ApiAppId { get; set; }
-
     /// <summary>
     /// Set to <c>1</c> when Slack is only verifying the request URL's SSL certificate
     /// </summary>

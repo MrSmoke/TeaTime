@@ -42,14 +42,20 @@ namespace TeaTime.Slack
             };
         }
 
-        internal static CallbackData ToCallbackData(this BlockActionsPayload payload)
+        internal static CallbackData ToCallbackData(this BlockActionsPayload payload, string responseUrl)
         {
             return new CallbackData
             {
                 UserId = payload.User.Id,
-                ResponseUrl = payload.ResponseUrl ??
-                              throw new System.InvalidOperationException("Payload has no response_url")
+                ResponseUrl = responseUrl
             };
+        }
+
+        internal static string? GetUserName(this SlashCommand command)
+        {
+#pragma warning disable CS0618 // Read while Slack still sends it; callers fall back when missing
+            return command.UserName;
+#pragma warning restore CS0618
         }
     }
 }

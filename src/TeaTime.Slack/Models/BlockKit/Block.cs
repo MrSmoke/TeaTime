@@ -11,7 +11,4 @@ public abstract class Block
 {
     [JsonPropertyName("type")]
     public abstract string Type { get; }
-
-    [JsonPropertyName("block_id")]
-    public string? BlockId { get; init; }
 }

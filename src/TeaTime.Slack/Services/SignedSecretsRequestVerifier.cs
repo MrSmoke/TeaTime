@@ -68,7 +68,9 @@ public class SignedSecretsRequestVerifier(
         var options = GetOptions();
         var now = timeProvider.GetUtcNow().ToUnixTimeSeconds();
 
-        if (Math.Abs(now - timestamp) > options.ClockSkew.TotalSeconds)
+        // Range check rather than Math.Abs(now - timestamp), which overflows on extreme header values
+        var skew = (long)options.ClockSkew.TotalSeconds;
+        if (timestamp < now - skew || timestamp > now + skew)
         {
             logger.LogWarning("Request verification failed. Timestamp outside allowed clock skew");
             return false;

@@ -27,12 +27,6 @@ public class SlashCommandResponse(string? text, ResponseType responseType)
     [JsonPropertyName("replace_original")]
     public bool ReplaceOriginal { get; init; }
 
-    [JsonPropertyName("delete_original")]
-    public bool DeleteOriginal { get; init; }
-
-    [JsonPropertyName("thread_ts")]
-    public string? ThreadTs { get; init; }
-
     [JsonIgnore]
     public ResponseType Type { get; init; } = responseType;
 

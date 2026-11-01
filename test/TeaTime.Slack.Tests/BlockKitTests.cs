@@ -42,7 +42,7 @@ public class BlockKitTests
     }
 
     [Fact]
-    public void Response_SerializesBlocksAndOmitsNulls()
+    public void Response_SerialisesBlocksAndOmitsNulls()
     {
         var response = new SlashCommandResponse
         {
@@ -55,7 +55,7 @@ public class BlockKitTests
 
         Assert.Equal("fallback", (string?)json["text"]);
         Assert.Equal("in_channel", (string?)json["response_type"]);
-        Assert.False(json.ContainsKey("thread_ts"));
+        Assert.False(json.ContainsKey("delete_original"));
         Assert.False((bool)json["replace_original"]!);
         Assert.False(json.ContainsKey("attachments"));
 
@@ -63,7 +63,6 @@ public class BlockKitTests
         Assert.Equal("section", (string?)blocks[0]!["type"]);
         Assert.Equal("mrkdwn", (string?)blocks[0]!["text"]!["type"]);
         Assert.False(blocks[0]!["text"]!.AsObject().ContainsKey("emoji"));
-        Assert.False(blocks[0]!.AsObject().ContainsKey("block_id"));
 
         var button = blocks[2]!["elements"]![0]!.AsObject();
         Assert.Equal("actions", (string?)blocks[2]!["type"]);
@@ -71,11 +70,10 @@ public class BlockKitTests
         Assert.Equal("join_option_7", (string?)button["action_id"]);
         Assert.Equal("7", (string?)button["value"]);
         Assert.Equal("plain_text", (string?)button["text"]!["type"]);
-        Assert.False(button.ContainsKey("style"));
     }
 
     [Fact]
-    public void BlockActionsPayload_Deserializes()
+    public void BlockActionsPayload_Deserialises()
     {
         const string json = """
             {
@@ -111,8 +109,6 @@ public class BlockKitTests
         Assert.Equal("U1", payload.User.Id);
         Assert.Equal("steve", payload.User.Username);
         Assert.Equal("C1", payload.Channel!.Id);
-        Assert.Equal("message", payload.Container!.Type);
-        Assert.Null(payload.Enterprise);
         Assert.Equal("https://hooks.slack.com/actions/T1/1/abc", payload.ResponseUrl);
 
         var action = Assert.Single(payload.Actions);
