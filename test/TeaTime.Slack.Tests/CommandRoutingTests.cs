@@ -71,7 +71,11 @@ namespace TeaTime.Slack.Tests
         {
             using var provider = CreateProvider();
 
-            Assert.StartsWith("*Commands*", await RunAsync(provider, "help"));
+            var help = await RunAsync(provider, "help");
+
+            Assert.StartsWith("*Commands*", help);
+            Assert.Contains("`/teatime join {option}`", help);
+            Assert.Contains("double quotes", help);
         }
 
         private static ServiceProvider CreateProvider()
