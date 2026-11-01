@@ -138,10 +138,12 @@ namespace TeaTime.Slack.Services
             }
             catch (SlackTeaTimeException e)
             {
+                logger.LogWarning("Join run rejected: {Message}", e.Message);
                 await ReplyAsync(requestPayload.ResponseUrl, e.Message);
             }
             catch (PermissionException e)
             {
+                logger.LogWarning("Join run denied: {Message}", e.Message);
                 await ReplyAsync(requestPayload.ResponseUrl, e.Message);
             }
             catch (Exception e)

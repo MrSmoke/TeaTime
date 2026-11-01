@@ -12,6 +12,7 @@ namespace TeaTime.Slack.Commands
     using Common.Features.Runs.Commands;
     using Exceptions;
     using MediatR;
+    using Microsoft.Extensions.Logging;
     using Models.SlashCommands;
     using Resources;
     using Services;
@@ -22,12 +23,15 @@ namespace TeaTime.Slack.Commands
         private readonly IIdGenerator<long> _idGenerator;
         private readonly TimeProvider _clock;
         private readonly ISlackService _slackService;
+        private readonly ILogger<RunCommand> _logger;
 
         public RunCommand(IMediator mediator,
             IIdGenerator<long> idGenerator,
             TimeProvider clock,
-            ISlackService slackService) : base(slackService)
+            ISlackService slackService,
+            ILogger<RunCommand> logger) : base(slackService)
         {
+            _logger = logger;
             _mediator = mediator;
             _idGenerator = idGenerator;
             _clock = clock;
@@ -84,6 +88,7 @@ namespace TeaTime.Slack.Commands
             }
             catch (SlackTeaTimeException e)
             {
+                _logger.LogWarning("Join run rejected: {Message}", e.Message);
                 return Response(e.Message, ResponseType.User);
             }
         }

@@ -82,6 +82,7 @@ namespace TeaTime.Slack.Tests
         {
             var services = new ServiceCollection();
             services.AddCommandRouter(typeof(ServiceCollectionExtension).Assembly);
+            services.AddLogging();
 
             // Strict, so a test fails if a command touches any of these
             services.AddSingleton(A.Fake<ISlackService>(o => o.Strict()));
