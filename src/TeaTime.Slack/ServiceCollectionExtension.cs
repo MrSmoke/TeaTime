@@ -32,7 +32,10 @@ namespace TeaTime.Slack
             services.AddTransient<IStartupFilter, SlackStartupFilter>();
 
             // General slack services
-            services.AddHttpClient<ISlackApiClient, SlackApiClient>();
+            services.AddSingleton<SlackHttpClientLogger>();
+            services.AddHttpClient<ISlackApiClient, SlackApiClient>()
+                .RemoveAllLoggers()
+                .AddLogger<SlackHttpClientLogger>();
             services.AddScoped<ISlackService, SlackService>();
 
             // OAuth
