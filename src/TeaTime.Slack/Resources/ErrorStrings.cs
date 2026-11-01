@@ -33,7 +33,7 @@ namespace TeaTime.Slack.Resources
             $"Failed to remove option. Unknown option *{optionName}*";
 
         internal static string RemoveOption_BadArguments() =>
-            "Failed to remove option. Invalid command. " + CommandStrings.AddOption();
+            "Failed to remove option. Invalid command. " + CommandStrings.RemoveOption();
 
 
         //Remove group
@@ -41,7 +41,7 @@ namespace TeaTime.Slack.Resources
             $"Failed to remove group. Unknown group *{groupName}*";
 
         internal static string RemoveGroup_BadArguments() =>
-            "Failed to remove group. Invalid command. " + CommandStrings.AddOption();
+            "Failed to remove group. Invalid command. " + CommandStrings.RemoveGroup();
 
 
         //Join run
@@ -73,5 +73,7 @@ namespace TeaTime.Slack.Resources
 
         internal static string CommandUnknown(string command) => $"Unknown command `{command}`";
         internal static string CommandFailed() => "Failed to run command";
+        internal static string CommandBadArguments(string command) =>
+            $"Invalid arguments for `{command}`. Use `/teatime help` to see the commands";
     }
 }
