@@ -92,4 +92,10 @@ public class SlashCommand
 
     [FromForm(Name = "api_app_id")]
     public string? ApiAppId { get; set; }
+
+    /// <summary>
+    /// Set to <c>1</c> when Slack is only verifying the request URL's SSL certificate
+    /// </summary>
+    [FromForm(Name = "ssl_check")]
+    public string? SslCheck { get; set; }
 }

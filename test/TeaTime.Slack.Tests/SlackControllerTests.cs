@@ -31,6 +31,26 @@ namespace TeaTime.Slack.Tests
         }
 
         [Fact]
+        public async Task SlashCommandHook_SslCheck_RepliesWithEmptyOk()
+        {
+            var controller = new SlackController(A.Fake<ICommandRunner>(o => o.Strict()),
+                A.Fake<ISlackService>(o => o.Strict()), NullLogger<SlackController>.Instance);
+
+            // Slack only sends ssl_check and token, so the usual fields bind as null
+            var result = await controller.SlashCommandHook(new SlashCommand
+            {
+                Command = null!,
+                Text = null!,
+                ResponseUrl = null!,
+                UserId = null!,
+                ChannelId = null!,
+                SslCheck = "1"
+            });
+
+            Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
         public async Task SlashCommandHook_UnknownCommand_RepliesWithUnknownCommand()
         {
             var controller = CreateController(new CommandNotFoundException("nope nope"));

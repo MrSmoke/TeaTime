@@ -32,6 +32,10 @@ namespace TeaTime.Slack.Controllers
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
+            // Slack's SSL certificate check only needs an empty 200
+            if (slashCommand.SslCheck == "1")
+                return Ok();
+
             if (string.IsNullOrWhiteSpace(slashCommand.Text))
             {
                 logger.LogWarning("Slash command contains no text");
