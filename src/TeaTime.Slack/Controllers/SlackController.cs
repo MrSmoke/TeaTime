@@ -2,6 +2,7 @@ namespace TeaTime.Slack.Controllers
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text.Json;
     using System.Threading.Tasks;
     using CommandRouter;
@@ -42,7 +43,9 @@ namespace TeaTime.Slack.Controllers
                 return Ok(ErrorStrings.General(), ResponseType.User);
             }
 
-            logger.LogInformation("Received slash command {Text} {@Command}", slashCommand.Text, slashCommand);
+            // Log selected fields only; response_url is a credential
+            logger.LogInformation("Received slash command {Text} from {SlackUserId} in {SlackChannelId} ({SlackTeamId})",
+                slashCommand.Text, slashCommand.UserId, slashCommand.ChannelId, slashCommand.TeamId);
 
             try
             {
@@ -142,7 +145,9 @@ namespace TeaTime.Slack.Controllers
                 return Ok();
             }
 
-            logger.LogInformation("Received block actions {@Payload}", payload);
+            // Log selected fields only; response_url is a credential
+            logger.LogInformation("Received block actions {ActionIds} from {SlackUserId} in {SlackChannelId}",
+                payload.Actions.Select(a => a.ActionId), payload.User.Id, payload.Channel?.Id);
 
             await slackService.HandleBlockActionsAsync(payload);
 
