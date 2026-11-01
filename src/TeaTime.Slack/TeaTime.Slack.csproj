@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="CommandRouter" Version="1.0.0-rc2" />
     <PackageReference Include="CommandRouter.Integration.AspNetCore" Version="1.0.0-rc2" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.14" />
   </ItemGroup>
 
   <ItemGroup>
