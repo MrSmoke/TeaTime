@@ -26,7 +26,7 @@ namespace TeaTime.Slack.Commands
         }
 
         [Command("add")]
-        public async Task<ICommandResult> AddOption(string groupName, string optionName)
+        public async Task<ICommandResult> AddOption(string? groupName, string? optionName)
         {
             if (string.IsNullOrWhiteSpace(groupName) || string.IsNullOrWhiteSpace(optionName))
                 return Response(ErrorStrings.AddOption_BadArguments(), ResponseType.User);
@@ -54,7 +54,7 @@ namespace TeaTime.Slack.Commands
         }
 
         [Command("remove")]
-        public async Task<ICommandResult> RemoveOption(string groupName, string optionName)
+        public async Task<ICommandResult> RemoveOption(string? groupName, string? optionName)
         {
             if (string.IsNullOrWhiteSpace(groupName) || string.IsNullOrWhiteSpace(optionName))
                 return Response(ErrorStrings.RemoveOption_BadArguments(), ResponseType.User);

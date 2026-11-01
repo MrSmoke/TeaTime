@@ -41,7 +41,7 @@ namespace TeaTime.Slack.Commands
         }
 
         [Command("remove")]
-        public async Task<ICommandResult> RemoveGroup(string name)
+        public async Task<ICommandResult> RemoveGroup(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return Response(ErrorStrings.RemoveGroup_BadArguments(), ResponseType.User);

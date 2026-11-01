@@ -63,6 +63,10 @@ namespace TeaTime.Slack.Controllers
             {
                 return Ok(ErrorStrings.CommandUnknown(slashCommand.Text), ResponseType.User);
             }
+            catch (ParameterBindingException)
+            {
+                return Ok(ErrorStrings.CommandBadArguments(slashCommand.Text), ResponseType.User);
+            }
             catch (RunStartException e)
             {
                 switch (e.Reason)
