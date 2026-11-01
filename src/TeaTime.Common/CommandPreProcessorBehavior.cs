@@ -34,7 +34,7 @@ namespace TeaTime.Common
                 await processor.ProcessAsync(request, cancellationToken);
             }
 
-            return await next();
+            return await next(cancellationToken);
         }
     }
 }

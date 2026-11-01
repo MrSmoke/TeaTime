@@ -17,7 +17,7 @@ namespace TeaTime.Common.Cache
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             if (request is not ICacheableQuery cacheQuery)
-                return await next();
+                return await next(cancellationToken);
 
             var cacheKey = cacheQuery.CacheKey;
 
@@ -27,7 +27,7 @@ namespace TeaTime.Common.Cache
                 return cacheItem.Value;
 
             // no result found in cache, so run the rest of the pipeline and cache the result
-            var response = await next();
+            var response = await next(cancellationToken);
 
             // dont cache null values
             if (response == null)

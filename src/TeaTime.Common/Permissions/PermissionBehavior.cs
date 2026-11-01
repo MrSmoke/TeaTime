@@ -35,7 +35,7 @@ namespace TeaTime.Common.Permissions
                 _logger.LogDebug("Skipping permission check for command {Command}", CommandTypeName);
             }
 
-            return await next();
+            return await next(cancellationToken);
         }
 
         private void Handle(PermissionCheckResult result)

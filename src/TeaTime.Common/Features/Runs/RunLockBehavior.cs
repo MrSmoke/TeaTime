@@ -16,7 +16,7 @@ public class RunLockBehavior<TCommand, TResponse>(IRoomRunLockService lockServic
     {
         await ProcessAsync(request, cancellationToken);
 
-        return await next();
+        return await next(cancellationToken);
     }
 
     private Task ProcessAsync(TCommand request, CancellationToken cancellationToken)
