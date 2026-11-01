@@ -247,8 +247,9 @@ namespace TeaTime.Slack.Services
             if (run == null)
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
+            // Buttons on an old round's message can still be clicked, and may be for a different group to the active round
             var option = await mediator.Send(new GetOptionQuery(optionId));
-            if (option == null)
+            if (option == null || option.GroupId != run.GroupId)
                 throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
             await JoinRunInternalAsync(userId, run, optionId, callbackData);

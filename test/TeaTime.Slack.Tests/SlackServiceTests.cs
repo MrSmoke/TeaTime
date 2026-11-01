@@ -7,6 +7,12 @@ using Client;
 using Common.Abstractions;
 using Common.Collections;
 using Common.Features.Links.Queries;
+using Common.Features.Options.Queries;
+using Common.Features.Orders.Commands;
+using Common.Features.Orders.Queries;
+using Common.Features.Rooms.Queries;
+using Common.Features.Users.Queries;
+using Common.Models.Data;
 using Common.Features.Users.Commands;
 using FakeItEasy;
 using MediatR;
@@ -84,6 +90,66 @@ public class SlackServiceTests
         var room = await service.GetOrCreateRoom("C123", name, userId: 1);
 
         Assert.Equal("Slack Channel C123", room.Name);
+    }
+
+    [Fact]
+    public async Task HandleBlockActions_OptionFromAnotherGroup_RepliesUnknownAndDoesNotOrder()
+    {
+        var apiClient = A.Fake<ISlackApiClient>();
+        var mediator = CreateJoinMediator(optionGroupId: 200);
+        var service = CreateService(apiClient, mediator);
+
+        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"));
+
+        A.CallTo(() => apiClient.PostResponseAsync(ResponseUrl,
+                A<SlashCommandResponse>.That.Matches(r => r.Text == ErrorStrings.OptionUnknown())))
+            .MustHaveHappenedOnceExactly();
+        // Sent via a BaseCommand variable, so match on that type
+        A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task HandleBlockActions_OptionFromRunGroup_CreatesOrder()
+    {
+        var apiClient = A.Fake<ISlackApiClient>();
+        var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
+        var idGenerator = A.Fake<IIdGenerator<long>>();
+        A.CallTo(() => idGenerator.GenerateAsync()).Returns(30L);
+        var service = CreateService(apiClient, mediator, idGenerator);
+
+        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"));
+
+        // Sent via a BaseCommand variable, so match on that type
+        A.CallTo(() => mediator.Send(A<BaseCommand>.That.Matches(c => c is CreateOrderCommand && ((CreateOrderCommand)c).OptionId == 1),
+                A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+        A.CallTo(() => apiClient.PostResponseAsync(A<string>._, A<SlashCommandResponse>._)).MustNotHaveHappened();
+    }
+
+    private const long RunGroupId = 100;
+
+    private static ISender CreateJoinMediator(long optionGroupId)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var mediator = A.Fake<ISender>();
+
+        A.CallTo(() => mediator.Send(A<GetObjectIdByLinkValueQuery>._, A<CancellationToken>._))
+            .Returns((long?)5);
+        A.CallTo(() => mediator.Send(A<GetUserQuery>._, A<CancellationToken>._))
+            .Returns(new User { Id = 5, Username = "slack_U1", DisplayName = "steve", CreatedDate = now });
+        A.CallTo(() => mediator.Send(A<GetRoomQuery>._, A<CancellationToken>._))
+            .Returns(new Room { Id = 5, Name = "general", CreatedBy = 5, CreatedDate = now });
+        A.CallTo(() => mediator.Send(A<GetCurrentRunQuery>._, A<CancellationToken>._))
+            .Returns(new Run
+            {
+                Id = 7, RoomId = 5, UserId = 5, GroupId = RunGroupId, StartTime = now, CreatedDate = now
+            });
+        A.CallTo(() => mediator.Send(A<GetOptionQuery>._, A<CancellationToken>._))
+            .Returns(new Option { Id = 1, Name = "Earl Grey", GroupId = optionGroupId, CreatedBy = 5, CreatedDate = now });
+        A.CallTo(() => mediator.Send(A<GetUserOrderQuery>._, A<CancellationToken>._))
+            .Returns((Order?)null);
+
+        return mediator;
     }
 
     private static SlackService CreateService(ISlackApiClient apiClient, ISender? mediator = null,
