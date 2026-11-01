@@ -61,11 +61,13 @@ namespace TeaTime.Slack.Commands
 
             await _mediator.Send(command);
 
+            var text = ResponseStrings.RunStarted(context.Command.UserId, roomItemGroup.Name);
+
             return Response(new SlashCommandResponse
             {
-                Text = ResponseStrings.RunStarted(context.Command.UserId, roomItemGroup.Name),
+                Text = text,
                 Type = ResponseType.Channel,
-                Attachments = AttachmentBuilder.BuildOptions(roomItemGroup.Options)
+                Blocks = BlockBuilder.BuildRunStarted(text, roomItemGroup.Options)
             });
         }
 

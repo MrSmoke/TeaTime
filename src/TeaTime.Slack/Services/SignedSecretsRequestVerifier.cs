@@ -3,6 +3,7 @@ namespace TeaTime.Slack.Services;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,9 +68,9 @@ public class SignedSecretsRequestVerifier(
         var options = GetOptions();
         var now = timeProvider.GetUtcNow().ToUnixTimeSeconds();
 
-        if (now - timestamp > options.ClockSkew.TotalSeconds)
+        if (Math.Abs(now - timestamp) > options.ClockSkew.TotalSeconds)
         {
-            logger.LogWarning("Request verification failed. Too much time has passed since timestamp");
+            logger.LogWarning("Request verification failed. Timestamp outside allowed clock skew");
             return false;
         }
 
@@ -82,8 +83,10 @@ public class SignedSecretsRequestVerifier(
         var hashString = HashHelper.HashStringSha256(keyBytes, signatureString);
         var mySignature = VersionNumber + '=' + hashString;
 
-        // Compare
-        return mySignature.Equals(signature);
+        // Constant-time compare to avoid timing attacks
+        return CryptographicOperations.FixedTimeEquals(
+            Encoding.ASCII.GetBytes(mySignature),
+            Encoding.ASCII.GetBytes(signature));
     }
 
     private static bool TryGetSignature(HttpRequest request, [NotNullWhen(true)] out string? signature)

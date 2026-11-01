@@ -5,21 +5,23 @@ namespace TeaTime.Slack
 
     internal static class SlackJsonSerializer
     {
-        private static readonly JsonSerializerOptions JsonSerializerSettings = new()
+        internal static readonly JsonSerializerOptions Options = new()
         {
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            // Slack treats optional fields as absent, not null
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
         internal static string Serialize(object obj)
         {
-            return JsonSerializer.Serialize(obj, JsonSerializerSettings);
+            return JsonSerializer.Serialize(obj, Options);
         }
 
         internal static T? Deserialize<T>(string json)
         {
-            return JsonSerializer.Deserialize<T>(json, JsonSerializerSettings);
+            return JsonSerializer.Deserialize<T>(json, Options);
         }
     }
 }

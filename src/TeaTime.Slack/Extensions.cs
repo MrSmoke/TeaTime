@@ -3,7 +3,7 @@ namespace TeaTime.Slack
     using System.Diagnostics.CodeAnalysis;
     using Common.Abstractions;
     using Models;
-    using Models.InteractiveMessages;
+    using Models.Interactivity;
     using Models.SlashCommands;
 
     internal static class Extensions
@@ -42,12 +42,13 @@ namespace TeaTime.Slack
             };
         }
 
-        internal static CallbackData ToCallbackData(this MessageRequestPayload payload)
+        internal static CallbackData ToCallbackData(this BlockActionsPayload payload)
         {
             return new CallbackData
             {
                 UserId = payload.User.Id,
-                ResponseUrl = payload.ResponseUrl
+                ResponseUrl = payload.ResponseUrl ??
+                              throw new System.InvalidOperationException("Payload has no response_url")
             };
         }
     }
