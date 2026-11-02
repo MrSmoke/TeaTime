@@ -93,12 +93,6 @@ public static class Program
                 .AddMeter("Microsoft.AspNetCore.Hosting")
                 .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
                 .AddMeter("MySqlConnector");
-
-            // Setup export
-            if (builder.Environment.IsDevelopment())
-            {
-                metrics.AddConsoleExporter();
-            }
         });
 
         // Tracing
@@ -108,12 +102,6 @@ public static class Program
             tracing.AddAspNetCoreInstrumentation();
             tracing.AddHttpClientInstrumentation();
             tracing.AddSource("MySqlConnector");
-
-            // Setup export
-            if (builder.Environment.IsDevelopment())
-            {
-                tracing.AddConsoleExporter();
-            }
         });
     }
 }
