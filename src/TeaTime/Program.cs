@@ -1,6 +1,7 @@
 namespace TeaTime;
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -30,7 +31,16 @@ public static class Program
 
         // Configure host
         builder.Configuration.AddEnvironmentVariables("TEATIME_");
-        builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+
+        // Setup logging
+        builder.Host.UseSerilog((context, loggerConfig) => loggerConfig
+            .ReadFrom.Configuration(context.Configuration)
+            .Enrich.FromLogContext()
+            .WriteTo.OpenTelemetry(options => options.ResourceAttributes = new Dictionary<string, object>
+            {
+                ["service.name"] = context.HostingEnvironment.ApplicationName,
+                ["service.version"] = Version
+            }));
 
         // Configure OpenTelemetry
         ConfigureOpenTelemetry(builder);
@@ -76,32 +86,35 @@ public static class Program
 
     private static void ConfigureOpenTelemetry(WebApplicationBuilder builder)
     {
-        var tracingOtlpEndpoint = builder.Configuration["OTLP_ENDPOINT_URL"];
         var otel = builder.Services.AddOpenTelemetry();
 
         // Configure OpenTelemetry Resources with the application name
-        otel.ConfigureResource(resource => resource.AddService(serviceName: builder.Environment.ApplicationName));
+        otel.ConfigureResource(resource =>
+        {
+            resource.AddService(serviceName: builder.Environment.ApplicationName, serviceVersion: Version);
+        });
 
-        // Setup OtlpExporer
         otel.UseOtlpExporter();
 
         // Metrics
         otel.WithMetrics(metrics =>
         {
-            // Add meters
-            metrics.AddAspNetCoreInstrumentation()
-                .AddMeter("Microsoft.AspNetCore.Hosting")
-                .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+            metrics
+                .AddAspNetCoreInstrumentation()
                 .AddMeter("MySqlConnector");
         });
 
         // Tracing
         otel.WithTracing(tracing =>
         {
-            // Setup sources
-            tracing.AddAspNetCoreInstrumentation();
-            tracing.AddHttpClientInstrumentation();
-            tracing.AddSource("MySqlConnector");
+            tracing
+                .AddAspNetCoreInstrumentation(options =>
+                {
+                    // Remove health check endpoint from otel
+                    options.Filter = context => !context.Request.Path.StartsWithSegments("/_health");
+                })
+                .AddHttpClientInstrumentation()
+                .AddSource("MySqlConnector");
         });
     }
 }
