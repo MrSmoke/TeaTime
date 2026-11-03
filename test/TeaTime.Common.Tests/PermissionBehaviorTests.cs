@@ -35,7 +35,7 @@ public class PermissionBehaviorTests
     {
         await using var provider = CreateProvider();
         var mediator = provider.GetRequiredService<IMediator>();
-        var handler = provider.GetRequiredService<DeleteOrderRecorder>();
+        var handler = provider.GetRequiredService<HandledRecorder>();
 
         var command = new DeleteOrderCommand(CreateOrder(userId: 1), UserId: 2);
 
@@ -52,9 +52,41 @@ public class PermissionBehaviorTests
     {
         await using var provider = CreateProvider();
         var mediator = provider.GetRequiredService<IMediator>();
-        var handler = provider.GetRequiredService<DeleteOrderRecorder>();
+        var handler = provider.GetRequiredService<HandledRecorder>();
 
         var command = new DeleteOrderCommand(CreateOrder(userId: 1), UserId: 1);
+
+        await mediator.Send(command, TestContext.Current.CancellationToken);
+
+        Assert.True(handler.Handled);
+    }
+
+    // The update check rejects changing another user's order before the handler runs
+    [Fact]
+    public async Task Send_UpdateOtherUsersOrder_ThrowsPermissionException()
+    {
+        await using var provider = CreateProvider();
+        var mediator = provider.GetRequiredService<IMediator>();
+        var handler = provider.GetRequiredService<HandledRecorder>();
+
+        var command = new UpdateOrderOptionCommand(CreateOrder(userId: 1), UserId: 2, OptionId: 40);
+
+        var ex = await Assert.ThrowsAsync<PermissionException>(
+            () => mediator.Send(command, TestContext.Current.CancellationToken));
+
+        Assert.Equal("You cannot change other users' orders", ex.Message);
+        Assert.False(handler.Handled);
+    }
+
+    // A user changing their own order passes the check and reaches the handler
+    [Fact]
+    public async Task Send_UpdateOwnOrder_ReachesHandler()
+    {
+        await using var provider = CreateProvider();
+        var mediator = provider.GetRequiredService<IMediator>();
+        var handler = provider.GetRequiredService<HandledRecorder>();
+
+        var command = new UpdateOrderOptionCommand(CreateOrder(userId: 1), UserId: 1, OptionId: 40);
 
         await mediator.Send(command, TestContext.Current.CancellationToken);
 
@@ -69,8 +101,9 @@ public class PermissionBehaviorTests
         services.AddSingleton<IPermissionService, PermissionService>();
         services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(PermissionBehavior<,>));
         services.AddSingleton<IPermissionCheck<DeleteOrderCommand>, OrderPermissions>();
+        services.AddSingleton<IPermissionCheck<UpdateOrderOptionCommand>, OrderPermissions>();
 
-        services.AddSingleton<DeleteOrderRecorder>();
+        services.AddSingleton<HandledRecorder>();
         services.AddMediatR(o => o.RegisterServicesFromAssemblyContaining<PermissionBehaviorTests>());
 
         return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true });
@@ -93,14 +126,22 @@ public class PermissionBehaviorTests
             Task.FromResult("pong");
     }
 
-    public class DeleteOrderRecorder
+    public class HandledRecorder
     {
         public bool Handled { get; set; }
     }
 
-    public class DeleteOrderHandler(DeleteOrderRecorder recorder) : IRequestHandler<DeleteOrderCommand>
+    public class OrderHandler(HandledRecorder recorder) :
+        IRequestHandler<DeleteOrderCommand>,
+        IRequestHandler<UpdateOrderOptionCommand>
     {
         public Task Handle(DeleteOrderCommand request, CancellationToken cancellationToken)
+        {
+            recorder.Handled = true;
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
         {
             recorder.Handled = true;
             return Task.CompletedTask;

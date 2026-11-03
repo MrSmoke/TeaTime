@@ -101,6 +101,7 @@ public static class Program
 
         // Register permission checks
         services.AddSingleton<IPermissionCheck<DeleteOrderCommand>, OrderPermissions>();
+        services.AddSingleton<IPermissionCheck<UpdateOrderOptionCommand>, OrderPermissions>();
 
         // Register all PreProcessors
         services.AddSingleton<ICommandPreProcessor<EndRunCommand>, RunPreProcessor>();
