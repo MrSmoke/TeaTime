@@ -2,6 +2,8 @@ namespace TeaTime.Common.Permissions;
 
 public sealed class PermissionCheckResult
 {
+    private static readonly PermissionCheckResult OkResult = new(true, null);
+
     private PermissionCheckResult(bool success, string? message)
     {
         Success = success;
@@ -13,7 +15,7 @@ public sealed class PermissionCheckResult
 
     public static PermissionCheckResult Ok()
     {
-        return new PermissionCheckResult(true, null);
+        return OkResult;
     }
 
     public static PermissionCheckResult NotOk(string message)

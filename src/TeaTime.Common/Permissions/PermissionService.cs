@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 public class PermissionService(IServiceProvider serviceProvider, ILogger<PermissionService> logger)
     : IPermissionService
 {
+    private static readonly Task<PermissionCheckResult> OkTask = Task.FromResult(PermissionCheckResult.Ok());
+
     public Task<PermissionCheckResult> CheckAsync<T>(T request, CancellationToken cancellationToken = default)
         where T : IUserCommand
     {
@@ -19,7 +21,7 @@ public class PermissionService(IServiceProvider serviceProvider, ILogger<Permiss
         }
 
         logger.LogDebug("No permission check registered for {Request}", typeof(T).Name);
-        return Task.FromResult(PermissionCheckResult.Ok());
+        return OkTask;
     }
 
     public Task CheckAsync<TQuery, TResponse>(TQuery query, CancellationToken cancellationToken = default)
