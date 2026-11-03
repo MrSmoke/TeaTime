@@ -72,10 +72,8 @@ public static class Program
         // Register our data services
         services.AddMySql(configuration.GetSection("mysql"));
 
-        // If using more than one instance, replace this with redis or something similar
-        services.AddDistributedMemoryCache();
-        services.AddSingleton<ICache, Cache>();
-        services.AddSingleton<ICacheSerializer, SystemTextJsonCacheSerializer>();
+        // In-memory only until an IDistributedCache such as Redis is registered for multiple instances
+        services.AddHybridCache();
 
         // Add Slack support
         services.AddSlack(mvcBuilder, configuration.GetSection("slack"));
@@ -130,9 +128,9 @@ public static class Program
             app.UseStatusCodePagesWithReExecute("/ErrorStatusCode", "?code={0}");
         }
 
-        app.UseStaticFiles();
         app.UseRouting();
-        app.MapControllers();
+        app.MapStaticAssets();
+        app.MapControllers().WithStaticAssets();
         app.UseSlack();
 
         // Log our version for startup
