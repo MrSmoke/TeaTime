@@ -1,6 +1,7 @@
 namespace TeaTime;
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -8,7 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Extensions.Logging;
 using Slack;
 
 public static class Program
@@ -26,7 +32,22 @@ public static class Program
 
         // Configure host
         builder.Configuration.AddEnvironmentVariables("TEATIME_");
-        builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+
+        // Setup logging
+        var serilogLogger = new LoggerConfiguration()
+            .MinimumLevel.Verbose()
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .CreateLogger();
+
+        var serilogProvider = new SerilogLoggerProvider(serilogLogger, dispose: true);
+
+        // Registered directly since AddSerilog adds a Trace filter that overrides the Logging section
+        builder.Logging.ClearProviders();
+        builder.Logging.Services.AddSingleton<ILoggerProvider>(serilogProvider);
+
+        // Configure OpenTelemetry
+        ConfigureOpenTelemetry(builder);
 
         // Register services
         builder.Services.AddHealthChecks();
@@ -65,5 +86,49 @@ public static class Program
 
         // Run
         app.Run();
+    }
+
+    private static void ConfigureOpenTelemetry(WebApplicationBuilder builder)
+    {
+        var otel = builder.Services.AddOpenTelemetry();
+
+        // Configure OpenTelemetry Resources with the application name
+        otel.ConfigureResource(resource =>
+        {
+            resource.AddService(serviceName: builder.Environment.ApplicationName, serviceVersion: Version);
+            resource.AddAttributes([
+                new KeyValuePair<string, object>("deployment.environment.name", builder.Environment.EnvironmentName)
+            ]);
+        });
+
+        otel.UseOtlpExporter();
+
+        // Logging
+        otel.WithLogging(configureBuilder: null, configureOptions: options =>
+        {
+            options.IncludeScopes = true;
+            options.IncludeFormattedMessage = true;
+        });
+
+        // Metrics
+        otel.WithMetrics(metrics =>
+        {
+            metrics
+                .AddAspNetCoreInstrumentation()
+                .AddMeter("MySqlConnector");
+        });
+
+        // Tracing
+        otel.WithTracing(tracing =>
+        {
+            tracing
+                .AddAspNetCoreInstrumentation(options =>
+                {
+                    // Remove health check endpoint from otel
+                    options.Filter = context => !context.Request.Path.StartsWithSegments("/_health");
+                })
+                .AddHttpClientInstrumentation()
+                .AddSource("MySqlConnector");
+        });
     }
 }
