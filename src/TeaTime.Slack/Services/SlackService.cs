@@ -136,12 +136,12 @@ namespace TeaTime.Slack.Services
             }
             catch (SlackTeaTimeException e)
             {
-                logger.LogWarning("Join run rejected: {Message}", e.Message);
+                logger.LogWarning(e, "Join run rejected");
                 await ReplyAsync(requestPayload.ResponseUrl, e.Message);
             }
             catch (PermissionException e)
             {
-                logger.LogWarning("Join run denied: {Message}", e.Message);
+                logger.LogWarning(e, "Join run denied");
                 await ReplyAsync(requestPayload.ResponseUrl, e.Message);
             }
             catch (Exception e)
@@ -180,9 +180,9 @@ namespace TeaTime.Slack.Services
         private static bool IsJoinAction(BlockAction action) =>
             action.ActionId.StartsWith(BlockBuilder.JoinOptionActionIdPrefix, StringComparison.Ordinal);
 
-        internal static string FallbackUserName(string slackUserId) => $"Slack User {slackUserId}";
+        private static string FallbackUserName(string slackUserId) => $"Slack User {slackUserId}";
 
-        internal static string FallbackChannelName(string slackChannelId) => $"Slack Channel {slackChannelId}";
+        private static string FallbackChannelName(string slackChannelId) => $"Slack Channel {slackChannelId}";
 
         public async Task InstallAsync(OAuthTokenResponse response)
         {
