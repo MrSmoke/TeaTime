@@ -8,5 +8,5 @@ public class SlackTeam
     public required string Id { get; init; }
 
     [JsonPropertyName("name")]
-    public required string Name { get; init; }
+    public string? Name { get; init; }
 }

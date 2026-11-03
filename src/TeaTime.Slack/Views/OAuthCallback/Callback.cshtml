@@ -8,7 +8,14 @@
             <div class="columns">
                 <div class="column">
                     <h1 class="title is-1">Success ✔️</h1>
-                    <p>TeaTime has successfully been installed in your slack workspace <strong>@Model.TeamName</strong> 🎉</p>
+                    @if (string.IsNullOrWhiteSpace(Model.TeamName))
+                    {
+                        <p>TeaTime has successfully been installed in your slack workspace 🎉</p>
+                    }
+                    else
+                    {
+                        <p>TeaTime has successfully been installed in your slack workspace <strong>@Model.TeamName</strong> 🎉</p>
+                    }
                 </div>
             </div>
             <div class="columns">

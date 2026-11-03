@@ -2,10 +2,13 @@ namespace TeaTime.Slack.Services
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
+    using Client;
     using Common.Abstractions;
     using Common.Collections;
+    using Common.Exceptions;
     using Common.Features.Links.Commands;
     using Common.Features.Links.Queries;
     using Common.Features.Options.Queries;
@@ -22,7 +25,7 @@ namespace TeaTime.Slack.Services
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Models;
-    using Models.InteractiveMessages;
+    using Models.Interactivity;
     using Models.OAuth;
     using Models.SlashCommands;
     using Resources;
@@ -31,13 +34,13 @@ namespace TeaTime.Slack.Services
         IIdGenerator<long> idGenerator,
         IDistributedHash hash,
         TimeProvider timeProvider,
+        ISlackApiClient slackApiClient,
         ILogger<SlackService> logger)
         : ISlackService
     {
-        public async Task<User> GetOrCreateUser(string userId, string name)
+        public async Task<User> GetOrCreateUser(string userId, string? name)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(userId);
-            ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
             var id = await mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, userId));
             if (id > 0)
@@ -51,7 +54,8 @@ namespace TeaTime.Slack.Services
             (
                 Id: await idGenerator.GenerateAsync(),
                 Username: "slack_" + userId,
-                DisplayName: name
+                // Slack may not send a name; never store a bare ID as one
+                DisplayName: string.IsNullOrWhiteSpace(name) ? FallbackUserName(userId) : name
             );
             await mediator.Send(command);
 
@@ -69,10 +73,9 @@ namespace TeaTime.Slack.Services
             };
         }
 
-        public async Task<Room> GetOrCreateRoom(string channelId, string channelName, long userId)
+        public async Task<Room> GetOrCreateRoom(string channelId, string? channelName, long userId)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(channelId);
-            ArgumentException.ThrowIfNullOrWhiteSpace(channelName);
 
             if (userId == default)
                 throw new ArgumentException("value cannot be empty", nameof(userId));
@@ -87,7 +90,7 @@ namespace TeaTime.Slack.Services
             var command = new CreateRoomCommand
             (
                 Id: await idGenerator.GenerateAsync(),
-                Name: channelName,
+                Name: string.IsNullOrWhiteSpace(channelName) ? FallbackChannelName(channelId) : channelName,
                 UserId: userId
             );
 
@@ -110,42 +113,104 @@ namespace TeaTime.Slack.Services
             ArgumentNullException.ThrowIfNull(slashCommand);
             ArgumentNullException.ThrowIfNull(optionName);
 
-            var user = await GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
+            var user = await GetOrCreateUser(slashCommand.UserId, slashCommand.GetUserName());
             var room = await GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, user.Id);
 
             await JoinRunAsync(user.Id, room.Id, optionName, slashCommand.ToCallbackData());
         }
 
-        public async Task JoinRunAsync(MessageRequestPayload requestPayload)
+        public async Task HandleBlockActionsAsync(BlockActionsPayload requestPayload)
         {
             ArgumentNullException.ThrowIfNull(requestPayload);
 
-            var user = await GetOrCreateUser(requestPayload.User.Id, requestPayload.User.Name);
-            var room = await GetOrCreateRoom(requestPayload.Channel.Id, requestPayload.Channel.Name, user.Id);
+            // Interaction acks can't carry a message, so failures are reported via response_url
+            if (string.IsNullOrWhiteSpace(requestPayload.ResponseUrl))
+            {
+                logger.LogWarning("Ignoring block_actions payload without response_url");
+                return;
+            }
 
-            var firstAction = requestPayload.Actions.First();
-            var optionId = long.Parse(firstAction.Value);
-
-            await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData());
+            try
+            {
+                await JoinRunAsync(requestPayload, requestPayload.ResponseUrl);
+            }
+            catch (SlackTeaTimeException e)
+            {
+                logger.LogWarning(e, "Join run rejected");
+                await ReplyAsync(requestPayload.ResponseUrl, e.Message);
+            }
+            catch (PermissionException e)
+            {
+                logger.LogWarning(e, "Join run denied");
+                await ReplyAsync(requestPayload.ResponseUrl, e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Failed to join run");
+                await ReplyAsync(requestPayload.ResponseUrl, ErrorStrings.General());
+            }
         }
+
+        private Task ReplyAsync(string responseUrl, string message)
+        {
+            return slackApiClient.PostResponseAsync(responseUrl, new SlashCommandResponse(message, ResponseType.User));
+        }
+
+        private async Task JoinRunAsync(BlockActionsPayload requestPayload, string responseUrl)
+        {
+            var channel = requestPayload.Channel;
+            if (channel is null)
+                throw new InvalidOperationException("block_actions payload has no channel");
+
+            var action = requestPayload.Actions.FirstOrDefault(IsJoinAction);
+            if (action is null)
+                throw new InvalidOperationException("block_actions payload has no join action");
+
+            if (!long.TryParse(action.Value, NumberStyles.None, CultureInfo.InvariantCulture, out var optionId))
+                throw new InvalidOperationException($"Invalid option id '{action.Value}'");
+
+            var usersName = requestPayload.User.Username ?? requestPayload.User.Name;
+
+            var user = await GetOrCreateUser(requestPayload.User.Id, usersName);
+            var room = await GetOrCreateRoom(channel.Id, channel.Name, user.Id);
+
+            await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData(responseUrl));
+        }
+
+        private static bool IsJoinAction(BlockAction action) =>
+            action.ActionId.StartsWith(BlockBuilder.JoinOptionActionIdPrefix, StringComparison.Ordinal);
+
+        private static string FallbackUserName(string slackUserId) => $"Slack User {slackUserId}";
+
+        private static string FallbackChannelName(string slackChannelId) => $"Slack Channel {slackChannelId}";
 
         public async Task InstallAsync(OAuthTokenResponse response)
         {
             ArgumentNullException.ThrowIfNull(response);
 
-            // Ensure data is correct
+            // Org-wide installs have no team
+            if (response.IsEnterpriseInstall || response.Team is null)
+                throw new InvalidOperationException("Org-wide installs are not supported");
+
             if (string.IsNullOrEmpty(response.Team.Id))
                 throw new InvalidOperationException("TeamId cannot be empty");
+
+            if (string.IsNullOrEmpty(response.AccessToken))
+                throw new InvalidOperationException("AccessToken cannot be empty");
 
             var hashKey = "slack:" + response.Team.Id;
 
             // Store base data for the whole team
-            await hash.SetAsync(hashKey, new List<HashEntry>
+            var entries = new List<HashEntry>
             {
-                new(Constants.FieldKeys.TeamName, response.Team.Name),
                 new(Constants.FieldKeys.AccessToken, response.AccessToken),
                 new(Constants.FieldKeys.InstallTime, timeProvider.GetUtcNow().ToString("O"))
-            });
+            };
+
+            if (!string.IsNullOrEmpty(response.Team.Name))
+                entries.Add(new(Constants.FieldKeys.TeamName, response.Team.Name));
+
+            await hash.SetAsync(hashKey, entries);
         }
 
         private async Task JoinRunAsync(long userId, long roomId, string optionName, CallbackData callbackData)
@@ -182,8 +247,9 @@ namespace TeaTime.Slack.Services
             if (run == null)
                 throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
+            // Buttons on an old round's message can still be clicked, and may be for a different group to the active round
             var option = await mediator.Send(new GetOptionQuery(optionId));
-            if (option == null)
+            if (option == null || option.GroupId != run.GroupId)
                 throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
             await JoinRunInternalAsync(userId, run, optionId, callbackData);

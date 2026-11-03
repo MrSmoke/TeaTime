@@ -54,7 +54,7 @@ namespace TeaTime.Slack.Controllers
             try
             {
                 await slackService.InstallAsync(response);
-                return View(OAuthCallbackViewModel.Ok(response.Team.Name));
+                return View(OAuthCallbackViewModel.Ok(response.Team?.Name));
             }
             catch (Exception ex)
             {

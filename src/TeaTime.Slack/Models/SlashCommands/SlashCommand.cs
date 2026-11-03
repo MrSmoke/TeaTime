@@ -62,4 +62,16 @@ public class SlashCommand
     /// </summary>
     [FromForm(Name = "channel_name")]
     public string? ChannelName { get; set; }
+
+    /// <summary>
+    /// The ID of the workspace the command was run in
+    /// </summary>
+    [FromForm(Name = "team_id")]
+    public string? TeamId { get; set; }
+
+    /// <summary>
+    /// Set to <c>1</c> when Slack is only verifying the request URL's SSL certificate
+    /// </summary>
+    [FromForm(Name = "ssl_check")]
+    public string? SslCheck { get; set; }
 }

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 public class SignedSecretsRequestVerifierOptions : IValidateOptions<SignedSecretsRequestVerifierOptions>
 {
-    public TimeSpan ClockSkew { get; set; } = TimeSpan.FromSeconds(10);
+    public TimeSpan ClockSkew { get; set; } = TimeSpan.FromMinutes(5);
     public string? SigningSecret { get; set; }
     public bool Enabled { get; set; } = true;
 

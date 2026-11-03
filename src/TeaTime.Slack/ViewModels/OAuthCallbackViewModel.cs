@@ -6,7 +6,7 @@ public class OAuthCallbackViewModel(bool success)
     public string? TeamName { get; private init; }
     public string? ErrorCode { get; private init; }
 
-    public static OAuthCallbackViewModel Ok(string teamName) => new(true)
+    public static OAuthCallbackViewModel Ok(string? teamName) => new(true)
     {
         TeamName = teamName,
     };

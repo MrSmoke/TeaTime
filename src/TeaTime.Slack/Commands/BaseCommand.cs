@@ -21,7 +21,7 @@ namespace TeaTime.Slack.Commands
 
         private Task<User> GetOrCreateUser(SlashCommand slashCommand)
         {
-            return slackService.GetOrCreateUser(slashCommand.UserId, slashCommand.UserName);
+            return slackService.GetOrCreateUser(slashCommand.UserId, slashCommand.GetUserName());
         }
 
         private Task<Room> GetOrCreateRoom(SlashCommand slashCommand, long userId)
