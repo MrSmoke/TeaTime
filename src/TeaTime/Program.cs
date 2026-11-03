@@ -92,6 +92,9 @@ public static class Program
         otel.ConfigureResource(resource =>
         {
             resource.AddService(serviceName: builder.Environment.ApplicationName, serviceVersion: Version);
+            resource.AddAttributes([
+                new KeyValuePair<string, object>("deployment.environment.name", builder.Environment.EnvironmentName)
+            ]);
         });
 
         otel.UseOtlpExporter();
