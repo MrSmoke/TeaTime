@@ -19,7 +19,7 @@ public class RunLockBehavior<TCommand, TResponse>(IRoomRunLockService lockServic
         return await next(cancellationToken);
     }
 
-    private Task ProcessAsync(TCommand request, CancellationToken cancellationToken)
+    private Task ProcessAsync(TCommand request, CancellationToken cancellationToken = default)
     {
         return request switch
         {
@@ -29,7 +29,7 @@ public class RunLockBehavior<TCommand, TResponse>(IRoomRunLockService lockServic
         };
     }
 
-    private async Task ProcessAsync(StartRunCommand request, CancellationToken cancellationToken)
+    private async Task ProcessAsync(StartRunCommand request, CancellationToken cancellationToken = default)
     {
         //try to create the run lock
         var created = await lockService.CreateLockAsync(request.RoomId, cancellationToken);
@@ -40,7 +40,7 @@ public class RunLockBehavior<TCommand, TResponse>(IRoomRunLockService lockServic
         //run lock created, so everything is ok
     }
 
-    private async Task ProcessAsync(EndRunCommand request, CancellationToken cancellationToken)
+    private async Task ProcessAsync(EndRunCommand request, CancellationToken cancellationToken = default)
     {
         //delete lock
         if (await lockService.DeleteLockAsync(request.Run.RoomId, cancellationToken))

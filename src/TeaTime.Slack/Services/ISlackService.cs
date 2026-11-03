@@ -1,5 +1,6 @@
 namespace TeaTime.Slack.Services;
 
+using System.Threading;
 using System.Threading.Tasks;
 using Common.Models.Data;
 using Models.Interactivity;
@@ -8,11 +9,12 @@ using Models.SlashCommands;
 
 public interface ISlackService
 {
-    Task<User> GetOrCreateUser(string userId, string? name);
-    Task<Room> GetOrCreateRoom(string channelId, string? channelName, long userId);
+    Task<User> GetOrCreateUserAsync(string userId, string? name, CancellationToken cancellationToken = default);
+    Task<Room> GetOrCreateRoomAsync(string channelId, string? channelName, long userId,
+        CancellationToken cancellationToken = default);
 
-    Task JoinRunAsync(SlashCommand slashCommand, string optionName);
-    Task HandleBlockActionsAsync(BlockActionsPayload requestPayload);
+    Task JoinRunAsync(SlashCommand slashCommand, string optionName, CancellationToken cancellationToken = default);
+    Task HandleBlockActionsAsync(BlockActionsPayload requestPayload, CancellationToken cancellationToken = default);
 
-    Task InstallAsync(OAuthTokenResponse response);
+    Task InstallAsync(OAuthTokenResponse response, CancellationToken cancellationToken = default);
 }

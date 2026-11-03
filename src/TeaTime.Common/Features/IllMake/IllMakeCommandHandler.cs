@@ -30,6 +30,6 @@ public class IllMakeCommandHandler : IRequestHandler<IllMakeCommand>
         };
 
         //todo: event
-        return _repository.CreateAsync(model);
+        return _repository.CreateAsync(model, cancellationToken);
     }
 }

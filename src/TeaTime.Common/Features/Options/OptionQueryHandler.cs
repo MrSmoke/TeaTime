@@ -18,6 +18,6 @@ public class OptionQueryHandler : IRequestHandler<GetOptionQuery, Option?>
 
     public Task<Option?> Handle(GetOptionQuery request, CancellationToken cancellationToken)
     {
-        return _optionsRepository.GetAsync(request.Id);
+        return _optionsRepository.GetAsync(request.Id, cancellationToken);
     }
 }

@@ -41,7 +41,7 @@ public class OrderCommandHandler :
             UserId = request.UserId
         };
 
-        await _orderRepository.CreateAsync(order);
+        await _orderRepository.CreateAsync(order, cancellationToken);
 
         var evt = new OrderPlacedEvent
         (
@@ -54,12 +54,12 @@ public class OrderCommandHandler :
             State = request.State
         };
 
-        await _eventPublisher.PublishAsync(evt);
+        await _eventPublisher.PublishAsync(evt, cancellationToken);
     }
 
     public async Task Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
     {
-        var existing = await _orderRepository.GetAsync(request.OrderId);
+        var existing = await _orderRepository.GetAsync(request.OrderId, cancellationToken);
 
         if (existing is null)
         {
@@ -74,7 +74,7 @@ public class OrderCommandHandler :
         var previousOptionId = existing.OptionId;
 
         //update
-        await _orderRepository.UpdateAsync(existing with { OptionId = request.OptionId });
+        await _orderRepository.UpdateAsync(existing with { OptionId = request.OptionId }, cancellationToken);
 
         //create event
         var evt = new OrderOptionChangedEvent
@@ -88,6 +88,6 @@ public class OrderCommandHandler :
             State = request.State,
         };
 
-        await _eventPublisher.PublishAsync(evt);
+        await _eventPublisher.PublishAsync(evt, cancellationToken);
     }
 }

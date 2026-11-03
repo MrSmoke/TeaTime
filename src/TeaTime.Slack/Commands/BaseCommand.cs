@@ -1,5 +1,6 @@
 namespace TeaTime.Slack.Commands;
 
+using System.Threading;
 using System.Threading.Tasks;
 using CommandRouter.Commands;
 using CommandRouter.Results;
@@ -10,23 +11,25 @@ using Services;
 
 public abstract class BaseCommand(ISlackService slackService) : Command
 {
-    protected async Task<CommandContext> GetContextAsync()
+    protected async Task<CommandContext> GetContextAsync(CancellationToken cancellationToken = default)
     {
         var command = GetCommand();
-        var user = await GetOrCreateUser(command);
-        var room = await GetOrCreateRoom(command, user.Id);
+        var user = await GetOrCreateUserAsync(command, cancellationToken);
+        var room = await GetOrCreateRoomAsync(command, user.Id, cancellationToken);
 
         return new CommandContext(command, user, room);
     }
 
-    private Task<User> GetOrCreateUser(SlashCommand slashCommand)
+    private Task<User> GetOrCreateUserAsync(SlashCommand slashCommand, CancellationToken cancellationToken = default)
     {
-        return slackService.GetOrCreateUser(slashCommand.UserId, slashCommand.GetUserName());
+        return slackService.GetOrCreateUserAsync(slashCommand.UserId, slashCommand.GetUserName(), cancellationToken);
     }
 
-    private Task<Room> GetOrCreateRoom(SlashCommand slashCommand, long userId)
+    private Task<Room> GetOrCreateRoomAsync(SlashCommand slashCommand, long userId,
+        CancellationToken cancellationToken = default)
     {
-        return slackService.GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, userId);
+        return slackService.GetOrCreateRoomAsync(slashCommand.ChannelId, slashCommand.ChannelName, userId,
+            cancellationToken);
     }
 
     protected SlashCommand GetCommand() => (SlashCommand)Context.Items[Constants.CommandContextKeys.SlashCommand];

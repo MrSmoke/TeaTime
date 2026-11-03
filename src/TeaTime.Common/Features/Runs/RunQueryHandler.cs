@@ -21,11 +21,11 @@ public class RunQueryHandler :
 
     public Task<Run?> Handle(GetCurrentRunQuery request, CancellationToken cancellationToken)
     {
-        return _runRepository.GetCurrentRunAsync(request.RoomId);
+        return _runRepository.GetCurrentRunAsync(request.RoomId, cancellationToken);
     }
 
     public Task<Run?> Handle(GetRunQuery request, CancellationToken cancellationToken)
     {
-        return _runRepository.GetAsync(request.RunId);
+        return _runRepository.GetAsync(request.RunId, cancellationToken);
     }
 }

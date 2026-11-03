@@ -17,6 +17,6 @@ public class LinkQueryHandler : IRequestHandler<GetObjectIdByLinkValueQuery, lon
 
     public Task<long?> Handle(GetObjectIdByLinkValueQuery request, CancellationToken cancellationToken)
     {
-        return _linkRepository.GetObjectId(request.Value, request.LinkType);
+        return _linkRepository.GetObjectIdAsync(request.Value, request.LinkType, cancellationToken);
     }
 }

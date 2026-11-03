@@ -50,7 +50,7 @@ internal class RunEndedHandler : INotificationHandler<RunEndedEvent>
         };
 
         var usernames = (await Task.WhenAll(userIds.Select(async uid =>
-                new KeyValuePair<long, string>(uid, await GetSlackUsername(uid)))))
+                new KeyValuePair<long, string>(uid, await GetSlackUsernameAsync(uid, cancellationToken)))))
             .ToDictionary(k => k.Key, v => v.Value);
 
         var messageBuilder = new StringBuilder();
@@ -79,17 +79,17 @@ internal class RunEndedHandler : INotificationHandler<RunEndedEvent>
 
         var data = new SlashCommandResponse(messageBuilder.ToString(), ResponseType.Channel);
 
-        await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl, data);
+        await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl, data, cancellationToken);
     }
 
-    private async Task<string> GetSlackUsername(long userId)
+    private async Task<string> GetSlackUsernameAsync(long userId, CancellationToken cancellationToken = default)
     {
-        var runnerSlackId = await _linkRepository.GetLinkAsync(userId, LinkType.User);
+        var runnerSlackId = await _linkRepository.GetLinkAsync(userId, LinkType.User, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(runnerSlackId))
             return StringHelpers.SlackUserId(runnerSlackId);
 
-        var runner = await _userRepository.GetAsync(userId);
+        var runner = await _userRepository.GetAsync(userId, cancellationToken);
 
         return runner?.DisplayName ?? "Unknown";
     }

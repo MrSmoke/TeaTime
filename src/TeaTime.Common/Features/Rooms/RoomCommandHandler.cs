@@ -34,7 +34,7 @@ public class RoomCommandHandler : IRequestHandler<CreateRoomCommand>
             CreatedDate = _clock.GetUtcNow()
         };
 
-        await _roomRepository.CreateAsync(room);
+        await _roomRepository.CreateAsync(room, cancellationToken);
 
         var evt = new RoomCreatedEvent
         (
@@ -44,6 +44,6 @@ public class RoomCommandHandler : IRequestHandler<CreateRoomCommand>
             CreateDefaultItemGroup: request.CreateDefaultItemGroup
         );
 
-        await _eventPublisher.PublishAsync(evt);
+        await _eventPublisher.PublishAsync(evt, cancellationToken);
     }
 }

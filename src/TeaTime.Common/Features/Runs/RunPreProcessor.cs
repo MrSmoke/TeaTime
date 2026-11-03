@@ -9,7 +9,7 @@ using Exceptions;
 
 public class RunPreProcessor : ICommandPreProcessor<EndRunCommand>
 {
-    public Task ProcessAsync(EndRunCommand request, CancellationToken cancellationToken)
+    public Task ProcessAsync(EndRunCommand request, CancellationToken cancellationToken = default)
     {
         if (!request.Orders.Any())
             throw new RunEndException("Cannot end run with no orders",

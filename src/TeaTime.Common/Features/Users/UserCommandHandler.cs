@@ -29,7 +29,7 @@ public class UserCommandHandler : IRequestHandler<CreateUserCommand>
             DisplayName = request.DisplayName
         };
 
-        return _userRepository.CreateAsync(user);
+        return _userRepository.CreateAsync(user, cancellationToken);
 
         //todo: create event
     }

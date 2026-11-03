@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Client;
 using Common.Abstractions;
@@ -38,29 +39,30 @@ internal class SlackService(ISender mediator,
     ILogger<SlackService> logger)
     : ISlackService
 {
-    public async Task<User> GetOrCreateUser(string userId, string? name)
+    public async Task<User> GetOrCreateUserAsync(string userId, string? name,
+        CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userId);
 
-        var id = await mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, userId));
+        var id = await mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.User, userId), cancellationToken);
         if (id > 0)
         {
-            return await mediator.Send(new GetUserQuery(id.Value)) ??
+            return await mediator.Send(new GetUserQuery(id.Value), cancellationToken) ??
                    throw new InvalidOperationException($"Failed to get user {id.Value}");
         }
 
         //we need to create a new user
         var command = new CreateUserCommand
         (
-            Id: await idGenerator.GenerateAsync(),
+            Id: await idGenerator.GenerateAsync(cancellationToken),
             Username: "slack_" + userId,
             // Slack may not send a name; never store a bare ID as one
             DisplayName: string.IsNullOrWhiteSpace(name) ? FallbackUserName(userId) : name
         );
-        await mediator.Send(command);
+        await mediator.Send(command, cancellationToken);
 
         //add link
-        await mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, userId));
+        await mediator.Send(new CreateLinkCommand(command.Id, LinkType.User, userId), cancellationToken);
 
         //this is not great because its not really a proper entity model, but it will do for now
         //we shouldn't query here because the command COULD eventually be eventual consistency
@@ -73,31 +75,32 @@ internal class SlackService(ISender mediator,
         };
     }
 
-    public async Task<Room> GetOrCreateRoom(string channelId, string? channelName, long userId)
+    public async Task<Room> GetOrCreateRoomAsync(string channelId, string? channelName, long userId,
+        CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(channelId);
 
         if (userId == default)
             throw new ArgumentException("value cannot be empty", nameof(userId));
 
-        var roomId = await mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, channelId));
+        var roomId = await mediator.Send(new GetObjectIdByLinkValueQuery(LinkType.Room, channelId), cancellationToken);
         if (roomId > 0)
         {
-            return await mediator.Send(new GetRoomQuery(roomId.Value)) ??
+            return await mediator.Send(new GetRoomQuery(roomId.Value), cancellationToken) ??
                    throw new InvalidOperationException($"Failed to get room {roomId.Value}");
         }
 
         var command = new CreateRoomCommand
         (
-            Id: await idGenerator.GenerateAsync(),
+            Id: await idGenerator.GenerateAsync(cancellationToken),
             Name: string.IsNullOrWhiteSpace(channelName) ? FallbackChannelName(channelId) : channelName,
             UserId: userId
         );
 
-        await mediator.Send(command);
+        await mediator.Send(command, cancellationToken);
 
         //add link
-        await mediator.Send(new CreateLinkCommand(command.Id, LinkType.Room, channelId));
+        await mediator.Send(new CreateLinkCommand(command.Id, LinkType.Room, channelId), cancellationToken);
 
         return new Room
         {
@@ -108,18 +111,21 @@ internal class SlackService(ISender mediator,
         };
     }
 
-    public async Task JoinRunAsync(SlashCommand slashCommand, string optionName)
+    public async Task JoinRunAsync(SlashCommand slashCommand, string optionName,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(slashCommand);
         ArgumentNullException.ThrowIfNull(optionName);
 
-        var user = await GetOrCreateUser(slashCommand.UserId, slashCommand.GetUserName());
-        var room = await GetOrCreateRoom(slashCommand.ChannelId, slashCommand.ChannelName, user.Id);
+        var user = await GetOrCreateUserAsync(slashCommand.UserId, slashCommand.GetUserName(), cancellationToken);
+        var room = await GetOrCreateRoomAsync(slashCommand.ChannelId, slashCommand.ChannelName, user.Id,
+            cancellationToken);
 
-        await JoinRunAsync(user.Id, room.Id, optionName, slashCommand.ToCallbackData());
+        await JoinRunAsync(user.Id, room.Id, optionName, slashCommand.ToCallbackData(), cancellationToken);
     }
 
-    public async Task HandleBlockActionsAsync(BlockActionsPayload requestPayload)
+    public async Task HandleBlockActionsAsync(BlockActionsPayload requestPayload,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(requestPayload);
 
@@ -132,31 +138,33 @@ internal class SlackService(ISender mediator,
 
         try
         {
-            await JoinRunAsync(requestPayload, requestPayload.ResponseUrl);
+            await JoinRunAsync(requestPayload, requestPayload.ResponseUrl, cancellationToken);
         }
         catch (SlackTeaTimeException e)
         {
             logger.LogWarning(e, "Join run rejected");
-            await ReplyAsync(requestPayload.ResponseUrl, e.Message);
+            await ReplyAsync(requestPayload.ResponseUrl, e.Message, cancellationToken);
         }
         catch (PermissionException e)
         {
             logger.LogWarning(e, "Join run denied");
-            await ReplyAsync(requestPayload.ResponseUrl, e.Message);
+            await ReplyAsync(requestPayload.ResponseUrl, e.Message, cancellationToken);
         }
         catch (Exception e)
         {
             logger.LogError(e, "Failed to join run");
-            await ReplyAsync(requestPayload.ResponseUrl, ErrorStrings.General());
+            await ReplyAsync(requestPayload.ResponseUrl, ErrorStrings.General(), cancellationToken);
         }
     }
 
-    private Task ReplyAsync(string responseUrl, string message)
+    private Task ReplyAsync(string responseUrl, string message, CancellationToken cancellationToken = default)
     {
-        return slackApiClient.PostResponseAsync(responseUrl, new SlashCommandResponse(message, ResponseType.User));
+        return slackApiClient.PostResponseAsync(responseUrl, new SlashCommandResponse(message, ResponseType.User),
+            cancellationToken);
     }
 
-    private async Task JoinRunAsync(BlockActionsPayload requestPayload, string responseUrl)
+    private async Task JoinRunAsync(BlockActionsPayload requestPayload, string responseUrl,
+        CancellationToken cancellationToken = default)
     {
         var channel = requestPayload.Channel;
         if (channel is null)
@@ -171,10 +179,10 @@ internal class SlackService(ISender mediator,
 
         var usersName = requestPayload.User.Username ?? requestPayload.User.Name;
 
-        var user = await GetOrCreateUser(requestPayload.User.Id, usersName);
-        var room = await GetOrCreateRoom(channel.Id, channel.Name, user.Id);
+        var user = await GetOrCreateUserAsync(requestPayload.User.Id, usersName, cancellationToken);
+        var room = await GetOrCreateRoomAsync(channel.Id, channel.Name, user.Id, cancellationToken);
 
-        await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData(responseUrl));
+        await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData(responseUrl), cancellationToken);
     }
 
     private static bool IsJoinAction(BlockAction action) =>
@@ -184,7 +192,7 @@ internal class SlackService(ISender mediator,
 
     private static string FallbackChannelName(string slackChannelId) => $"Slack Channel {slackChannelId}";
 
-    public async Task InstallAsync(OAuthTokenResponse response)
+    public async Task InstallAsync(OAuthTokenResponse response, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(response);
 
@@ -210,19 +218,20 @@ internal class SlackService(ISender mediator,
         if (!string.IsNullOrEmpty(response.Team.Name))
             entries.Add(new(Constants.FieldKeys.TeamName, response.Team.Name));
 
-        await hash.SetAsync(hashKey, entries);
+        await hash.SetAsync(hashKey, entries, cancellationToken);
     }
 
-    private async Task JoinRunAsync(long userId, long roomId, string optionName, CallbackData callbackData)
+    private async Task JoinRunAsync(long userId, long roomId, string optionName, CallbackData callbackData,
+        CancellationToken cancellationToken = default)
     {
-        var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId));
+        var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId), cancellationToken);
         if (run == null)
             throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
         var group = await mediator.Send(new GetRoomItemGroupQuery(
             RoomId: run.RoomId,
             UserId: userId,
-            GroupId: run.GroupId));
+            GroupId: run.GroupId), cancellationToken);
 
         if (group == null)
         {
@@ -238,24 +247,26 @@ internal class SlackService(ISender mediator,
         if (option == null)
             throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
-        await JoinRunInternalAsync(userId, run, option.Id, callbackData);
+        await JoinRunInternalAsync(userId, run, option.Id, callbackData, cancellationToken);
     }
 
-    private async Task JoinRunAsync(long userId, long roomId, long optionId, CallbackData callbackData)
+    private async Task JoinRunAsync(long userId, long roomId, long optionId, CallbackData callbackData,
+        CancellationToken cancellationToken = default)
     {
-        var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId));
+        var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId), cancellationToken);
         if (run == null)
             throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
         // Buttons on an old round's message can still be clicked, and may be for a different group to the active round
-        var option = await mediator.Send(new GetOptionQuery(optionId));
+        var option = await mediator.Send(new GetOptionQuery(optionId), cancellationToken);
         if (option == null || option.GroupId != run.GroupId)
             throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
-        await JoinRunInternalAsync(userId, run, optionId, callbackData);
+        await JoinRunInternalAsync(userId, run, optionId, callbackData, cancellationToken);
     }
 
-    private async Task JoinRunInternalAsync(long userId, Run run, long optionId, CallbackData callbackData)
+    private async Task JoinRunInternalAsync(long userId, Run run, long optionId, CallbackData callbackData,
+        CancellationToken cancellationToken = default)
     {
         BaseCommand command;
 
@@ -263,12 +274,12 @@ internal class SlackService(ISender mediator,
             throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded());
 
         //check if we need to join or update
-        var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, userId));
+        var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, userId), cancellationToken);
         if (existingOrder == null)
         {
             command = new CreateOrderCommand
             (
-                Id: await idGenerator.GenerateAsync(),
+                Id: await idGenerator.GenerateAsync(cancellationToken),
                 RunId: run.Id,
                 UserId: userId,
                 OptionId: optionId
@@ -282,6 +293,6 @@ internal class SlackService(ISender mediator,
 
         command.AddCallbackState(callbackData);
 
-        await mediator.Send(command);
+        await mediator.Send(command, cancellationToken);
     }
 }

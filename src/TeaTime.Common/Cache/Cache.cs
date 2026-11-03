@@ -16,9 +16,9 @@ public class Cache : ICache
         _serializer = serializer;
     }
 
-    public async Task<CacheValue<T>?> GetAsync<T>(string key, CancellationToken token = default)
+    public async Task<CacheValue<T>?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
     {
-        var bytes = await _distributedCache.GetAsync(key, token);
+        var bytes = await _distributedCache.GetAsync(key, cancellationToken);
         if (bytes == null)
             return null;
 
@@ -29,7 +29,8 @@ public class Cache : ICache
         return new CacheValue<T>(value);
     }
 
-    public Task SetAsync(string key, object value, CacheEntryOptions? options, CancellationToken token = default)
+    public Task SetAsync(string key, object value, CacheEntryOptions? options,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(value);
@@ -48,6 +49,6 @@ public class Cache : ICache
                 distributedCacheEntryOptions.SetAbsoluteExpiration(options.Expiration.Value);
         }
 
-        return _distributedCache.SetAsync(key, bytes, distributedCacheEntryOptions, token);
+        return _distributedCache.SetAsync(key, bytes, distributedCacheEntryOptions, cancellationToken);
     }
 }

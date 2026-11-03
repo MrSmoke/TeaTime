@@ -47,7 +47,7 @@ internal class SlackAuthenticationService(
             ClientSecret = oauth.ClientSecret ?? throw new InvalidOperationException("ClientSecret missing"),
             RedirectUri = GetRedirectUrl(),
             Code = code
-        });
+        }, cancellationToken);
     }
 
     private string GetRedirectUrl() => urlGenerator.CreateAbsoluteUrlByName(Constants.RouteNames.OauthCallback);

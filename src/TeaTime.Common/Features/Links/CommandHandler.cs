@@ -17,6 +17,6 @@ public class LinkCommandHandler : IRequestHandler<CreateLinkCommand>
 
     public Task Handle(CreateLinkCommand request, CancellationToken cancellationToken)
     {
-        return _linkRepository.Add(request.ObjectId, request.LinkType, request.Value);
+        return _linkRepository.AddAsync(request.ObjectId, request.LinkType, request.Value, cancellationToken);
     }
 }

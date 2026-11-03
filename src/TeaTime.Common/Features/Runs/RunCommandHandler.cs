@@ -47,7 +47,7 @@ public class RunCommandHandler :
             UserId = request.UserId
         };
 
-        await _runRepository.CreateAsync(run);
+        await _runRepository.CreateAsync(run, cancellationToken);
 
         var evt = new RunStartedEvent
         (
@@ -58,7 +58,7 @@ public class RunCommandHandler :
             EndTime: run.EndTime
         );
 
-        await _eventPublisher.PublishAsync(evt);
+        await _eventPublisher.PublishAsync(evt, cancellationToken);
     }
 
     //End run
@@ -70,7 +70,7 @@ public class RunCommandHandler :
         await _runRepository.UpdateAsync(request.Run with
         {
             Ended = true
-        });
+        }, cancellationToken);
 
         //store result
         var runResult = new RunResult
@@ -80,7 +80,7 @@ public class RunCommandHandler :
             EndedTime = _clock.GetUtcNow()
         };
 
-        await _runRepository.CreateResultAsync(runResult);
+        await _runRepository.CreateResultAsync(runResult, cancellationToken);
 
         //publish event
         var evt = new RunEndedEvent
@@ -95,13 +95,13 @@ public class RunCommandHandler :
             State = request.State
         };
 
-        await _eventPublisher.PublishAsync(evt);
+        await _eventPublisher.PublishAsync(evt, cancellationToken);
     }
 
-    private async Task<long> GetRunnerAsync(EndRunCommand command, CancellationToken cancellationToken)
+    private async Task<long> GetRunnerAsync(EndRunCommand command, CancellationToken cancellationToken = default)
     {
         //todo: dont tie illmake in with this handler directly...kinda gross
-        var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.Run.Id);
+        var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.Run.Id, cancellationToken);
 
         var illMake = illMakeResults.MaxBy(o => o.CreatedDate);
 

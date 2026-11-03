@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Models.OAuth;
@@ -14,12 +15,14 @@ using Models.SlashCommands;
 
 internal class SlackApiClient(HttpClient httpClient, ILogger<SlackApiClient> logger) : ISlackApiClient
 {
-    public Task PostResponseAsync(string callbackUrl, SlashCommandResponse response)
+    public Task PostResponseAsync(string callbackUrl, SlashCommandResponse response,
+        CancellationToken cancellationToken = default)
     {
-        return PostAsync(callbackUrl, response);
+        return PostAsync(callbackUrl, response, cancellationToken);
     }
 
-    public async Task<OAuthTokenResponse> GetOAuthTokenAsync(OAuthTokenRequest request)
+    public async Task<OAuthTokenResponse> GetOAuthTokenAsync(OAuthTokenRequest request,
+        CancellationToken cancellationToken = default)
     {
         var formData = new Dictionary<string, string>
         {
@@ -38,25 +41,27 @@ internal class SlackApiClient(HttpClient httpClient, ILogger<SlackApiClient> log
 
         message.Content = new FormUrlEncodedContent(formData);
 
-        using var response = await httpClient.SendAsync(message);
+        using var response = await httpClient.SendAsync(message, cancellationToken);
 
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<OAuthTokenResponse>(SlackJsonSerializer.Options) ??
+        return await response.Content.ReadFromJsonAsync<OAuthTokenResponse>(SlackJsonSerializer.Options,
+            cancellationToken) ??
                throw new JsonException("Response returned null when a type was expected");
     }
 
-    private async Task PostAsync(string url, object body)
+    private async Task PostAsync(string url, object body, CancellationToken cancellationToken = default)
     {
         try
         {
-            using var response = await httpClient.PostAsJsonAsync(url, body, SlackJsonSerializer.Options);
+            using var response = await httpClient.PostAsJsonAsync(url, body, SlackJsonSerializer.Options,
+                cancellationToken);
 
             if (response.IsSuccessStatusCode)
                 return;
 
             // Slack returns a short error code as the body. The URL is a credential, so it's not logged
-            var error = await response.Content.ReadAsStringAsync();
+            var error = await response.Content.ReadAsStringAsync(cancellationToken);
 
             logger.LogWarning("Slack rejected response_url post with {StatusCode}: {SlackError}",
                 (int)response.StatusCode, error);

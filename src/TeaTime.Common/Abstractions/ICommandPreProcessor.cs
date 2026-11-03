@@ -5,5 +5,5 @@ using System.Threading.Tasks;
 
 public interface ICommandPreProcessor<in TCommand>
 {
-    Task ProcessAsync(TCommand request, CancellationToken cancellationToken);
+    Task ProcessAsync(TCommand request, CancellationToken cancellationToken = default);
 }

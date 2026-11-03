@@ -94,7 +94,7 @@ public class SlackControllerTests
 
         Assert.IsType<OkResult>(result);
         A.CallTo(() => slackService.HandleBlockActionsAsync(
-                A<BlockActionsPayload>.That.Matches(p => p.User.Id == "U1")))
+                A<BlockActionsPayload>.That.Matches(p => p.User.Id == "U1"), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 

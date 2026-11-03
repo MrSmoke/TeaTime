@@ -32,11 +32,11 @@ public class OptionsCommandHandler :
             GroupId = request.GroupId
         };
 
-        return _optionsRepository.CreateAsync(option);
+        return _optionsRepository.CreateAsync(option, cancellationToken);
     }
 
     public Task Handle(DeleteOptionCommand request, CancellationToken cancellationToken)
     {
-        return _optionsRepository.DeleteAsync(request.OptionId);
+        return _optionsRepository.DeleteAsync(request.OptionId, cancellationToken);
     }
 }

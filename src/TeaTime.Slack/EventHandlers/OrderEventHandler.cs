@@ -32,16 +32,17 @@ public class OrderEventHandler :
 
     public async Task Handle(OrderPlacedEvent notification, CancellationToken cancellationToken)
     {
-        var slackUserId = await GetSlackUserId(notification.UserId);
+        var slackUserId = await GetSlackUserIdAsync(notification.UserId, cancellationToken);
         if (slackUserId == null)
             return;
 
-        await SendMessage(notification, ResponseStrings.RunUserJoined(slackUserId), ResponseType.Channel);
+        await SendMessageAsync(notification, ResponseStrings.RunUserJoined(slackUserId), ResponseType.Channel,
+            cancellationToken);
     }
 
     public async Task Handle(OrderOptionChangedEvent notification, CancellationToken cancellationToken)
     {
-        var slackUserId = await GetSlackUserId(notification.UserId);
+        var slackUserId = await GetSlackUserIdAsync(notification.UserId, cancellationToken);
         if (slackUserId == null)
             return;
 
@@ -49,7 +50,7 @@ public class OrderEventHandler :
         {
             notification.PreviousOptionId,
             notification.OptionId
-        });
+        }, cancellationToken);
 
         var oDict = options.ToDictionary(o => o.Id);
 
@@ -57,12 +58,12 @@ public class OrderEventHandler :
             oDict[notification.PreviousOptionId].Name,
             oDict[notification.OptionId].Name);
 
-        await SendMessage(notification, message, ResponseType.User);
+        await SendMessageAsync(notification, message, ResponseType.User, cancellationToken);
     }
 
-    private async Task<string?> GetSlackUserId(long userId)
+    private async Task<string?> GetSlackUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
-        var slackUserId = await _linkRepository.GetLinkAsync(userId, LinkType.User);
+        var slackUserId = await _linkRepository.GetLinkAsync(userId, LinkType.User, cancellationToken);
         if (!string.IsNullOrWhiteSpace(slackUserId))
             return slackUserId;
 
@@ -70,12 +71,13 @@ public class OrderEventHandler :
         return null;
     }
 
-    private async Task SendMessage(BaseEvent evt, string message, ResponseType responseType)
+    private async Task SendMessageAsync(BaseEvent evt, string message, ResponseType responseType,
+        CancellationToken cancellationToken = default)
     {
         if (!evt.TryGetCallbackState(out var callbackData))
             return;
 
         await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl,
-            new SlashCommandResponse(message, responseType));
+            new SlashCommandResponse(message, responseType), cancellationToken);
     }
 }

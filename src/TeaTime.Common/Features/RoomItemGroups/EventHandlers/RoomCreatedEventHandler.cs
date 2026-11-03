@@ -27,7 +27,7 @@ public class RoomCreatedEventHandler : INotificationHandler<RoomCreatedEvent>
             return;
 
         var command = new CreateRoomItemGroupCommand(
-            Id: await _idGenerator.GenerateAsync(),
+            Id: await _idGenerator.GenerateAsync(CancellationToken.None),
             RoomId: notification.Id,
             UserId: notification.CreatedBy,
             Name: "tea");
@@ -38,7 +38,7 @@ public class RoomCreatedEventHandler : INotificationHandler<RoomCreatedEvent>
         foreach (var name in DefaultItemNames)
         {
             var optionCommand = new CreateOptionCommand(
-                Id: await _idGenerator.GenerateAsync(),
+                Id: await _idGenerator.GenerateAsync(CancellationToken.None),
                 UserId: notification.CreatedBy,
                 GroupId: command.Id,
                 Name: name);

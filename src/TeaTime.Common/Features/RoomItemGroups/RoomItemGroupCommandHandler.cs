@@ -32,13 +32,13 @@ public class RoomItemGroupCommandHandler :
             RoomId = request.RoomId
         };
 
-        return _optionsRepository.CreateGroupAsync(roomGroup);
+        return _optionsRepository.CreateGroupAsync(roomGroup, cancellationToken);
 
         //todo: event
     }
 
     public Task Handle(DeleteRoomItemGroupCommand request, CancellationToken cancellationToken)
     {
-        return _optionsRepository.DeleteGroupAsync(request.GroupId);
+        return _optionsRepository.DeleteGroupAsync(request.GroupId, cancellationToken);
     }
 }

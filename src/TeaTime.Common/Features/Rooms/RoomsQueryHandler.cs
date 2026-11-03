@@ -18,6 +18,6 @@ public class RoomsQueryHandler : IRequestHandler<GetRoomQuery, Room?>
 
     public Task<Room?> Handle(GetRoomQuery request, CancellationToken cancellationToken)
     {
-        return _roomRepository.GetAsync(request.RoomId);
+        return _roomRepository.GetAsync(request.RoomId, cancellationToken);
     }
 }

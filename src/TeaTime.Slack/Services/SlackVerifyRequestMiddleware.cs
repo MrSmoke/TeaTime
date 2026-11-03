@@ -69,7 +69,8 @@ public class SlackVerifyRequestMiddleware(RequestDelegate next,
         maxRequestBodySizeFeature.MaxRequestBodySize = MaxLength;
     }
 
-    private static async Task ReplaceRequestBodyAsync(HttpContext context, CancellationToken cancellationToken)
+    private static async Task ReplaceRequestBodyAsync(HttpContext context,
+        CancellationToken cancellationToken = default)
     {
         // todo: replace with recyclable memory stream
         var memoryStream = new MemoryStream();

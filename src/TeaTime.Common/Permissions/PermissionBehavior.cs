@@ -26,7 +26,7 @@ public class PermissionBehavior<TCommand, TResponse> : IPipelineBehavior<TComman
         {
             _logger.LogDebug("Checking permission for command {Command}", CommandTypeName);
 
-            var result = await _permissionService.CheckAsync(command);
+            var result = await _permissionService.CheckAsync(command, cancellationToken);
 
             Handle(result);
         }

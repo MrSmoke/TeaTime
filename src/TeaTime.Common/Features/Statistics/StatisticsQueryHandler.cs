@@ -18,8 +18,8 @@ public class StatisticsQueryHandler : IRequestHandler<GetGlobalTotalsQuery, Glob
 
     public async Task<GlobalTotals> Handle(GetGlobalTotalsQuery request, CancellationToken cancellationToken)
     {
-        var ordersTask = _statisticsRepository.CountGlobalOrdersMadeAsync();
-        var runsTask = _statisticsRepository.CountGlobalEndedRunsAsync();
+        var ordersTask = _statisticsRepository.CountGlobalOrdersMadeAsync(cancellationToken);
+        var runsTask = _statisticsRepository.CountGlobalEndedRunsAsync(cancellationToken);
 
         return new GlobalTotals
         {
