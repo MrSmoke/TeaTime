@@ -39,10 +39,11 @@ public class SlackController(
 
         using var scope = BeginSlackScope(slashCommand.UserId, slashCommand.ChannelId, slashCommand.TeamId);
 
-        if (string.IsNullOrWhiteSpace(slashCommand.Text))
+        var commandText = slashCommand.Text;
+        if (string.IsNullOrWhiteSpace(commandText))
         {
-            logger.LogInformation("Slash command contains no text");
-            return Ok(ErrorStrings.General(), ResponseType.User);
+            // If a slash command has no text, show the help menu
+            commandText = "help";
         }
 
         // Command text is user input so isn't logged
@@ -51,7 +52,7 @@ public class SlackController(
 
         try
         {
-            var result = await commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
+            var result = await commandRunner.RunAsync(commandText, new Dictionary<string, object>
             {
                 {Constants.CommandContextKeys.SlashCommand, slashCommand}
             });
@@ -62,13 +63,13 @@ public class SlackController(
         catch (CommandNotFoundException)
         {
             logger.LogInformation("Slash command not found");
-            return Ok(ErrorStrings.CommandUnknown(slashCommand.Text), ResponseType.User);
+            return Ok(ErrorStrings.CommandUnknown(commandText), ResponseType.User);
         }
         catch (ParameterBindingException e)
         {
             // Parameter name is ours; the value is user input so it isn't logged
             logger.LogInformation("Slash command arguments invalid for parameter {ParameterName}", e.ParameterName);
-            return Ok(ErrorStrings.CommandBadArguments(slashCommand.Text), ResponseType.User);
+            return Ok(ErrorStrings.CommandBadArguments(commandText), ResponseType.User);
         }
         catch (RunStartException e)
         {
