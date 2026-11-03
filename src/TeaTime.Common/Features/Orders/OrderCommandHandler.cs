@@ -82,10 +82,15 @@ public class OrderCommandHandler(
 
     public async Task Handle(DeleteOrderCommand request, CancellationToken cancellationToken)
     {
-        // If we return false, then nothing was deleted, so dont publish an event
+        // Nothing was deleted, so don't publish an event
         if (!await orderRepository.DeleteAsync(request.Order.Id, cancellationToken))
             return;
 
-        await eventPublisher.PublishAsync(new OrderDeletedEvent(request.Order), cancellationToken);
+        var evt = new OrderDeletedEvent(request.Order)
+        {
+            State = request.State
+        };
+
+        await eventPublisher.PublishAsync(evt, cancellationToken);
     }
 }

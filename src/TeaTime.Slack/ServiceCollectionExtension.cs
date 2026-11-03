@@ -55,6 +55,7 @@ public static class ServiceCollectionExtension
         services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedHandler>();
         services.AddTransient<INotificationHandler<OrderPlacedEvent>, OrderEventHandler>();
         services.AddTransient<INotificationHandler<OrderOptionChangedEvent>, OrderEventHandler>();
+        services.AddTransient<INotificationHandler<OrderDeletedEvent>, OrderEventHandler>();
     }
 
     public static void UseSlack(this IApplicationBuilder builder)

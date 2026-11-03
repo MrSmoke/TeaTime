@@ -81,19 +81,25 @@ public class RunCommand(
         }
     }
 
+    [Command("leave")]
     public async Task<ICommandResult> Leave()
     {
         var context = await GetContextAsync();
 
         var run = await mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
         if (run == null)
-            return Response(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User);
+            return Response(ErrorStrings.LeaveRun_RunNotStarted(), ResponseType.User);
+
+        if (run.Ended)
+            return Response(ErrorStrings.LeaveRun_RunEnded(), ResponseType.User);
 
         var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, context.User.Id));
         if (existingOrder is null)
-            return Response(ErrorStrings.LeaveRun_NoOrder(), ResponseType.User);
+            return Response(ErrorStrings.LeaveRun_NotJoined(), ResponseType.User);
 
         var command = new DeleteOrderCommand(existingOrder, context.User.Id);
+
+        command.AddCallbackState(context.Command.ToCallbackData());
 
         await mediator.Send(command);
 
