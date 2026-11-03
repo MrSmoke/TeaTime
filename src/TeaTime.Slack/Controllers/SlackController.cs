@@ -123,7 +123,6 @@ namespace TeaTime.Slack.Controllers
 
         [SlackVerifyRequest]
         [HttpPost("interactions")]
-        [HttpPost("interactive-messages")] // Old URL; remove once Slack app interactivity URLs are updated
         public async Task<IActionResult> InteractionHook(InteractionRequest request)
         {
             if (string.IsNullOrWhiteSpace(request?.PayloadJson))
