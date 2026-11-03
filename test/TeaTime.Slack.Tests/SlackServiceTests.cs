@@ -142,7 +142,12 @@ public class SlackServiceTests
         A.CallTo(() => mediator.Send(A<GetCurrentRunQuery>._, A<CancellationToken>._))
             .Returns(new Run
             {
-                Id = 7, RoomId = 5, UserId = 5, GroupId = RunGroupId, StartTime = now, CreatedDate = now
+                Id = 7,
+                RoomId = 5,
+                UserId = 5,
+                GroupId = RunGroupId,
+                StartTime = now,
+                CreatedDate = now
             });
         A.CallTo(() => mediator.Send(A<GetOptionQuery>._, A<CancellationToken>._))
             .Returns(new Option { Id = 1, Name = "Earl Grey", GroupId = optionGroupId, CreatedBy = 5, CreatedDate = now });
