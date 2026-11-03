@@ -13,7 +13,7 @@ public class DatabaseFixture : IAsyncLifetime
     public IMySqlConnectionFactory ConnectionFactory { get; } =
         new MySqlConnectionFactory(Options.Create(TestConfig.ConnectionOptions));
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await using var conn = ConnectionFactory.GetConnection();
 
@@ -47,8 +47,8 @@ public class DatabaseFixture : IAsyncLifetime
         migration.Execute();
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 }

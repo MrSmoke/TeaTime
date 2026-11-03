@@ -36,7 +36,8 @@ public class SlackServiceTests
         var service = CreateService(apiClient);
 
         // No join action, so the join fails before touching the domain
-        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "something_else"));
+        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "something_else"),
+            TestContext.Current.CancellationToken);
 
         A.CallTo(() => apiClient.PostResponseAsync(ResponseUrl,
                 A<SlashCommandResponse>.That.Matches(r =>
@@ -50,7 +51,8 @@ public class SlackServiceTests
         var apiClient = A.Fake<ISlackApiClient>(o => o.Strict());
         var service = CreateService(apiClient);
 
-        await service.HandleBlockActionsAsync(CreatePayload(null, actionId: "join_option_1"));
+        await service.HandleBlockActionsAsync(CreatePayload(null, actionId: "join_option_1"),
+            TestContext.Current.CancellationToken);
     }
 
     [Theory]
@@ -67,7 +69,7 @@ public class SlackServiceTests
 
         var service = CreateService(A.Fake<ISlackApiClient>(), mediator, idGenerator);
 
-        var user = await service.GetOrCreateUserAsync("U123", name);
+        var user = await service.GetOrCreateUserAsync("U123", name, TestContext.Current.CancellationToken);
 
         Assert.Equal("Slack User U123", user.DisplayName);
         A.CallTo(() => mediator.Send(A<CreateUserCommand>.That.Matches(c => c.DisplayName == "Slack User U123"),
@@ -89,7 +91,8 @@ public class SlackServiceTests
 
         var service = CreateService(A.Fake<ISlackApiClient>(), mediator, idGenerator);
 
-        var room = await service.GetOrCreateRoomAsync("C123", name, userId: 1);
+        var room = await service.GetOrCreateRoomAsync("C123", name, userId: 1,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal("Slack Channel C123", room.Name);
     }
@@ -101,7 +104,8 @@ public class SlackServiceTests
         var mediator = CreateJoinMediator(optionGroupId: 200);
         var service = CreateService(apiClient, mediator);
 
-        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"));
+        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"),
+            TestContext.Current.CancellationToken);
 
         A.CallTo(() => apiClient.PostResponseAsync(ResponseUrl,
                 A<SlashCommandResponse>.That.Matches(r => r.Text == ErrorStrings.OptionUnknown()),
@@ -120,7 +124,8 @@ public class SlackServiceTests
         A.CallTo(() => idGenerator.GenerateAsync(A<CancellationToken>._)).Returns(30L);
         var service = CreateService(apiClient, mediator, idGenerator);
 
-        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"));
+        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"),
+            TestContext.Current.CancellationToken);
 
         // Sent via a BaseCommand variable, so match on that type
         A.CallTo(() => mediator.Send(A<BaseCommand>.That.Matches(c => c is CreateOrderCommand && ((CreateOrderCommand)c).OptionId == 1),

@@ -6,28 +6,20 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 # Copy in csproj so we can restore
 WORKDIR /build
-COPY TeaTime.slnx TeaTime.slnx
 COPY Directory.Build.props Directory.Build.props
 COPY ["src/TeaTime/TeaTime.csproj", "src/TeaTime/"]
 COPY ["src/TeaTime.Data.MySql/TeaTime.Data.MySql.csproj", "src/TeaTime.Data.MySql/"]
 COPY ["src/TeaTime.Common/TeaTime.Common.csproj", "src/TeaTime.Common/"]
 COPY ["src/TeaTime.Slack/TeaTime.Slack.csproj", "src/TeaTime.Slack/"]
-COPY ["test/TeaTime.Data.MySql.Tests/TeaTime.Data.MySql.Tests.csproj", "test/TeaTime.Data.MySql.Tests/"]
-COPY ["test/TeaTime.Slack.Tests/TeaTime.Slack.Tests.csproj", "test/TeaTime.Slack.Tests/"]
-COPY ["test/TeaTime.Common.Tests/TeaTime.Common.Tests.csproj", "test/TeaTime.Common.Tests/"]
-RUN dotnet restore
+RUN dotnet restore src/TeaTime/TeaTime.csproj
 
 # Copy in everything else
 COPY sql/ sql/
 COPY src/ src/
-COPY test/ test/
 
 # Build
 WORKDIR /build/
-RUN dotnet build --no-restore -c Release
-
-# Test
-RUN dotnet test -c Release --no-build
+RUN dotnet build src/TeaTime/TeaTime.csproj --no-restore -c Release
 
 # Publish
 FROM build AS publish

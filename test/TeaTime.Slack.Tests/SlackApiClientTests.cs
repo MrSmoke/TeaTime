@@ -24,7 +24,8 @@ public class SlackApiClientTests
             Content = new StringContent("expired_url")
         }, logger);
 
-        await client.PostResponseAsync(ResponseUrl, new SlashCommandResponse("hi", ResponseType.User));
+        await client.PostResponseAsync(ResponseUrl, new SlashCommandResponse("hi", ResponseType.User),
+            TestContext.Current.CancellationToken);
 
         var entry = Assert.Single(logger.Entries);
         Assert.Equal(LogLevel.Warning, entry.Level);
@@ -39,7 +40,8 @@ public class SlackApiClientTests
         var logger = new ListLogger<SlackApiClient>();
         var client = CreateClient(_ => throw new HttpRequestException("connection refused"), logger);
 
-        await client.PostResponseAsync(ResponseUrl, new SlashCommandResponse("hi", ResponseType.User));
+        await client.PostResponseAsync(ResponseUrl, new SlashCommandResponse("hi", ResponseType.User),
+            TestContext.Current.CancellationToken);
 
         var entry = Assert.Single(logger.Entries);
         Assert.Equal(LogLevel.Error, entry.Level);
@@ -52,7 +54,8 @@ public class SlackApiClientTests
         var logger = new ListLogger<SlackApiClient>();
         var client = CreateClient(_ => new HttpResponseMessage(HttpStatusCode.OK), logger);
 
-        await client.PostResponseAsync(ResponseUrl, new SlashCommandResponse("hi", ResponseType.User));
+        await client.PostResponseAsync(ResponseUrl, new SlashCommandResponse("hi", ResponseType.User),
+            TestContext.Current.CancellationToken);
 
         Assert.Empty(logger.Entries);
     }

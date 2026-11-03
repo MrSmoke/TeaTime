@@ -84,7 +84,7 @@ public class DefaultRunnerRandomizerTests
 
         for (var i = 0; i < 200; i++)
         {
-            results.Add(await randomizer.GetRunnerUserIdAsync(orders));
+            results.Add(await randomizer.GetRunnerUserIdAsync(orders, TestContext.Current.CancellationToken));
         }
 
         Assert.Equal(orders.Count, results.Distinct().Count());

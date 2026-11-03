@@ -28,7 +28,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
             CreatedDate = TestData.MySqlNow(),
             DisplayName = TestData.NewString()
         };
-        await userRepo.CreateAsync(user);
+        await userRepo.CreateAsync(user, TestContext.Current.CancellationToken);
 
         var roomRepo = new RoomRepository(_databaseFixture.ConnectionFactory);
         var room = new Room
@@ -38,7 +38,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
             CreatedBy = user.Id,
             CreatedDate = TestData.MySqlNow()
         };
-        await roomRepo.CreateAsync(room);
+        await roomRepo.CreateAsync(room, TestContext.Current.CancellationToken);
 
         var optionRepo = new OptionsRepository(_databaseFixture.ConnectionFactory, TimeProvider.System);
         var group = new RoomItemGroup
@@ -49,7 +49,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
             CreatedDate = TestData.MySqlNow(),
             RoomId = room.Id
         };
-        await optionRepo.CreateGroupAsync(group);
+        await optionRepo.CreateGroupAsync(group, TestContext.Current.CancellationToken);
 
         var option = new Option
         {
@@ -59,7 +59,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
             CreatedDate = TestData.MySqlNow(),
             GroupId = group.Id
         };
-        await optionRepo.CreateAsync(option);
+        await optionRepo.CreateAsync(option, TestContext.Current.CancellationToken);
 
         var runRepo = new RunRepository(_databaseFixture.ConnectionFactory);
         var run = new Run
@@ -72,10 +72,10 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
             UserId = user.Id,
             Ended = false
         };
-        await runRepo.CreateAsync(run);
+        await runRepo.CreateAsync(run, TestContext.Current.CancellationToken);
 
         // Ok setup done, now we can actually do the test
-        var result = await runRepo.GetAsync(run.Id);
+        var result = await runRepo.GetAsync(run.Id, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(run, result);

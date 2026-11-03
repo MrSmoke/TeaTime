@@ -28,9 +28,9 @@ public class UserRepositoryTests : IClassFixture<DatabaseFixture>
             DisplayName = TestData.NewString()
         };
 
-        await repo.CreateAsync(user);
+        await repo.CreateAsync(user, TestContext.Current.CancellationToken);
 
-        var result = await repo.GetAsync(user.Id);
+        var result = await repo.GetAsync(user.Id, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(user, result);
