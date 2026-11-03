@@ -14,6 +14,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Extensions.Logging;
 using Slack;
 
 public static class Program
@@ -39,8 +40,11 @@ public static class Program
             .WriteTo.Console()
             .CreateLogger();
 
+        var serilogProvider = new SerilogLoggerProvider(serilogLogger, dispose: true);
+
+        // Registered directly since AddSerilog adds a Trace filter that overrides the Logging section
         builder.Logging.ClearProviders();
-        builder.Logging.AddSerilog(serilogLogger, dispose: true);
+        builder.Logging.Services.AddSingleton<ILoggerProvider>(serilogProvider);
 
         // Configure OpenTelemetry
         ConfigureOpenTelemetry(builder);
