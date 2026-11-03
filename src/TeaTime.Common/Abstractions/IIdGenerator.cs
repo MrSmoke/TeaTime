@@ -1,9 +1,8 @@
-namespace TeaTime.Common.Abstractions
-{
-    using System.Threading.Tasks;
+namespace TeaTime.Common.Abstractions;
 
-    public interface IIdGenerator<T>
-    {
-        Task<T> GenerateAsync();
-    }
+using System.Threading.Tasks;
+
+public interface IIdGenerator<T>
+{
+    Task<T> GenerateAsync();
 }

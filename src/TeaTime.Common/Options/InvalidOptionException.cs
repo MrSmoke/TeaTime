@@ -1,14 +1,13 @@
-namespace TeaTime.Common.Options
+namespace TeaTime.Common.Options;
+
+using System;
+
+public class InvalidOptionException : Exception
 {
-    using System;
+    public string OptionName { get; }
 
-    public class InvalidOptionException : Exception
+    public InvalidOptionException(string optionName, string message) : base($"Invalid option {optionName}. {message}")
     {
-        public string OptionName { get; }
-
-        public InvalidOptionException(string optionName, string message) : base($"Invalid option {optionName}. {message}")
-        {
-            OptionName = optionName;
-        }
+        OptionName = optionName;
     }
 }

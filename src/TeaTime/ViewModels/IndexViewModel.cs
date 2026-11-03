@@ -1,8 +1,7 @@
-namespace TeaTime.ViewModels
+namespace TeaTime.ViewModels;
+
+public class IndexViewModel
 {
-    public class IndexViewModel
-    {
-        public long TotalOrdersMade { get; set; }
-        public long TotalEndedRuns { get; set; }
-    }
+    public long TotalOrdersMade { get; set; }
+    public long TotalEndedRuns { get; set; }
 }

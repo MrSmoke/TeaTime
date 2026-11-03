@@ -1,13 +1,12 @@
-namespace TeaTime.Common.Abstractions.Data
+namespace TeaTime.Common.Abstractions.Data;
+
+using System.Threading.Tasks;
+using Models;
+
+public interface ILinkRepository
 {
-    using System.Threading.Tasks;
-    using Models;
+    Task<long?> GetObjectId(string link, LinkType linkType);
+    Task Add(long objectId, LinkType linkType, string link);
 
-    public interface ILinkRepository
-    {
-        Task<long?> GetObjectId(string link, LinkType linkType);
-        Task Add(long objectId, LinkType linkType, string link);
-
-        Task<string?> GetLinkAsync(long objectId, LinkType linkType);
-    }
+    Task<string?> GetLinkAsync(long objectId, LinkType linkType);
 }

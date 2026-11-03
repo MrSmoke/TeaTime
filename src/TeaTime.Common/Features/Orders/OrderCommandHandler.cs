@@ -1,94 +1,93 @@
-namespace TeaTime.Common.Features.Orders
+namespace TeaTime.Common.Features.Orders;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using Commands;
+using Events;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Models.Data;
+
+public class OrderCommandHandler :
+    IRequestHandler<CreateOrderCommand>,
+    IRequestHandler<UpdateOrderOptionCommand>
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using Commands;
-    using Events;
-    using MediatR;
-    using Microsoft.Extensions.Logging;
-    using Models.Data;
+    private readonly IOrderRepository _orderRepository;
+    private readonly TimeProvider _clock;
+    private readonly IEventPublisher _eventPublisher;
+    private readonly ILogger<OrderCommandHandler> _logger;
 
-    public class OrderCommandHandler :
-        IRequestHandler<CreateOrderCommand>,
-        IRequestHandler<UpdateOrderOptionCommand>
+    public OrderCommandHandler(IOrderRepository orderRepository,
+        TimeProvider clock,
+        IEventPublisher eventPublisher,
+        ILogger<OrderCommandHandler> logger)
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly TimeProvider _clock;
-        private readonly IEventPublisher _eventPublisher;
-        private readonly ILogger<OrderCommandHandler> _logger;
+        _orderRepository = orderRepository;
+        _clock = clock;
+        _eventPublisher = eventPublisher;
+        _logger = logger;
+    }
 
-        public OrderCommandHandler(IOrderRepository orderRepository,
-            TimeProvider clock,
-            IEventPublisher eventPublisher,
-            ILogger<OrderCommandHandler> logger)
+    public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    {
+        var order = new Order
         {
-            _orderRepository = orderRepository;
-            _clock = clock;
-            _eventPublisher = eventPublisher;
-            _logger = logger;
+            Id = request.Id,
+            CreatedDate = _clock.GetUtcNow(),
+            OptionId = request.OptionId,
+            RunId = request.RunId,
+            UserId = request.UserId
+        };
+
+        await _orderRepository.CreateAsync(order);
+
+        var evt = new OrderPlacedEvent
+        (
+            OrderId: order.Id,
+            RunId: order.RunId,
+            UserId: order.UserId,
+            OptionId: order.OptionId
+        )
+        {
+            State = request.State
+        };
+
+        await _eventPublisher.PublishAsync(evt);
+    }
+
+    public async Task Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
+    {
+        var existing = await _orderRepository.GetAsync(request.OrderId);
+
+        if (existing is null)
+        {
+            _logger.LogWarning("Failed to get existing order {OrderId}", request.OrderId);
+            return;
         }
 
-        public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+        if (existing.OptionId == request.OptionId)
+            return;
+
+        //store the previous id for the event
+        var previousOptionId = existing.OptionId;
+
+        //update
+        await _orderRepository.UpdateAsync(existing with { OptionId = request.OptionId });
+
+        //create event
+        var evt = new OrderOptionChangedEvent
+        (
+            OrderId: request.OrderId,
+            UserId: request.UserId,
+            PreviousOptionId: previousOptionId,
+            OptionId: request.OptionId
+        )
         {
-            var order = new Order
-            {
-                Id = request.Id,
-                CreatedDate = _clock.GetUtcNow(),
-                OptionId = request.OptionId,
-                RunId = request.RunId,
-                UserId = request.UserId
-            };
+            State = request.State,
+        };
 
-            await _orderRepository.CreateAsync(order);
-
-            var evt = new OrderPlacedEvent
-            (
-                OrderId: order.Id,
-                RunId: order.RunId,
-                UserId: order.UserId,
-                OptionId: order.OptionId
-            )
-            {
-                State = request.State
-            };
-
-            await _eventPublisher.PublishAsync(evt);
-        }
-
-        public async Task Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
-        {
-            var existing = await _orderRepository.GetAsync(request.OrderId);
-
-            if (existing is null)
-            {
-                _logger.LogWarning("Failed to get existing order {OrderId}", request.OrderId);
-                return;
-            }
-
-            if (existing.OptionId == request.OptionId)
-                return;
-
-            //store the previous id for the event
-            var previousOptionId = existing.OptionId;
-
-            //update
-            await _orderRepository.UpdateAsync(existing with { OptionId = request.OptionId });
-
-            //create event
-            var evt = new OrderOptionChangedEvent
-            (
-                OrderId: request.OrderId,
-                UserId: request.UserId,
-                PreviousOptionId: previousOptionId,
-                OptionId: request.OptionId
-            )
-            {
-                State = request.State,
-            };
-
-            await _eventPublisher.PublishAsync(evt);
-        }
+        await _eventPublisher.PublishAsync(evt);
     }
 }

@@ -1,11 +1,10 @@
-namespace TeaTime.Slack.Exceptions
-{
-    using Common.Exceptions;
+namespace TeaTime.Slack.Exceptions;
 
-    public class SlackTeaTimeException : TeaTimeException
+using Common.Exceptions;
+
+public class SlackTeaTimeException : TeaTimeException
+{
+    public SlackTeaTimeException(string message) : base(message)
     {
-        public SlackTeaTimeException(string message) : base(message)
-        {
-        }
     }
 }

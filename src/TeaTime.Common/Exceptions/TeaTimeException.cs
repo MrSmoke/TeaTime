@@ -1,11 +1,10 @@
-namespace TeaTime.Common.Exceptions
-{
-    using System;
+namespace TeaTime.Common.Exceptions;
 
-    public class TeaTimeException : Exception
+using System;
+
+public class TeaTimeException : Exception
+{
+    public TeaTimeException(string message) : base(message)
     {
-        public TeaTimeException(string message) : base(message)
-        {
-        }
     }
 }

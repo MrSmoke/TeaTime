@@ -1,9 +1,8 @@
 #nullable disable
-namespace TeaTime.Slack.Models
+namespace TeaTime.Slack.Models;
+
+internal class CallbackData
 {
-    internal class CallbackData
-    {
-        public string ResponseUrl { get; set; }
-        public string UserId { get; set; }
-    }
+    public string ResponseUrl { get; set; }
+    public string UserId { get; set; }
 }

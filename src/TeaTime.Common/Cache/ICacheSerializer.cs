@@ -1,10 +1,9 @@
-namespace TeaTime.Common.Cache
-{
-    using System;
+namespace TeaTime.Common.Cache;
 
-    public interface ICacheSerializer
-    {
-        byte[] Serialize(object value);
-        T? Deserialize<T>(ReadOnlySpan<byte> bytes);
-    }
+using System;
+
+public interface ICacheSerializer
+{
+    byte[] Serialize(object value);
+    T? Deserialize<T>(ReadOnlySpan<byte> bytes);
 }

@@ -1,24 +1,23 @@
-namespace TeaTime.Common.Features.Options
+namespace TeaTime.Common.Features.Options;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using MediatR;
+using Models.Data;
+using Queries;
+
+public class OptionQueryHandler : IRequestHandler<GetOptionQuery, Option?>
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using MediatR;
-    using Models.Data;
-    using Queries;
+    private readonly IOptionsRepository _optionsRepository;
 
-    public class OptionQueryHandler : IRequestHandler<GetOptionQuery, Option?>
+    public OptionQueryHandler(IOptionsRepository optionsRepository)
     {
-        private readonly IOptionsRepository _optionsRepository;
+        _optionsRepository = optionsRepository;
+    }
 
-        public OptionQueryHandler(IOptionsRepository optionsRepository)
-        {
-            _optionsRepository = optionsRepository;
-        }
-
-        public Task<Option?> Handle(GetOptionQuery request, CancellationToken cancellationToken)
-        {
-            return _optionsRepository.GetAsync(request.Id);
-        }
+    public Task<Option?> Handle(GetOptionQuery request, CancellationToken cancellationToken)
+    {
+        return _optionsRepository.GetAsync(request.Id);
     }
 }

@@ -1,36 +1,35 @@
-namespace TeaTime.Common.Features.IllMake
+namespace TeaTime.Common.Features.IllMake;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using Commands;
+using MediatR;
+using Models.Data;
+
+public class IllMakeCommandHandler : IRequestHandler<IllMakeCommand>
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using Commands;
-    using MediatR;
-    using Models.Data;
+    private readonly IIllMakeRepository _repository;
+    private readonly TimeProvider _clock;
 
-    public class IllMakeCommandHandler : IRequestHandler<IllMakeCommand>
+    public IllMakeCommandHandler(IIllMakeRepository repository, TimeProvider clock)
     {
-        private readonly IIllMakeRepository _repository;
-        private readonly TimeProvider _clock;
+        _repository = repository;
+        _clock = clock;
+    }
 
-        public IllMakeCommandHandler(IIllMakeRepository repository, TimeProvider clock)
+    public Task Handle(IllMakeCommand request, CancellationToken cancellationToken)
+    {
+        var model = new IllMake
         {
-            _repository = repository;
-            _clock = clock;
-        }
+            Id = request.Id,
+            RunId = request.RunId,
+            UserId = request.UserId,
+            CreatedDate = _clock.GetUtcNow()
+        };
 
-        public Task Handle(IllMakeCommand request, CancellationToken cancellationToken)
-        {
-            var model = new IllMake
-            {
-                Id = request.Id,
-                RunId = request.RunId,
-                UserId = request.UserId,
-                CreatedDate = _clock.GetUtcNow()
-            };
-
-            //todo: event
-            return _repository.CreateAsync(model);
-        }
+        //todo: event
+        return _repository.CreateAsync(model);
     }
 }

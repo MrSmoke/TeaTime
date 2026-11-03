@@ -1,10 +1,9 @@
-namespace TeaTime.Common.Abstractions
-{
-    using System.Threading.Tasks;
+namespace TeaTime.Common.Abstractions;
 
-    public interface ILinkable<T>
-    {
-        Task<T> GetByLink(string link);
-        Task<bool> AddLink(string link, T obj);
-    }
+using System.Threading.Tasks;
+
+public interface ILinkable<T>
+{
+    Task<T> GetByLink(string link);
+    Task<bool> AddLink(string link, T obj);
 }

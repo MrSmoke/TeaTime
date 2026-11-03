@@ -1,19 +1,18 @@
-namespace TeaTime.Common.Abstractions.Data
+namespace TeaTime.Common.Abstractions.Data;
+
+using System.Threading.Tasks;
+
+public interface IStatisticsRepository
 {
-    using System.Threading.Tasks;
+    /// <summary>
+    /// Gets the count of all orders made from ended runs
+    /// </summary>
+    /// <returns></returns>
+    Task<long> CountGlobalOrdersMadeAsync();
 
-    public interface IStatisticsRepository
-    {
-        /// <summary>
-        /// Gets the count of all orders made from ended runs
-        /// </summary>
-        /// <returns></returns>
-        Task<long> CountGlobalOrdersMadeAsync();
-
-        /// <summary>
-        /// Gets the count of all runs which have ended
-        /// </summary>
-        /// <returns></returns>
-        Task<long> CountGlobalEndedRunsAsync();
-    }
+    /// <summary>
+    /// Gets the count of all runs which have ended
+    /// </summary>
+    /// <returns></returns>
+    Task<long> CountGlobalEndedRunsAsync();
 }

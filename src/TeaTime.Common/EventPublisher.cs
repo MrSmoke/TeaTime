@@ -1,21 +1,20 @@
-namespace TeaTime.Common
+namespace TeaTime.Common;
+
+using System.Threading.Tasks;
+using Abstractions;
+using MediatR;
+
+public class EventPublisher : IEventPublisher
 {
-    using System.Threading.Tasks;
-    using Abstractions;
-    using MediatR;
+    private readonly IMediator _mediator;
 
-    public class EventPublisher : IEventPublisher
+    public EventPublisher(IMediator mediator)
     {
-        private readonly IMediator _mediator;
+        _mediator = mediator;
+    }
 
-        public EventPublisher(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        public Task PublishAsync<T>(T eventModel) where T : IEvent
-        {
-            return _mediator.Publish(eventModel);
-        }
+    public Task PublishAsync<T>(T eventModel) where T : IEvent
+    {
+        return _mediator.Publish(eventModel);
     }
 }

@@ -1,7 +1,6 @@
-namespace TeaTime.ViewModels
+namespace TeaTime.ViewModels;
+
+public class ErrorViewModel
 {
-    public class ErrorViewModel
-    {
-        public int StatusCode { get; set; }
-    }
+    public int StatusCode { get; set; }
 }

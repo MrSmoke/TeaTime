@@ -1,12 +1,11 @@
-namespace TeaTime.Common.Cache
-{
-    public class CacheValue<T>
-    {
-        public CacheValue(T value)
-        {
-            Value = value;
-        }
+namespace TeaTime.Common.Cache;
 
-        public T Value { get; }
+public class CacheValue<T>
+{
+    public CacheValue(T value)
+    {
+        Value = value;
     }
+
+    public T Value { get; }
 }

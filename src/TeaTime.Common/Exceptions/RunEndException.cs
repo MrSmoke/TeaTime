@@ -1,32 +1,31 @@
-namespace TeaTime.Common.Exceptions
+namespace TeaTime.Common.Exceptions;
+
+public class RunEndException : TeaTimeException
 {
-    public class RunEndException : TeaTimeException
+    public RunEndExceptionReason Reason { get; }
+
+    public RunEndException(string message, RunEndExceptionReason reason) : base("Failed to end run. " + message)
     {
-        public RunEndExceptionReason Reason { get; }
+        Reason = reason;
+    }
 
-        public RunEndException(string message, RunEndExceptionReason reason) : base("Failed to end run. " + message)
-        {
-            Reason = reason;
-        }
+    public enum RunEndExceptionReason
+    {
+        Unspecified = 0,
 
-        public enum RunEndExceptionReason
-        {
-            Unspecified = 0,
+        /// <summary>
+        /// No active run to end
+        /// </summary>
+        NoActiveRun = 1,
 
-            /// <summary>
-            /// No active run to end
-            /// </summary>
-            NoActiveRun = 1,
+        /// <summary>
+        /// Run has no orders
+        /// </summary>
+        NoOrders = 2,
 
-            /// <summary>
-            /// Run has no orders
-            /// </summary>
-            NoOrders = 2,
-
-            /// <summary>
-            /// The current user has not joined
-            /// </summary>
-            NotJoined = 3
-        }
+        /// <summary>
+        /// The current user has not joined
+        /// </summary>
+        NotJoined = 3
     }
 }

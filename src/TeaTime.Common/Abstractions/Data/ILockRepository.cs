@@ -1,10 +1,9 @@
-namespace TeaTime.Common.Abstractions.Data
-{
-    using System.Threading.Tasks;
+namespace TeaTime.Common.Abstractions.Data;
 
-    public interface ILockRepository
-    {
-        Task<bool> CreateLockAsync(string key);
-        Task<bool> DeleteLockAsync(string key);
-    }
+using System.Threading.Tasks;
+
+public interface ILockRepository
+{
+    Task<bool> CreateLockAsync(string key);
+    Task<bool> DeleteLockAsync(string key);
 }
