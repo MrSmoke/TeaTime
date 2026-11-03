@@ -11,30 +11,23 @@ public class PermissionBehavior<TCommand, TResponse>(
     IPermissionService permissionService,
     ILogger<PermissionBehavior<TCommand, TResponse>> logger)
     : IPipelineBehavior<TCommand, TResponse>
-    where TCommand : notnull
+    where TCommand : IUserCommand
 {
     public async Task<TResponse> Handle(TCommand request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (request is IUserCommand command)
+        logger.LogDebug("Checking permission for command {Command}", typeof(TCommand).Name);
+
+        var result = await permissionService.CheckAsync(request, cancellationToken);
+        if (!result.Success)
         {
-            logger.LogDebug("Checking permission for command {Command}", typeof(TCommand).Name);
+            logger.LogDebug("Permission check failed for command {Command} with message {Message}",
+                typeof(TCommand).Name, result.Message);
 
-            var result = await permissionService.CheckAsync(command, cancellationToken);
-            if (!result.Success)
-            {
-                logger.LogDebug("Permission check failed for command {Command} with message {Message}",
-                    typeof(TCommand).Name, result.Message);
-
-                throw new PermissionException(result.Message ?? "Permission denied");
-            }
-
-            logger.LogDebug("Permission check succeeded for command {Command}", typeof(TCommand).Name);
+            throw new PermissionException(result.Message ?? "Permission denied");
         }
-        else
-        {
-            logger.LogDebug("Skipping permission check for command {Command}", typeof(TCommand).Name);
-        }
+
+        logger.LogDebug("Permission check succeeded for command {Command}", typeof(TCommand).Name);
 
         return await next(cancellationToken);
     }
