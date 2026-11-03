@@ -48,11 +48,12 @@ public class OrderCommandHandler(
 
     public async Task Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
     {
-        var existing = await orderRepository.GetAsync(request.OrderId, cancellationToken);
+        // Re-read so a concurrent leave or option change isn't overwritten
+        var existing = await orderRepository.GetAsync(request.Order.Id, cancellationToken);
 
         if (existing is null)
         {
-            logger.LogWarning("Failed to get existing order {OrderId}", request.OrderId);
+            logger.LogWarning("Failed to get existing order {OrderId}", request.Order.Id);
             return;
         }
 
@@ -68,7 +69,7 @@ public class OrderCommandHandler(
         //create event
         var evt = new OrderOptionChangedEvent
         (
-            OrderId: request.OrderId,
+            OrderId: request.Order.Id,
             UserId: request.UserId,
             PreviousOptionId: previousOptionId,
             OptionId: request.OptionId

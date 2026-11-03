@@ -288,7 +288,7 @@ internal class SlackService(ISender mediator,
         else
         {
             //we need to update the existing order
-            command = new UpdateOrderOptionCommand(existingOrder.Id, userId, optionId);
+            command = new UpdateOrderOptionCommand(existingOrder, userId, optionId);
         }
 
         command.AddCallbackState(callbackData);

@@ -7,6 +7,8 @@ using System.Reflection;
 using Common;
 using Common.Abstractions;
 using Common.Cache;
+using Common.Features.Orders.Commands;
+using Common.Features.Orders.Permissions;
 using Common.Features.Runs;
 using Common.Features.Runs.Commands;
 using Common.Permissions;
@@ -96,6 +98,10 @@ public static class Program
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandPreProcessorBehavior<,>));
         services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(CacheBehaviour<,>));
         services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(RunLockBehavior<,>));
+
+        // Register permission checks
+        services.AddSingleton<IPermissionCheck<DeleteOrderCommand>, OrderPermissions>();
+        services.AddSingleton<IPermissionCheck<UpdateOrderOptionCommand>, OrderPermissions>();
 
         // Register all PreProcessors
         services.AddSingleton<ICommandPreProcessor<EndRunCommand>, RunPreProcessor>();
