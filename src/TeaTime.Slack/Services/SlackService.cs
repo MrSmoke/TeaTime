@@ -287,9 +287,10 @@ internal class SlackService(ISender mediator,
             throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
         var group = await mediator.Send(new GetRoomItemGroupQuery(
-            RoomId: run.RoomId,
-            UserId: userId,
-            GroupId: run.GroupId), cancellationToken);
+                RoomId: run.RoomId,
+                UserId: userId,
+                GroupId: run.GroupId),
+            cancellationToken);
 
         if (group == null)
         {
@@ -305,7 +306,7 @@ internal class SlackService(ISender mediator,
         if (option == null)
             throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
-        await JoinRunInternalAsync(userId, run, option.Id, callbackData, cancellationToken);
+        await JoinRunInternalAsync(userId, run, option, callbackData, cancellationToken);
     }
 
     private async Task JoinRunAsync(long userId, long roomId, long optionId, CallbackData callbackData,
@@ -320,10 +321,10 @@ internal class SlackService(ISender mediator,
         if (option == null || option.GroupId != run.GroupId)
             throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
 
-        await JoinRunInternalAsync(userId, run, optionId, callbackData, cancellationToken);
+        await JoinRunInternalAsync(userId, run, option, callbackData, cancellationToken);
     }
 
-    private async Task JoinRunInternalAsync(long userId, Run run, long optionId, CallbackData callbackData,
+    private async Task JoinRunInternalAsync(long userId, Run run, Option option, CallbackData callbackData,
         CancellationToken cancellationToken = default)
     {
         BaseCommand command;
@@ -340,17 +341,24 @@ internal class SlackService(ISender mediator,
                 Id: await idGenerator.GenerateAsync(cancellationToken),
                 RunId: run.Id,
                 UserId: userId,
-                OptionId: optionId
+                OptionId: option.Id
             );
         }
         else
         {
             //we need to update the existing order
-            command = new UpdateOrderOptionCommand(existingOrder, userId, optionId);
+            command = new UpdateOrderOptionCommand(existingOrder, userId, option.Id);
         }
 
         command.AddCallbackState(callbackData);
 
-        await mediator.Send(command, cancellationToken);
+        try
+        {
+            await mediator.Send(command, cancellationToken);
+        }
+        catch (OrderException e) when (e.Reason == OrderException.OrderExceptionReason.OptionUnavailable)
+        {
+            throw new SlackTeaTimeException(ErrorStrings.JoinRun_OptionUnavailable(option.Name), e);
+        }
     }
 }

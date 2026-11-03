@@ -12,30 +12,34 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     : BaseRepository(factory), IOptionsRepository
 {
     private const string GroupSelectColumns = "id, name, roomId, createdBy, createdDate";
-    private const string OptionSelectColumns = "id, name, groupId, createdBy, createdDate";
+    private const string OptionSelectColumns = "id, name, groupId, createdBy, createdDate, available";
 
     public Task CreateGroupAsync(RoomItemGroup group, CancellationToken cancellationToken = default)
     {
-        const string sql = "INSERT INTO option_groups " +
-                           "(id, name, roomId, createdBy, createdDate) VALUES " +
-                           "(@id, @name, @roomId, @createdBy, @createdDate)";
+        const string sql = """
+                           INSERT INTO option_groups (id, name, roomId, createdBy, createdDate)
+                           VALUES (@id, @name, @roomId, @createdBy, @createdDate)
+                           """;
 
         return ExecuteAsync(sql, group, cancellationToken);
     }
 
     public Task UpdateGroupAsync(RoomItemGroup group, CancellationToken cancellationToken = default)
     {
-        const string sql = "UPDATE option_groups SET name = @name WHERE id = @id AND deleted = 0";
+        const string sql = """
+                           UPDATE option_groups SET name = @name
+                           WHERE id = @id AND deleted = 0
+                           """;
 
         return ExecuteAsync(sql, group, cancellationToken);
     }
 
     public Task DeleteGroupAsync(long groupId, CancellationToken cancellationToken = default)
     {
-        const string sql = "UPDATE option_groups" +
-                           " SET deleted = 1" +
-                           ",deletedDate = @now" +
-                           " WHERE id = @groupId AND deleted = 0";
+        const string sql = """
+                           UPDATE option_groups SET deleted = 1, deletedDate = @now
+                           WHERE id = @groupId AND deleted = 0
+                           """;
 
         return ExecuteAsync(sql, new
         {
@@ -46,9 +50,10 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
 
     public Task<RoomItemGroup?> GetGroupAsync(long groupId, CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT " + GroupSelectColumns +
-                           " FROM option_groups " +
-                           " WHERE id = @groupId AND deleted = 0";
+        const string sql = $"""
+                           SELECT {GroupSelectColumns} FROM option_groups
+                           WHERE id = @groupId AND deleted = 0
+                           """;
 
         return SingleOrDefaultAsync<RoomItemGroup>(sql, new { groupId }, cancellationToken);
     }
@@ -56,45 +61,50 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     public Task<RoomItemGroup?> GetGroupByNameAsync(long roomId, string name,
         CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT " + GroupSelectColumns +
-                           " FROM option_groups" +
-                           " WHERE roomId = @roomId AND name = @name AND deleted = 0";
+        const string sql = $"""
+                           SELECT {GroupSelectColumns} FROM option_groups
+                           WHERE roomId = @roomId AND name = @name AND deleted = 0
+                           """;
 
         return SingleOrDefaultAsync<RoomItemGroup>(sql, new { roomId, name }, cancellationToken);
     }
 
     public Task CreateAsync(Option option, CancellationToken cancellationToken = default)
     {
-        const string sql = "INSERT INTO options " +
-                           "(id, name, groupId, createdBy, createdDate) VALUES " +
-                           "(@id, @name, @groupId, @createdBy, @createdDate)";
+        const string sql = """
+                           INSERT INTO options (id, name, groupId, createdBy, createdDate, available)
+                           VALUES (@id, @name, @groupId, @createdBy, @createdDate, @available)
+                           """;
 
         return ExecuteAsync(sql, option, cancellationToken);
     }
 
     public Task<Option?> GetAsync(long optionId, CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT " + OptionSelectColumns +
-                           " FROM options" +
-                           " WHERE id = @optionId AND deleted = 0";
+        const string sql = $"""
+                           SELECT {OptionSelectColumns} FROM options
+                           WHERE id = @optionId AND deleted = 0
+                           """;
 
         return SingleOrDefaultAsync<Option>(sql, new { optionId }, cancellationToken);
     }
 
     public Task UpdateAsync(Option option, CancellationToken cancellationToken = default)
     {
-        const string sql = "UPDATE options" +
-                           " SET name = @name" +
-                           " WHERE id = @id AND deleted = 0";
+        const string sql = """
+                           UPDATE options SET name = @name
+                           WHERE id = @id AND deleted = 0
+                           """;
 
         return ExecuteAsync(sql, option, cancellationToken);
     }
 
     public Task DeleteAsync(long optionId, CancellationToken cancellationToken = default)
     {
-        const string sql = "UPDATE options" +
-                           " SET deleted=1,deletedDate=@now" +
-                           " WHERE id = @optionId AND deleted = 0";
+        const string sql = """
+                           UPDATE options SET deleted = 1, deletedDate = @now
+                           WHERE id = @optionId AND deleted = 0
+                           """;
 
         return ExecuteAsync(sql, new
         {
@@ -105,9 +115,10 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
 
     public Task<IEnumerable<Option>> GetManyAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT " + OptionSelectColumns +
-                           " FROM options" +
-                           " WHERE id IN @ids AND deleted = 0";
+        const string sql = $"""
+                           SELECT {OptionSelectColumns} FROM options
+                           WHERE id IN @ids AND deleted = 0
+                           """;
 
         return QueryAsync<Option>(sql, new { ids }, cancellationToken);
     }
@@ -115,9 +126,10 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     public Task<IEnumerable<Option>> GetOptionsByGroupIdAsync(long groupId,
         CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT " + OptionSelectColumns +
-                           " FROM options" +
-                           " WHERE groupId = @groupId AND deleted = 0";
+        const string sql = $"""
+                           SELECT {OptionSelectColumns} FROM options
+                           WHERE groupId = @groupId AND deleted = 0
+                           """;
 
         return QueryAsync<Option>(sql, new { groupId }, cancellationToken);
     }
