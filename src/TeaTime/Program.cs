@@ -33,14 +33,14 @@ public static class Program
         builder.Configuration.AddEnvironmentVariables("TEATIME_");
 
         // Setup logging
-        builder.Host.UseSerilog((context, loggerConfig) => loggerConfig
-            .ReadFrom.Configuration(context.Configuration)
+        var serilogLogger = new LoggerConfiguration()
+            .MinimumLevel.Verbose()
             .Enrich.FromLogContext()
-            .WriteTo.OpenTelemetry(options => options.ResourceAttributes = new Dictionary<string, object>
-            {
-                ["service.name"] = context.HostingEnvironment.ApplicationName,
-                ["service.version"] = Version
-            }));
+            .WriteTo.Console()
+            .CreateLogger();
+
+        builder.Logging.ClearProviders();
+        builder.Logging.AddSerilog(serilogLogger, dispose: true);
 
         // Configure OpenTelemetry
         ConfigureOpenTelemetry(builder);
@@ -98,6 +98,13 @@ public static class Program
         });
 
         otel.UseOtlpExporter();
+
+        // Logging
+        otel.WithLogging(configureBuilder: null, configureOptions: options =>
+        {
+            options.IncludeScopes = true;
+            options.IncludeFormattedMessage = true;
+        });
 
         // Metrics
         otel.WithMetrics(metrics =>
