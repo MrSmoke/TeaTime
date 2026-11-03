@@ -25,7 +25,7 @@ public class MySqlServerVerificationStartupAction(
 
             var evolve = new Evolve(conn, msg => logger.LogInformation(msg))
             {
-                EmbeddedResourceAssemblies = new[] { typeof(MySqlServerVerificationStartupAction).Assembly },
+                EmbeddedResourceAssemblies = [typeof(MySqlServerVerificationStartupAction).Assembly],
                 IsEraseDisabled = true
             };
 

@@ -2,14 +2,14 @@ namespace TeaTime.Common.Permissions;
 
 public sealed class PermissionCheckResult
 {
-    public bool Success { get; }
-    public string? Message { get; }
-
     private PermissionCheckResult(bool success, string? message)
     {
         Success = success;
         Message = message;
     }
+
+    public bool Success { get; }
+    public string? Message { get; }
 
     public static PermissionCheckResult Ok()
     {

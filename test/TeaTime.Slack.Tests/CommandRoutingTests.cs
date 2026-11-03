@@ -20,6 +20,14 @@ using Xunit;
 
 public class CommandRoutingTests
 {
+    public static TheoryData<string, string> MissingArgumentCommands => new()
+    {
+        { "options add tea", ErrorStrings.AddOption_BadArguments() },
+        { "options add", ErrorStrings.AddOption_BadArguments() },
+        { "options remove tea", ErrorStrings.RemoveOption_BadArguments() },
+        { "groups remove", ErrorStrings.RemoveGroup_BadArguments() }
+    };
+
     [Fact]
     public void AddCommandRouter_RegistersEverySlackCommand()
     {
@@ -31,14 +39,6 @@ public class CommandRoutingTests
             ["", "end", "groups add", "groups remove", "help", "illmake", "join", "options add", "options remove"],
             provider.GetRequiredService<ICommandTable>().Keys.Order(StringComparer.Ordinal));
     }
-
-    public static TheoryData<string, string> MissingArgumentCommands => new()
-    {
-        { "options add tea", ErrorStrings.AddOption_BadArguments() },
-        { "options add", ErrorStrings.AddOption_BadArguments() },
-        { "options remove tea", ErrorStrings.RemoveOption_BadArguments() },
-        { "groups remove", ErrorStrings.RemoveGroup_BadArguments() }
-    };
 
     [Theory]
     [MemberData(nameof(MissingArgumentCommands))]

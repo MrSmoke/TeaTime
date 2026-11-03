@@ -24,12 +24,13 @@ internal class SlackAuthenticationService(
     public string BuildAuthorizeUrl()
     {
         var oauth = GetOptions();
+        var clientId = oauth.ClientId ?? throw new InvalidOperationException("ClientId missing");
 
         const string baseUrl = "https://slack.com/oauth/v2/authorize";
 
         return QueryHelpers.AddQueryString(baseUrl, new KeyValuePair<string, StringValues>[]
         {
-            new("client_id", oauth.ClientId),
+            new("client_id", clientId),
             new("scope", Scopes),
             new("redirect_uri", GetRedirectUrl())
         });
@@ -57,9 +58,6 @@ internal class SlackAuthenticationService(
         var options = optionsMonitor.CurrentValue;
         if (!options.Enabled)
             throw new InvalidOperationException("Oauth is not enabled");
-
-        if (!options.IsValid())
-            throw new InvalidOperationException("Oauth is not configured");
 
         return options;
     }

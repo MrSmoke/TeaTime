@@ -8,17 +8,8 @@ using Commands;
 using MediatR;
 using Models.Data;
 
-public class IllMakeCommandHandler : IRequestHandler<IllMakeCommand>
+public class IllMakeCommandHandler(IIllMakeRepository repository, TimeProvider clock) : IRequestHandler<IllMakeCommand>
 {
-    private readonly IIllMakeRepository _repository;
-    private readonly TimeProvider _clock;
-
-    public IllMakeCommandHandler(IIllMakeRepository repository, TimeProvider clock)
-    {
-        _repository = repository;
-        _clock = clock;
-    }
-
     public Task Handle(IllMakeCommand request, CancellationToken cancellationToken)
     {
         var model = new IllMake
@@ -26,10 +17,10 @@ public class IllMakeCommandHandler : IRequestHandler<IllMakeCommand>
             Id = request.Id,
             RunId = request.RunId,
             UserId = request.UserId,
-            CreatedDate = _clock.GetUtcNow()
+            CreatedDate = clock.GetUtcNow()
         };
 
         //todo: event
-        return _repository.CreateAsync(model, cancellationToken);
+        return repository.CreateAsync(model, cancellationToken);
     }
 }

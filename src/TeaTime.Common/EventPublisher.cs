@@ -5,17 +5,10 @@ using System.Threading.Tasks;
 using Abstractions;
 using MediatR;
 
-public class EventPublisher : IEventPublisher
+public class EventPublisher(IMediator mediator) : IEventPublisher
 {
-    private readonly IMediator _mediator;
-
-    public EventPublisher(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     public Task PublishAsync<T>(T eventModel, CancellationToken cancellationToken = default) where T : IEvent
     {
-        return _mediator.Publish(eventModel, cancellationToken);
+        return mediator.Publish(eventModel, cancellationToken);
     }
 }

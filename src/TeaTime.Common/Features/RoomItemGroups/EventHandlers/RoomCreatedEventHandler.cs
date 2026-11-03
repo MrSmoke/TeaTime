@@ -8,18 +8,12 @@ using MediatR;
 using Options.Commands;
 using Rooms.Events;
 
-public class RoomCreatedEventHandler : INotificationHandler<RoomCreatedEvent>
+public class RoomCreatedEventHandler(
+    IMediator mediator,
+    IIdGenerator<long> idGenerator)
+    : INotificationHandler<RoomCreatedEvent>
 {
-    private readonly IMediator _mediator;
-    private readonly IIdGenerator<long> _idGenerator;
-
-    private static readonly string[] DefaultItemNames = { "Earl Grey", "English Breakfast" };
-
-    public RoomCreatedEventHandler(IMediator mediator, IIdGenerator<long> idGenerator)
-    {
-        _mediator = mediator;
-        _idGenerator = idGenerator;
-    }
+    private static readonly string[] DefaultItemNames = ["Earl Grey", "English Breakfast"];
 
     public async Task Handle(RoomCreatedEvent notification, CancellationToken cancellationToken)
     {
@@ -27,23 +21,23 @@ public class RoomCreatedEventHandler : INotificationHandler<RoomCreatedEvent>
             return;
 
         var command = new CreateRoomItemGroupCommand(
-            Id: await _idGenerator.GenerateAsync(CancellationToken.None),
+            Id: await idGenerator.GenerateAsync(CancellationToken.None),
             RoomId: notification.Id,
             UserId: notification.CreatedBy,
             Name: "tea");
 
-        await _mediator.Send(command, CancellationToken.None);
+        await mediator.Send(command, CancellationToken.None);
 
         //create some options
         foreach (var name in DefaultItemNames)
         {
             var optionCommand = new CreateOptionCommand(
-                Id: await _idGenerator.GenerateAsync(CancellationToken.None),
+                Id: await idGenerator.GenerateAsync(CancellationToken.None),
                 UserId: notification.CreatedBy,
                 GroupId: command.Id,
                 Name: name);
 
-            await _mediator.Send(optionCommand, CancellationToken.None);
+            await mediator.Send(optionCommand, CancellationToken.None);
         }
     }
 }

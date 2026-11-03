@@ -10,38 +10,26 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Models.Data;
 
-public class OrderCommandHandler :
+public class OrderCommandHandler(
+    IOrderRepository orderRepository,
+    TimeProvider clock,
+    IEventPublisher eventPublisher,
+    ILogger<OrderCommandHandler> logger) :
     IRequestHandler<CreateOrderCommand>,
     IRequestHandler<UpdateOrderOptionCommand>
 {
-    private readonly IOrderRepository _orderRepository;
-    private readonly TimeProvider _clock;
-    private readonly IEventPublisher _eventPublisher;
-    private readonly ILogger<OrderCommandHandler> _logger;
-
-    public OrderCommandHandler(IOrderRepository orderRepository,
-        TimeProvider clock,
-        IEventPublisher eventPublisher,
-        ILogger<OrderCommandHandler> logger)
-    {
-        _orderRepository = orderRepository;
-        _clock = clock;
-        _eventPublisher = eventPublisher;
-        _logger = logger;
-    }
-
     public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
         var order = new Order
         {
             Id = request.Id,
-            CreatedDate = _clock.GetUtcNow(),
+            CreatedDate = clock.GetUtcNow(),
             OptionId = request.OptionId,
             RunId = request.RunId,
             UserId = request.UserId
         };
 
-        await _orderRepository.CreateAsync(order, cancellationToken);
+        await orderRepository.CreateAsync(order, cancellationToken);
 
         var evt = new OrderPlacedEvent
         (
@@ -54,16 +42,16 @@ public class OrderCommandHandler :
             State = request.State
         };
 
-        await _eventPublisher.PublishAsync(evt, cancellationToken);
+        await eventPublisher.PublishAsync(evt, cancellationToken);
     }
 
     public async Task Handle(UpdateOrderOptionCommand request, CancellationToken cancellationToken)
     {
-        var existing = await _orderRepository.GetAsync(request.OrderId, cancellationToken);
+        var existing = await orderRepository.GetAsync(request.OrderId, cancellationToken);
 
         if (existing is null)
         {
-            _logger.LogWarning("Failed to get existing order {OrderId}", request.OrderId);
+            logger.LogWarning("Failed to get existing order {OrderId}", request.OrderId);
             return;
         }
 
@@ -74,7 +62,7 @@ public class OrderCommandHandler :
         var previousOptionId = existing.OptionId;
 
         //update
-        await _orderRepository.UpdateAsync(existing with { OptionId = request.OptionId }, cancellationToken);
+        await orderRepository.UpdateAsync(existing with { OptionId = request.OptionId }, cancellationToken);
 
         //create event
         var evt = new OrderOptionChangedEvent
@@ -88,6 +76,6 @@ public class OrderCommandHandler :
             State = request.State,
         };
 
-        await _eventPublisher.PublishAsync(evt, cancellationToken);
+        await eventPublisher.PublishAsync(evt, cancellationToken);
     }
 }

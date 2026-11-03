@@ -6,17 +6,10 @@ using Abstractions.Data;
 using MediatR;
 using Queries;
 
-public class LinkQueryHandler : IRequestHandler<GetObjectIdByLinkValueQuery, long?>
+public class LinkQueryHandler(ILinkRepository linkRepository) : IRequestHandler<GetObjectIdByLinkValueQuery, long?>
 {
-    private readonly ILinkRepository _linkRepository;
-
-    public LinkQueryHandler(ILinkRepository linkRepository)
-    {
-        _linkRepository = linkRepository;
-    }
-
     public Task<long?> Handle(GetObjectIdByLinkValueQuery request, CancellationToken cancellationToken)
     {
-        return _linkRepository.GetObjectIdAsync(request.Value, request.LinkType, cancellationToken);
+        return linkRepository.GetObjectIdAsync(request.Value, request.LinkType, cancellationToken);
     }
 }

@@ -9,7 +9,6 @@ using Common.Features.Runs.Commands;
 using Common.Permissions;
 using Common.Services;
 using Data.MySql;
-using Data.MySql.Factories;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -17,15 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Slack;
 
-public class Startup
+public class Startup(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-
-    public Startup(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
     public void ConfigureServices(IServiceCollection services)
     {
         // Add framework services.
@@ -44,7 +36,7 @@ public class Startup
         services.AddSingleton<ICacheSerializer, SystemTextJsonCacheSerializer>();
 
         // Add Slack support
-        services.AddSlack(mvcBuilder, _configuration.GetSection("slack"));
+        services.AddSlack(mvcBuilder, configuration.GetSection("slack"));
 
         // Core
         services.TryAddSingleton(TimeProvider.System);
@@ -53,7 +45,7 @@ public class Startup
         services.AddSingleton<IRoomRunLockService, RoomRunLockService>();
         services.AddSingleton<IPermissionService, PermissionService>();
         services.AddSingleton<IUrlGenerator, UrlGenerator>();
-        services.Configure<UrlGeneratorOptions>(_configuration);
+        services.Configure<UrlGeneratorOptions>(configuration);
 
         // Register the pipelines manually so we can define order
         // - Check permissions first
@@ -76,12 +68,6 @@ public class Startup
 
     private void RegisterDataLayer(IServiceCollection services)
     {
-        var mysqlOptions = _configuration.GetSection("mysql").Get<MySqlConnectionOptions>();
-        if (mysqlOptions == null)
-            throw new Exception("No database has been configured");
-
-        mysqlOptions.Validate();
-
-        services.AddMySql(mysqlOptions);
+        services.AddMySql(configuration.GetSection("mysql"));
     }
 }

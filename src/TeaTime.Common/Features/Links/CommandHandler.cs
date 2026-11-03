@@ -6,17 +6,10 @@ using Abstractions.Data;
 using Commands;
 using MediatR;
 
-public class LinkCommandHandler : IRequestHandler<CreateLinkCommand>
+public class LinkCommandHandler(ILinkRepository linkRepository) : IRequestHandler<CreateLinkCommand>
 {
-    private readonly ILinkRepository _linkRepository;
-
-    public LinkCommandHandler(ILinkRepository linkRepository)
-    {
-        _linkRepository = linkRepository;
-    }
-
     public Task Handle(CreateLinkCommand request, CancellationToken cancellationToken)
     {
-        return _linkRepository.AddAsync(request.ObjectId, request.LinkType, request.Value, cancellationToken);
+        return linkRepository.AddAsync(request.ObjectId, request.LinkType, request.Value, cancellationToken);
     }
 }

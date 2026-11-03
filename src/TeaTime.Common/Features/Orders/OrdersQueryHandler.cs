@@ -11,37 +11,27 @@ using Models.Data;
 using Models.Domain;
 using Queries;
 
-public class OrdersQueryHandler :
+public class OrdersQueryHandler(
+    IOrderRepository orderRepository,
+    IUserRepository userRepository,
+    IOptionsRepository optionsRepository,
+    IRunRepository runRepository) :
     IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>,
     IRequestHandler<GetUserOrderQuery, Order?>
 {
-    private readonly IOrderRepository _orderRepository;
-    private readonly IUserRepository _userRepository;
-    private readonly IOptionsRepository _optionsRepository;
-    private readonly IRunRepository _runRepository;
-
-    public OrdersQueryHandler(IOrderRepository orderRepository, IUserRepository userRepository,
-        IOptionsRepository optionsRepository, IRunRepository runRepository)
-    {
-        _orderRepository = orderRepository;
-        _userRepository = userRepository;
-        _optionsRepository = optionsRepository;
-        _runRepository = runRepository;
-    }
-
     public async Task<IEnumerable<OrderModel>> Handle(GetRunOrdersQuery request,
         CancellationToken cancellationToken)
     {
-        var run = await _runRepository.GetAsync(request.RunId, cancellationToken);
+        var run = await runRepository.GetAsync(request.RunId, cancellationToken);
         if (run is null)
             throw new TeaTimeException($"Unknown RunId {request.RunId}");
 
-        var orders = (await _orderRepository.GetOrdersAsync(run.Id, cancellationToken)).ToList();
+        var orders = (await orderRepository.GetOrdersAsync(run.Id, cancellationToken)).ToList();
         if (orders.Count == 0)
-            return new List<OrderModel>();
+            return [];
 
-        var users = _userRepository.GetManyAsync(orders.Select(o => o.UserId), cancellationToken);
-        var options = _optionsRepository.GetManyAsync(orders.Select(o => o.OptionId), cancellationToken);
+        var users = userRepository.GetManyAsync(orders.Select(o => o.UserId), cancellationToken);
+        var options = optionsRepository.GetManyAsync(orders.Select(o => o.OptionId), cancellationToken);
 
         var userDict = (await users).ToDictionary(k => k.Id);
         var optionsDict = (await options).ToDictionary(k => k.Id);
@@ -58,7 +48,7 @@ public class OrdersQueryHandler :
 
     public async Task<Order?> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
     {
-        var orders = await _orderRepository.GetOrdersAsync(request.RunId, cancellationToken);
+        var orders = await orderRepository.GetOrdersAsync(request.RunId, cancellationToken);
 
         return orders.FirstOrDefault(o => o.UserId == request.UserId);
     }

@@ -11,6 +11,13 @@ using Services;
 
 public abstract class BaseCommand(ISlackService slackService) : Command
 {
+    protected ISlackService SlackService { get; } = slackService;
+
+    protected static ICommandResult Ok()
+    {
+        return new StringResult("");
+    }
+
     protected async Task<CommandContext> GetContextAsync(CancellationToken cancellationToken = default)
     {
         var command = GetCommand();
@@ -18,18 +25,6 @@ public abstract class BaseCommand(ISlackService slackService) : Command
         var room = await GetOrCreateRoomAsync(command, user.Id, cancellationToken);
 
         return new CommandContext(command, user, room);
-    }
-
-    private Task<User> GetOrCreateUserAsync(SlashCommand slashCommand, CancellationToken cancellationToken = default)
-    {
-        return slackService.GetOrCreateUserAsync(slashCommand.UserId, slashCommand.GetUserName(), cancellationToken);
-    }
-
-    private Task<Room> GetOrCreateRoomAsync(SlashCommand slashCommand, long userId,
-        CancellationToken cancellationToken = default)
-    {
-        return slackService.GetOrCreateRoomAsync(slashCommand.ChannelId, slashCommand.ChannelName, userId,
-            cancellationToken);
     }
 
     protected SlashCommand GetCommand() => (SlashCommand)Context.Items[Constants.CommandContextKeys.SlashCommand];
@@ -44,8 +39,15 @@ public abstract class BaseCommand(ISlackService slackService) : Command
         return StringResult(SlackJsonSerializer.Serialize(response));
     }
 
-    protected static ICommandResult Ok()
+    private Task<User> GetOrCreateUserAsync(SlashCommand slashCommand, CancellationToken cancellationToken = default)
     {
-        return new StringResult("");
+        return SlackService.GetOrCreateUserAsync(slashCommand.UserId, slashCommand.GetUserName(), cancellationToken);
+    }
+
+    private Task<Room> GetOrCreateRoomAsync(SlashCommand slashCommand, long userId,
+        CancellationToken cancellationToken = default)
+    {
+        return SlackService.GetOrCreateRoomAsync(slashCommand.ChannelId, slashCommand.ChannelName, userId,
+            cancellationToken);
     }
 }

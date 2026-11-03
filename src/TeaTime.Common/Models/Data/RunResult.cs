@@ -2,17 +2,17 @@ namespace TeaTime.Common.Models.Data;
 
 using System;
 
-public class RunResult
+public record RunResult
 {
-    public long RunId { get; set; }
+    public required long RunId { get; init; }
 
     /// <summary>
     /// The user id of the runner
     /// </summary>
-    public long RunnerUserId { get; set; }
+    public required long RunnerUserId { get; init; }
 
     /// <summary>
     /// The time the run ended
     /// </summary>
-    public DateTimeOffset EndedTime { get; set; }
+    public required DateTimeOffset EndedTime { get; init; }
 }

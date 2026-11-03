@@ -7,17 +7,10 @@ using MediatR;
 using Models.Data;
 using Queries;
 
-public class RoomsQueryHandler : IRequestHandler<GetRoomQuery, Room?>
+public class RoomsQueryHandler(IRoomRepository roomRepository) : IRequestHandler<GetRoomQuery, Room?>
 {
-    private readonly IRoomRepository _roomRepository;
-
-    public RoomsQueryHandler(IRoomRepository roomRepository)
-    {
-        _roomRepository = roomRepository;
-    }
-
     public Task<Room?> Handle(GetRoomQuery request, CancellationToken cancellationToken)
     {
-        return _roomRepository.GetAsync(request.RoomId, cancellationToken);
+        return roomRepository.GetAsync(request.RoomId, cancellationToken);
     }
 }

@@ -8,28 +8,23 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// Behavior for executing all <see cref="ICommandPreProcessor{TRequest}"/> instances before handling a request
+/// Behaviour for executing all <see cref="ICommandPreProcessor{TRequest}"/> instances before handling a request
 /// </summary>
 /// <typeparam name="TRequest"></typeparam>
 /// <typeparam name="TResponse"></typeparam>
-public class CommandPreProcessorBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+public class CommandPreProcessorBehavior<TRequest, TResponse>(
+    IEnumerable<ICommandPreProcessor<TRequest>> preProcessors,
+    ILogger<CommandPreProcessorBehavior<TRequest, TResponse>> logger)
+    : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
 {
-    private readonly IEnumerable<ICommandPreProcessor<TRequest>> _preProcessors;
-    private readonly ILogger<CommandPreProcessorBehavior<TRequest, TResponse>> _logger;
-
-    public CommandPreProcessorBehavior(IEnumerable<ICommandPreProcessor<TRequest>> preProcessors,
-        ILogger<CommandPreProcessorBehavior<TRequest, TResponse>> logger)
-    {
-        _preProcessors = preProcessors;
-        _logger = logger;
-    }
-
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        foreach (var processor in _preProcessors)
+        foreach (var processor in preProcessors)
         {
-            _logger.LogDebug("Running ICommandPreProcessor for command {Command}", typeof(TRequest).Name);
+            logger.LogDebug("Running {PreProcessor} for command {Command}",
+                processor.GetType().Name, typeof(TRequest).Name);
 
             await processor.ProcessAsync(request, cancellationToken);
         }

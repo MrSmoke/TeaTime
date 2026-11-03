@@ -12,11 +12,11 @@ internal static class BlockBuilder
 
     internal static List<Block> BuildRunStarted(string text, IEnumerable<Option> options)
     {
-        var blocks = new List<Block>
-        {
+        List<Block> blocks =
+        [
             new SectionBlock(TextObject.Markdown(text)),
             new SectionBlock(TextObject.PlainText("Select an option to join this round!"))
-        };
+        ];
 
         foreach (var chunk in options.Chunk(ActionsBlock.MaxElements))
         {

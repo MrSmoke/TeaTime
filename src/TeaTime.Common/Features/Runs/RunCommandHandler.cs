@@ -11,43 +11,29 @@ using Events;
 using MediatR;
 using Models.Data;
 
-public class RunCommandHandler :
+public class RunCommandHandler(
+    IRunRepository runRepository,
+    IEventPublisher eventPublisher,
+    IRunnerRandomizer randomizer,
+    TimeProvider clock,
+    IIllMakeRepository illMakeRepository) :
     IRequestHandler<StartRunCommand>,
     IRequestHandler<EndRunCommand>
 {
-    private readonly IRunRepository _runRepository;
-    private readonly IEventPublisher _eventPublisher;
-    private readonly IRunnerRandomizer _randomizer;
-    private readonly TimeProvider _clock;
-    private readonly IIllMakeRepository _illMakeRepository;
-
-    public RunCommandHandler(IRunRepository runRepository,
-        IEventPublisher eventPublisher,
-        IRunnerRandomizer randomizer,
-        TimeProvider clock,
-        IIllMakeRepository illMakeRepository)
-    {
-        _runRepository = runRepository;
-        _eventPublisher = eventPublisher;
-        _randomizer = randomizer;
-        _clock = clock;
-        _illMakeRepository = illMakeRepository;
-    }
-
     //Start run
     public async Task Handle(StartRunCommand request, CancellationToken cancellationToken)
     {
         var run = new Run
         {
             Id = request.Id,
-            CreatedDate = _clock.GetUtcNow(),
+            CreatedDate = clock.GetUtcNow(),
             GroupId = request.RoomGroupId,
             RoomId = request.RoomId,
             StartTime = request.StartTime,
             UserId = request.UserId
         };
 
-        await _runRepository.CreateAsync(run, cancellationToken);
+        await runRepository.CreateAsync(run, cancellationToken);
 
         var evt = new RunStartedEvent
         (
@@ -58,7 +44,7 @@ public class RunCommandHandler :
             EndTime: run.EndTime
         );
 
-        await _eventPublisher.PublishAsync(evt, cancellationToken);
+        await eventPublisher.PublishAsync(evt, cancellationToken);
     }
 
     //End run
@@ -67,7 +53,7 @@ public class RunCommandHandler :
         var runnerUserId = await GetRunnerAsync(request, cancellationToken);
 
         //update run
-        await _runRepository.UpdateAsync(request.Run with
+        await runRepository.UpdateAsync(request.Run with
         {
             Ended = true
         }, cancellationToken);
@@ -77,10 +63,10 @@ public class RunCommandHandler :
         {
             RunId = request.Run.Id,
             RunnerUserId = runnerUserId,
-            EndedTime = _clock.GetUtcNow()
+            EndedTime = clock.GetUtcNow()
         };
 
-        await _runRepository.CreateResultAsync(runResult, cancellationToken);
+        await runRepository.CreateResultAsync(runResult, cancellationToken);
 
         //publish event
         var evt = new RunEndedEvent
@@ -95,13 +81,13 @@ public class RunCommandHandler :
             State = request.State
         };
 
-        await _eventPublisher.PublishAsync(evt, cancellationToken);
+        await eventPublisher.PublishAsync(evt, cancellationToken);
     }
 
     private async Task<long> GetRunnerAsync(EndRunCommand command, CancellationToken cancellationToken = default)
     {
         //todo: dont tie illmake in with this handler directly...kinda gross
-        var illMakeResults = await _illMakeRepository.GetAllByRunAsync(command.Run.Id, cancellationToken);
+        var illMakeResults = await illMakeRepository.GetAllByRunAsync(command.Run.Id, cancellationToken);
 
         var illMake = illMakeResults.MaxBy(o => o.CreatedDate);
 
@@ -109,6 +95,6 @@ public class RunCommandHandler :
             return illMake.UserId;
 
         //random runner
-        return await _randomizer.GetRunnerUserIdAsync(command.Orders, cancellationToken);
+        return await randomizer.GetRunnerUserIdAsync(command.Orders, cancellationToken);
     }
 }

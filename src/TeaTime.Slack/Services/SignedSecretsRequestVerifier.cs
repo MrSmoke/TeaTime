@@ -60,6 +60,25 @@ public class SignedSecretsRequestVerifier(
         return Verify(slackSignature, timestamp, requestBody);
     }
 
+    private static bool TryGetSignature(HttpRequest request, [NotNullWhen(true)] out string? signature)
+    {
+        if (!request.Headers.TryGetValue(SignatureHeaderKey, out var slackSignatureValues))
+        {
+            signature = null;
+            return false;
+        }
+
+        string? slackSignature = slackSignatureValues;
+        if (string.IsNullOrEmpty(slackSignature))
+        {
+            signature = null;
+            return false;
+        }
+
+        signature = slackSignature;
+        return true;
+    }
+
     private bool Verify(string signature, long timestamp, string requestBody)
     {
         ArgumentNullException.ThrowIfNull(signature);
@@ -91,25 +110,6 @@ public class SignedSecretsRequestVerifier(
             Encoding.ASCII.GetBytes(signature));
     }
 
-    private static bool TryGetSignature(HttpRequest request, [NotNullWhen(true)] out string? signature)
-    {
-        if (!request.Headers.TryGetValue(SignatureHeaderKey, out var slackSignatureValues))
-        {
-            signature = null;
-            return false;
-        }
-
-        string? slackSignature = slackSignatureValues;
-        if (string.IsNullOrEmpty(slackSignature))
-        {
-            signature = null;
-            return false;
-        }
-
-        signature = slackSignature;
-        return true;
-    }
-
     private void LogFailure(string reason) => logger.LogWarning("Request verification failed. {Reason}", reason);
 
     private SignedSecretsRequestVerifierOptions GetOptions()
@@ -118,9 +118,6 @@ public class SignedSecretsRequestVerifier(
 
         if (!options.Enabled)
             throw new InvalidOperationException("Request Verification is not enabled");
-
-        if (!options.IsValid())
-            throw new InvalidOperationException("Request Verification is not configured");
 
         return options;
     }

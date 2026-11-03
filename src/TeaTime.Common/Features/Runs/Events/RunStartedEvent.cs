@@ -3,6 +3,9 @@ namespace TeaTime.Common.Features.Runs.Events;
 using System;
 using Abstractions;
 
+/// <summary>
+/// Published after a run has been started in a room
+/// </summary>
 /// <param name="RunId"></param>
 /// <param name="UserId">The id of the user who started the run</param>
 /// <param name="RoomId"></param>

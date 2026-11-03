@@ -9,21 +9,12 @@ using Events;
 using MediatR;
 using Models.Data;
 
-public class RoomCommandHandler : IRequestHandler<CreateRoomCommand>
+public class RoomCommandHandler(
+    IRoomRepository roomRepository,
+    IEventPublisher eventPublisher,
+    TimeProvider clock)
+    : IRequestHandler<CreateRoomCommand>
 {
-    private readonly IRoomRepository _roomRepository;
-    private readonly IEventPublisher _eventPublisher;
-    private readonly TimeProvider _clock;
-
-    public RoomCommandHandler(IRoomRepository roomRepository,
-        IEventPublisher eventPublisher,
-        TimeProvider clock)
-    {
-        _roomRepository = roomRepository;
-        _eventPublisher = eventPublisher;
-        _clock = clock;
-    }
-
     public async Task Handle(CreateRoomCommand request, CancellationToken cancellationToken)
     {
         var room = new Room
@@ -31,10 +22,10 @@ public class RoomCommandHandler : IRequestHandler<CreateRoomCommand>
             Id = request.Id,
             Name = request.Name,
             CreatedBy = request.UserId,
-            CreatedDate = _clock.GetUtcNow()
+            CreatedDate = clock.GetUtcNow()
         };
 
-        await _roomRepository.CreateAsync(room, cancellationToken);
+        await roomRepository.CreateAsync(room, cancellationToken);
 
         var evt = new RoomCreatedEvent
         (
@@ -44,6 +35,6 @@ public class RoomCommandHandler : IRequestHandler<CreateRoomCommand>
             CreateDefaultItemGroup: request.CreateDefaultItemGroup
         );
 
-        await _eventPublisher.PublishAsync(evt, cancellationToken);
+        await eventPublisher.PublishAsync(evt, cancellationToken);
     }
 }

@@ -4,15 +4,13 @@ using System;
 
 public class CacheEntryOptions
 {
-    private TimeSpan? _expiration = TimeSpan.FromMinutes(5);
-
     /// <summary>
     /// Gets or sets how long a cache entry can be inactive (e.g. not accessed) before it will be removed.
     /// This will not extend the entry lifetime beyond the absolute expiration (if set).
     /// </summary>
     public TimeSpan? Expiration
     {
-        get => _expiration;
+        get;
         set
         {
             if (value <= TimeSpan.Zero)
@@ -23,9 +21,9 @@ public class CacheEntryOptions
                     "The sliding expiration value must be positive.");
             }
 
-            _expiration = value;
+            field = value;
         }
-    }
+    } = TimeSpan.FromMinutes(5);
 
     public bool Sliding { get; set; } = true;
 }

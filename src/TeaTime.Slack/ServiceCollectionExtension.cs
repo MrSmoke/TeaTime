@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Services;
 
 public static class ServiceCollectionExtension
@@ -41,15 +40,16 @@ public static class ServiceCollectionExtension
         // OAuth
         services.AddOptions<SlackOAuthOptions>()
             .Bind(configuration.GetSection("oauth"))
+            .Validate(o => !o.Enabled || !string.IsNullOrWhiteSpace(o.ClientId), "Slack ClientId is missing")
+            .Validate(o => !o.Enabled || !string.IsNullOrWhiteSpace(o.ClientSecret), "Slack ClientSecret is missing")
             .ValidateOnStart();
-        services.AddSingleton<IValidateOptions<SlackOAuthOptions>, SlackOAuthOptions>();
         services.AddScoped<ISlackAuthenticationService, SlackAuthenticationService>();
 
         // Request verification
         services.AddOptions<SignedSecretsRequestVerifierOptions>()
             .Bind(configuration.GetSection("requestVerification"))
+            .Validate(o => !o.Enabled || !string.IsNullOrWhiteSpace(o.SigningSecret), "SigningSecret is required")
             .ValidateOnStart();
-        services.AddSingleton<IValidateOptions<SignedSecretsRequestVerifierOptions>, SignedSecretsRequestVerifierOptions>();
         services.AddSingleton<ISlackRequestVerifier, SignedSecretsRequestVerifier>();
 
         services.AddTransient<INotificationHandler<RunEndedEvent>, RunEndedHandler>();

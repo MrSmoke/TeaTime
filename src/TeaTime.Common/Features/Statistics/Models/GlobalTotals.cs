@@ -1,7 +1,7 @@
 namespace TeaTime.Common.Features.Statistics.Models;
 
-public class GlobalTotals
+public record GlobalTotals
 {
-    public long OrdersMade { get; set; }
-    public long RunsEnded { get; set; }
+    public required long OrdersMade { get; init; }
+    public required long RunsEnded { get; init; }
 }

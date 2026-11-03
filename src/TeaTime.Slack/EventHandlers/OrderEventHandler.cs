@@ -13,23 +13,14 @@ using Microsoft.Extensions.Logging;
 using Models.SlashCommands;
 using Resources;
 
-public class OrderEventHandler :
+public class OrderEventHandler(
+    ISlackApiClient slackApiClient,
+    ILinkRepository linkRepository,
+    ILogger<OrderEventHandler> logger,
+    IOptionsRepository optionsRepository) :
     INotificationHandler<OrderPlacedEvent>,
     INotificationHandler<OrderOptionChangedEvent>
 {
-    private readonly ISlackApiClient _slackApiClient;
-    private readonly ILinkRepository _linkRepository;
-    private readonly ILogger<OrderEventHandler> _logger;
-    private readonly IOptionsRepository _optionsRepository;
-
-    public OrderEventHandler(ISlackApiClient slackApiClient, ILinkRepository linkRepository, ILogger<OrderEventHandler> logger, IOptionsRepository optionsRepository)
-    {
-        _slackApiClient = slackApiClient;
-        _linkRepository = linkRepository;
-        _logger = logger;
-        _optionsRepository = optionsRepository;
-    }
-
     public async Task Handle(OrderPlacedEvent notification, CancellationToken cancellationToken)
     {
         var slackUserId = await GetSlackUserIdAsync(notification.UserId, cancellationToken);
@@ -46,11 +37,8 @@ public class OrderEventHandler :
         if (slackUserId == null)
             return;
 
-        var options = await _optionsRepository.GetManyAsync(new[]
-        {
-            notification.PreviousOptionId,
-            notification.OptionId
-        }, cancellationToken);
+        long[] optionIds = [notification.PreviousOptionId, notification.OptionId];
+        var options = await optionsRepository.GetManyAsync(optionIds, cancellationToken);
 
         var oDict = options.ToDictionary(o => o.Id);
 
@@ -63,11 +51,11 @@ public class OrderEventHandler :
 
     private async Task<string?> GetSlackUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
-        var slackUserId = await _linkRepository.GetLinkAsync(userId, LinkType.User, cancellationToken);
+        var slackUserId = await linkRepository.GetLinkAsync(userId, LinkType.User, cancellationToken);
         if (!string.IsNullOrWhiteSpace(slackUserId))
             return slackUserId;
 
-        _logger.LogError("Could not get slack user link for: {UserId}", userId);
+        logger.LogError("Could not get slack user link for: {UserId}", userId);
         return null;
     }
 
@@ -77,7 +65,7 @@ public class OrderEventHandler :
         if (!evt.TryGetCallbackState(out var callbackData))
             return;
 
-        await _slackApiClient.PostResponseAsync(callbackData.ResponseUrl,
+        await slackApiClient.PostResponseAsync(callbackData.ResponseUrl,
             new SlashCommandResponse(message, responseType), cancellationToken);
     }
 }

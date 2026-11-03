@@ -12,30 +12,25 @@ using Resources;
 using Services;
 
 [CommandPrefix("groups")]
-public class GroupsCommand : BaseCommand
+public class GroupsCommand(
+    ISlackService slackService,
+    IMediator mediator,
+    IIdGenerator<long> idGenerator)
+    : BaseCommand(slackService)
 {
-    private readonly IMediator _mediator;
-    private readonly IIdGenerator<long> _idGenerator;
-
-    public GroupsCommand(ISlackService slackService, IMediator mediator, IIdGenerator<long> idGenerator) : base(slackService)
-    {
-        _mediator = mediator;
-        _idGenerator = idGenerator;
-    }
-
     [Command("add")]
     public async Task<ICommandResult> AddGroup(string name)
     {
         var context = await GetContextAsync();
 
         var command = new CreateRoomItemGroupCommand(
-            Id: await _idGenerator.GenerateAsync(),
+            Id: await idGenerator.GenerateAsync(),
             RoomId: context.Room.Id,
             Name: name,
             UserId: context.User.Id
         );
 
-        await _mediator.Send(command);
+        await mediator.Send(command);
 
         return Response(ResponseStrings.GroupAdded(name), ResponseType.User);
     }
@@ -48,7 +43,7 @@ public class GroupsCommand : BaseCommand
 
         var context = await GetContextAsync();
 
-        var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(context.Room.Id, context.User.Id, name));
+        var group = await mediator.Send(new GetRoomItemGroupByNameQuery(context.Room.Id, context.User.Id, name));
         if (group == null)
             return Response(ErrorStrings.RemoveGroup_GroupInvalidName(name), ResponseType.User);
 
@@ -57,7 +52,7 @@ public class GroupsCommand : BaseCommand
             UserId: context.User.Id
         );
 
-        await _mediator.Send(command);
+        await mediator.Send(command);
 
         return Response(ResponseStrings.GroupRemoved(name), ResponseType.User);
     }

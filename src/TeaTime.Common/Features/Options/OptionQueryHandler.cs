@@ -7,17 +7,10 @@ using MediatR;
 using Models.Data;
 using Queries;
 
-public class OptionQueryHandler : IRequestHandler<GetOptionQuery, Option?>
+public class OptionQueryHandler(IOptionsRepository optionsRepository) : IRequestHandler<GetOptionQuery, Option?>
 {
-    private readonly IOptionsRepository _optionsRepository;
-
-    public OptionQueryHandler(IOptionsRepository optionsRepository)
-    {
-        _optionsRepository = optionsRepository;
-    }
-
     public Task<Option?> Handle(GetOptionQuery request, CancellationToken cancellationToken)
     {
-        return _optionsRepository.GetAsync(request.Id, cancellationToken);
+        return optionsRepository.GetAsync(request.Id, cancellationToken);
     }
 }

@@ -13,18 +13,6 @@ public static class HashHelper
 
         var valueBytes = Encoding.UTF8.GetBytes(value);
         var hashBytes = HMACSHA256.HashData(key, valueBytes);
-        return ToHex(hashBytes);
-    }
-
-    public static string ToHex(byte[] bytes)
-    {
-        ArgumentNullException.ThrowIfNull(bytes);
-
-        var sBuilder = new StringBuilder();
-
-        for (var i = 0; i < bytes.Length; i++)
-            sBuilder.Append(bytes[i].ToString("x2"));
-
-        return sBuilder.ToString();
+        return Convert.ToHexStringLower(hashBytes);
     }
 }

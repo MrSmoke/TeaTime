@@ -109,8 +109,6 @@ public class SlackControllerTests
             NullLogger<SlackController>.Instance);
     }
 
-    private sealed record SlackReply(string? Text, string? ResponseType);
-
     private static async Task<SlackReply> RunAsync(SlackController controller, string text)
     {
         var result = await controller.SlashCommandHook(new SlashCommand
@@ -128,4 +126,6 @@ public class SlackControllerTests
         var json = JsonNode.Parse(content.Content!)!;
         return new SlackReply((string?)json["text"], (string?)json["response_type"]);
     }
+
+    private sealed record SlackReply(string? Text, string? ResponseType);
 }

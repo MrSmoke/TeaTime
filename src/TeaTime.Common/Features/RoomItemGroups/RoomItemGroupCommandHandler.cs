@@ -8,19 +8,10 @@ using Commands;
 using Common.Models.Data;
 using MediatR;
 
-public class RoomItemGroupCommandHandler :
+public class RoomItemGroupCommandHandler(IOptionsRepository optionsRepository, TimeProvider clock) :
     IRequestHandler<CreateRoomItemGroupCommand>,
     IRequestHandler<DeleteRoomItemGroupCommand>
 {
-    private readonly IOptionsRepository _optionsRepository;
-    private readonly TimeProvider _clock;
-
-    public RoomItemGroupCommandHandler(IOptionsRepository optionsRepository, TimeProvider clock)
-    {
-        _optionsRepository = optionsRepository;
-        _clock = clock;
-    }
-
     public Task Handle(CreateRoomItemGroupCommand request, CancellationToken cancellationToken)
     {
         var roomGroup = new RoomItemGroup
@@ -28,17 +19,17 @@ public class RoomItemGroupCommandHandler :
             Id = request.Id,
             Name = request.Name,
             CreatedBy = request.UserId,
-            CreatedDate = _clock.GetUtcNow(),
+            CreatedDate = clock.GetUtcNow(),
             RoomId = request.RoomId
         };
 
-        return _optionsRepository.CreateGroupAsync(roomGroup, cancellationToken);
+        return optionsRepository.CreateGroupAsync(roomGroup, cancellationToken);
 
         //todo: event
     }
 
     public Task Handle(DeleteRoomItemGroupCommand request, CancellationToken cancellationToken)
     {
-        return _optionsRepository.DeleteGroupAsync(request.GroupId, cancellationToken);
+        return optionsRepository.DeleteGroupAsync(request.GroupId, cancellationToken);
     }
 }

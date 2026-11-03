@@ -71,7 +71,6 @@ public static class Program
         }
         else
         {
-            app.UseStatusCodePages();
             app.UseStatusCodePagesWithReExecute("/ErrorStatusCode", "?code={0}");
         }
 

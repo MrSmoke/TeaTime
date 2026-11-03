@@ -5,19 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Abstractions;
 
-public class PermissionService : IPermissionService
+public class PermissionService(IServiceProvider serviceProvider) : IPermissionService
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public PermissionService(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
     public Task<PermissionCheckResult> CheckAsync<T>(T request, CancellationToken cancellationToken = default)
         where T : IUserCommand
     {
-        if (_serviceProvider.GetService(typeof(IPermissionCheck<T>)) is IPermissionCheck<T> check)
+        if (serviceProvider.GetService(typeof(IPermissionCheck<T>)) is IPermissionCheck<T> check)
             return check.CheckAsync(request, cancellationToken);
 
         return Task.FromResult(PermissionCheckResult.Ok());

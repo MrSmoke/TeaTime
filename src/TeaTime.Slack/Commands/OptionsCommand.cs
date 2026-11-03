@@ -14,17 +14,12 @@ using Resources;
 using Services;
 
 [CommandPrefix("options")]
-public class OptionsCommand : BaseCommand
+public class OptionsCommand(
+    ISlackService slackService,
+    IMediator mediator,
+    IIdGenerator<long> idGenerator)
+    : BaseCommand(slackService)
 {
-    private readonly IMediator _mediator;
-    private readonly IIdGenerator<long> _idGenerator;
-
-    public OptionsCommand(ISlackService slackService, IMediator mediator, IIdGenerator<long> idGenerator) : base(slackService)
-    {
-        _mediator = mediator;
-        _idGenerator = idGenerator;
-    }
-
     [Command("add")]
     public async Task<ICommandResult> AddOption(string? groupName, string? optionName)
     {
@@ -33,7 +28,7 @@ public class OptionsCommand : BaseCommand
 
         var context = await GetContextAsync();
 
-        var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(
+        var group = await mediator.Send(new GetRoomItemGroupByNameQuery(
             RoomId: context.Room.Id,
             UserId: context.User.Id,
             Name: groupName));
@@ -43,12 +38,12 @@ public class OptionsCommand : BaseCommand
 
         var command =
             new CreateOptionCommand(
-                Id: await _idGenerator.GenerateAsync(),
+                Id: await idGenerator.GenerateAsync(),
                 UserId: context.User.Id,
                 GroupId: group.Id,
                 Name: optionName);
 
-        await _mediator.Send(command);
+        await mediator.Send(command);
 
         return Response(ResponseStrings.OptionAddedToGroup(optionName, group.Name), ResponseType.User);
     }
@@ -61,7 +56,7 @@ public class OptionsCommand : BaseCommand
 
         var context = await GetContextAsync();
 
-        var group = await _mediator.Send(new GetRoomItemGroupByNameQuery(
+        var group = await mediator.Send(new GetRoomItemGroupByNameQuery(
             RoomId: context.Room.Id,
             UserId: context.User.Id,
             Name: groupName));
@@ -75,7 +70,7 @@ public class OptionsCommand : BaseCommand
 
         var command = new DeleteOptionCommand(option.Id, context.User.Id);
 
-        await _mediator.Send(command);
+        await mediator.Send(command);
 
         return Response(ResponseStrings.OptionRemoved(optionName, groupName), ResponseType.User);
     }

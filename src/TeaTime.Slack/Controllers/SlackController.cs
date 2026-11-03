@@ -41,7 +41,7 @@ public class SlackController(
 
         if (string.IsNullOrWhiteSpace(slashCommand.Text))
         {
-            logger.LogWarning("Slash command contains no text");
+            logger.LogInformation("Slash command contains no text");
             return Ok(ErrorStrings.General(), ResponseType.User);
         }
 
@@ -61,18 +61,18 @@ public class SlackController(
         }
         catch (CommandNotFoundException)
         {
-            logger.LogWarning("Slash command not found");
+            logger.LogInformation("Slash command not found");
             return Ok(ErrorStrings.CommandUnknown(slashCommand.Text), ResponseType.User);
         }
         catch (ParameterBindingException e)
         {
             // Parameter name is ours; the value is user input so it isn't logged
-            logger.LogWarning("Slash command arguments invalid for parameter {ParameterName}", e.ParameterName);
+            logger.LogInformation("Slash command arguments invalid for parameter {ParameterName}", e.ParameterName);
             return Ok(ErrorStrings.CommandBadArguments(slashCommand.Text), ResponseType.User);
         }
         catch (RunStartException e)
         {
-            logger.LogWarning("Failed to start run: {Reason}", e.Reason);
+            logger.LogInformation("Failed to start run: {Reason}", e.Reason);
 
             switch (e.Reason)
             {
@@ -88,7 +88,7 @@ public class SlackController(
         }
         catch (RunEndException e)
         {
-            logger.LogWarning("Failed to end run: {Reason}", e.Reason);
+            logger.LogInformation("Failed to end run: {Reason}", e.Reason);
 
             switch (e.Reason)
             {
@@ -110,7 +110,7 @@ public class SlackController(
         }
         catch (PermissionException e)
         {
-            logger.LogWarning("Slash command denied: {Message}", e.Message);
+            logger.LogInformation("Slash command denied: {Message}", e.Message);
             return Ok(e.Message, ResponseType.User);
         }
         catch (Exception e)
@@ -150,7 +150,7 @@ public class SlackController(
 
         if (payload.Type != BlockActionsPayload.PayloadType)
         {
-            logger.LogWarning("Ignoring unsupported interaction type {Type}", payload.Type);
+            logger.LogInformation("Ignoring unsupported interaction type {Type}", payload.Type);
             return Ok();
         }
 

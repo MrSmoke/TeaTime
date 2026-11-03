@@ -17,33 +17,20 @@ using Models.SlashCommands;
 using Resources;
 using Services;
 
-public class RunCommand : BaseCommand
+public class RunCommand(
+    IMediator mediator,
+    IIdGenerator<long> idGenerator,
+    TimeProvider clock,
+    ISlackService slackService,
+    ILogger<RunCommand> logger)
+    : BaseCommand(slackService)
 {
-    private readonly IMediator _mediator;
-    private readonly IIdGenerator<long> _idGenerator;
-    private readonly TimeProvider _clock;
-    private readonly ISlackService _slackService;
-    private readonly ILogger<RunCommand> _logger;
-
-    public RunCommand(IMediator mediator,
-        IIdGenerator<long> idGenerator,
-        TimeProvider clock,
-        ISlackService slackService,
-        ILogger<RunCommand> logger) : base(slackService)
-    {
-        _logger = logger;
-        _mediator = mediator;
-        _idGenerator = idGenerator;
-        _clock = clock;
-        _slackService = slackService;
-    }
-
     [Command("")]
     public async Task<ICommandResult> Start(string group = "tea")
     {
         var context = await GetContextAsync();
 
-        var roomItemGroup = await _mediator.Send(new GetRoomItemGroupByNameQuery(
+        var roomItemGroup = await mediator.Send(new GetRoomItemGroupByNameQuery(
             RoomId: context.Room.Id,
             UserId: context.User.Id,
             Name: group));
@@ -56,14 +43,14 @@ public class RunCommand : BaseCommand
 
         var command = new StartRunCommand
         (
-            Id: await _idGenerator.GenerateAsync(),
+            Id: await idGenerator.GenerateAsync(),
             UserId: context.User.Id,
             RoomId: context.Room.Id,
             RoomGroupId: roomItemGroup.Id,
-            StartTime: _clock.GetUtcNow()
+            StartTime: clock.GetUtcNow()
         );
 
-        await _mediator.Send(command);
+        await mediator.Send(command);
 
         var text = ResponseStrings.RunStarted(context.Command.UserId, roomItemGroup.Name);
 
@@ -82,13 +69,13 @@ public class RunCommand : BaseCommand
 
         try
         {
-            await _slackService.JoinRunAsync(slashCommand, optionName);
+            await SlackService.JoinRunAsync(slashCommand, optionName);
 
             return Ok();
         }
         catch (SlackTeaTimeException e)
         {
-            _logger.LogWarning("Join run rejected: {Message}", e.Message);
+            logger.LogInformation("Join run rejected: {Message}", e.Message);
             return Response(e.Message, ResponseType.User);
         }
     }
@@ -98,11 +85,11 @@ public class RunCommand : BaseCommand
     {
         var context = await GetContextAsync();
 
-        var run = await _mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
+        var run = await mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
         if (run == null)
             return Response(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User);
 
-        var orders = await _mediator.Send(new GetRunOrdersQuery(run.Id, context.User.Id));
+        var orders = await mediator.Send(new GetRunOrdersQuery(run.Id, context.User.Id));
 
         var command = new EndRunCommand(
             Run: run,
@@ -112,7 +99,7 @@ public class RunCommand : BaseCommand
 
         command.AddCallbackState(context.Command.ToCallbackData());
 
-        await _mediator.Send(command);
+        await mediator.Send(command);
 
         return Response(null, ResponseType.Channel);
     }

@@ -8,21 +8,14 @@ using MediatR;
 using Models;
 using Queries;
 
-public class RoomItemGroupQueryHandler :
+public class RoomItemGroupQueryHandler(IOptionsRepository optionsRepository) :
     IRequestHandler<GetRoomItemGroupByNameQuery, RoomItemGroupModel?>,
     IRequestHandler<GetRoomItemGroupQuery, RoomItemGroupModel?>
 {
-    private readonly IOptionsRepository _optionsRepository;
-
-    public RoomItemGroupQueryHandler(IOptionsRepository optionsRepository)
-    {
-        _optionsRepository = optionsRepository;
-    }
-
     public async Task<RoomItemGroupModel?> Handle(GetRoomItemGroupByNameQuery request,
         CancellationToken cancellationToken)
     {
-        var group = await _optionsRepository.GetGroupByNameAsync(request.RoomId, request.Name, cancellationToken);
+        var group = await optionsRepository.GetGroupByNameAsync(request.RoomId, request.Name, cancellationToken);
         if (group == null)
             return null;
 
@@ -33,7 +26,7 @@ public class RoomItemGroupQueryHandler :
             CreatedBy = group.CreatedBy,
             CreatedDate = group.CreatedDate,
             RoomId = group.RoomId,
-            Options = (await _optionsRepository.GetOptionsByGroupIdAsync(group.Id, cancellationToken)).AsReadOnlyList()
+            Options = (await optionsRepository.GetOptionsByGroupIdAsync(group.Id, cancellationToken)).AsReadOnlyList()
         };
 
         return model;
@@ -41,7 +34,7 @@ public class RoomItemGroupQueryHandler :
 
     public async Task<RoomItemGroupModel?> Handle(GetRoomItemGroupQuery request, CancellationToken cancellationToken)
     {
-        var group = await _optionsRepository.GetGroupAsync(request.GroupId, cancellationToken);
+        var group = await optionsRepository.GetGroupAsync(request.GroupId, cancellationToken);
         if (group == null)
             return null;
 
@@ -52,7 +45,7 @@ public class RoomItemGroupQueryHandler :
             CreatedBy = group.CreatedBy,
             CreatedDate = group.CreatedDate,
             RoomId = group.RoomId,
-            Options = (await _optionsRepository.GetOptionsByGroupIdAsync(group.Id, cancellationToken)).AsReadOnlyList()
+            Options = (await optionsRepository.GetOptionsByGroupIdAsync(group.Id, cancellationToken)).AsReadOnlyList()
         };
 
         return model;

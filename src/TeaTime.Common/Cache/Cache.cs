@@ -5,24 +5,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 
-public class Cache : ICache
+public class Cache(IDistributedCache distributedCache, ICacheSerializer serializer) : ICache
 {
-    private readonly IDistributedCache _distributedCache;
-    private readonly ICacheSerializer _serializer;
-
-    public Cache(IDistributedCache distributedCache, ICacheSerializer serializer)
-    {
-        _distributedCache = distributedCache;
-        _serializer = serializer;
-    }
-
     public async Task<CacheValue<T>?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
     {
-        var bytes = await _distributedCache.GetAsync(key, cancellationToken);
+        var bytes = await distributedCache.GetAsync(key, cancellationToken);
         if (bytes == null)
             return null;
 
-        var value = _serializer.Deserialize<T>(bytes);
+        var value = serializer.Deserialize<T>(bytes);
         if (value is null)
             return null;
 
@@ -37,7 +28,7 @@ public class Cache : ICache
 
         options ??= new CacheEntryOptions();
 
-        var bytes = _serializer.Serialize(value);
+        var bytes = serializer.Serialize(value);
 
         var distributedCacheEntryOptions = new DistributedCacheEntryOptions();
 
@@ -49,6 +40,6 @@ public class Cache : ICache
                 distributedCacheEntryOptions.SetAbsoluteExpiration(options.Expiration.Value);
         }
 
-        return _distributedCache.SetAsync(key, bytes, distributedCacheEntryOptions, cancellationToken);
+        return distributedCache.SetAsync(key, bytes, distributedCacheEntryOptions, cancellationToken);
     }
 }

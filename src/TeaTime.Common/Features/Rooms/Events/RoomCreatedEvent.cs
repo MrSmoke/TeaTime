@@ -2,6 +2,9 @@ namespace TeaTime.Common.Features.Rooms.Events;
 
 using Abstractions;
 
+/// <summary>
+/// Published after a room has been created
+/// </summary>
 /// <param name="Id"></param>
 /// <param name="Name"></param>
 /// <param name="CreatedBy">The id of the user who created the room</param>

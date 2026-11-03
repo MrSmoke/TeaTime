@@ -27,6 +27,8 @@ public class SlackServiceTests
 {
     private const string ResponseUrl = "https://hooks.slack.com/actions/T1/1/abc";
 
+    private const long RunGroupId = 100;
+
     [Fact]
     public async Task HandleBlockActions_JoinFails_RepliesEphemerallyViaResponseUrl()
     {
@@ -126,8 +128,6 @@ public class SlackServiceTests
             .MustHaveHappenedOnceExactly();
         A.CallTo(() => apiClient.PostResponseAsync(A<string>._, A<SlashCommandResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
-
-    private const long RunGroupId = 100;
 
     private static ISender CreateJoinMediator(long optionGroupId)
     {

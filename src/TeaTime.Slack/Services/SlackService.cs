@@ -142,12 +142,12 @@ internal class SlackService(ISender mediator,
         }
         catch (SlackTeaTimeException e)
         {
-            logger.LogWarning(e, "Join run rejected");
+            logger.LogInformation("Join run rejected: {Message}", e.Message);
             await ReplyAsync(requestPayload.ResponseUrl, e.Message, cancellationToken);
         }
         catch (PermissionException e)
         {
-            logger.LogWarning(e, "Join run denied");
+            logger.LogInformation("Join run denied: {Message}", e.Message);
             await ReplyAsync(requestPayload.ResponseUrl, e.Message, cancellationToken);
         }
         catch (Exception e)
@@ -156,6 +156,42 @@ internal class SlackService(ISender mediator,
             await ReplyAsync(requestPayload.ResponseUrl, ErrorStrings.General(), cancellationToken);
         }
     }
+
+    public async Task InstallAsync(OAuthTokenResponse response, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(response);
+
+        // Org-wide installs have no team
+        if (response.IsEnterpriseInstall || response.Team is null)
+            throw new InvalidOperationException("Org-wide installs are not supported");
+
+        if (string.IsNullOrEmpty(response.Team.Id))
+            throw new InvalidOperationException("TeamId cannot be empty");
+
+        if (string.IsNullOrEmpty(response.AccessToken))
+            throw new InvalidOperationException("AccessToken cannot be empty");
+
+        var hashKey = "slack:" + response.Team.Id;
+
+        // Store base data for the whole team
+        List<HashEntry> entries =
+        [
+            new(Constants.FieldKeys.AccessToken, response.AccessToken),
+            new(Constants.FieldKeys.InstallTime, timeProvider.GetUtcNow().ToString("O"))
+        ];
+
+        if (!string.IsNullOrEmpty(response.Team.Name))
+            entries.Add(new(Constants.FieldKeys.TeamName, response.Team.Name));
+
+        await hash.SetAsync(hashKey, entries, cancellationToken);
+    }
+
+    private static bool IsJoinAction(BlockAction action) =>
+        action.ActionId.StartsWith(BlockBuilder.JoinOptionActionIdPrefix, StringComparison.Ordinal);
+
+    private static string FallbackUserName(string slackUserId) => $"Slack User {slackUserId}";
+
+    private static string FallbackChannelName(string slackChannelId) => $"Slack Channel {slackChannelId}";
 
     private Task ReplyAsync(string responseUrl, string message, CancellationToken cancellationToken = default)
     {
@@ -183,42 +219,6 @@ internal class SlackService(ISender mediator,
         var room = await GetOrCreateRoomAsync(channel.Id, channel.Name, user.Id, cancellationToken);
 
         await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData(responseUrl), cancellationToken);
-    }
-
-    private static bool IsJoinAction(BlockAction action) =>
-        action.ActionId.StartsWith(BlockBuilder.JoinOptionActionIdPrefix, StringComparison.Ordinal);
-
-    private static string FallbackUserName(string slackUserId) => $"Slack User {slackUserId}";
-
-    private static string FallbackChannelName(string slackChannelId) => $"Slack Channel {slackChannelId}";
-
-    public async Task InstallAsync(OAuthTokenResponse response, CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(response);
-
-        // Org-wide installs have no team
-        if (response.IsEnterpriseInstall || response.Team is null)
-            throw new InvalidOperationException("Org-wide installs are not supported");
-
-        if (string.IsNullOrEmpty(response.Team.Id))
-            throw new InvalidOperationException("TeamId cannot be empty");
-
-        if (string.IsNullOrEmpty(response.AccessToken))
-            throw new InvalidOperationException("AccessToken cannot be empty");
-
-        var hashKey = "slack:" + response.Team.Id;
-
-        // Store base data for the whole team
-        var entries = new List<HashEntry>
-        {
-            new(Constants.FieldKeys.AccessToken, response.AccessToken),
-            new(Constants.FieldKeys.InstallTime, timeProvider.GetUtcNow().ToString("O"))
-        };
-
-        if (!string.IsNullOrEmpty(response.Team.Name))
-            entries.Add(new(Constants.FieldKeys.TeamName, response.Team.Name));
-
-        await hash.SetAsync(hashKey, entries, cancellationToken);
     }
 
     private async Task JoinRunAsync(long userId, long roomId, string optionName, CallbackData callbackData,

@@ -10,33 +10,28 @@ using Models.SlashCommands;
 using Resources;
 using Services;
 
-public class IllMakeCommand : BaseCommand
+public class IllMakeCommand(
+    ISlackService slackService,
+    IMediator mediator,
+    IIdGenerator<long> idGenerator)
+    : BaseCommand(slackService)
 {
-    private readonly IMediator _mediator;
-    private readonly IIdGenerator<long> _idGenerator;
-
-    public IllMakeCommand(ISlackService slackService, IMediator mediator, IIdGenerator<long> idGenerator) : base(slackService)
-    {
-        _mediator = mediator;
-        _idGenerator = idGenerator;
-    }
-
     [Command("illmake")]
     public async Task<ICommandResult> IllMake()
     {
         var context = await GetContextAsync();
 
-        var run = await _mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
+        var run = await mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
         if (run == null)
             return Response(ErrorStrings.IllMake_RunNotStarted(), ResponseType.User);
 
         var command = new Common.Features.IllMake.Commands.IllMakeCommand(
-            Id: await _idGenerator.GenerateAsync(),
+            Id: await idGenerator.GenerateAsync(),
             RunId: run.Id,
             UserId: context.User.Id
         );
 
-        await _mediator.Send(command);
+        await mediator.Send(command);
 
         return Response(new SlashCommandResponse
         {

@@ -8,28 +8,19 @@ using Commands;
 using MediatR;
 using Models.Data;
 
-public class UserCommandHandler : IRequestHandler<CreateUserCommand>
+public class UserCommandHandler(IUserRepository userRepository, TimeProvider clock) : IRequestHandler<CreateUserCommand>
 {
-    private readonly IUserRepository _userRepository;
-    private readonly TimeProvider _clock;
-
-    public UserCommandHandler(IUserRepository userRepository, TimeProvider clock)
-    {
-        _userRepository = userRepository;
-        _clock = clock;
-    }
-
     public Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var user = new User
         {
             Id = request.Id,
             Username = request.Username,
-            CreatedDate = _clock.GetUtcNow(),
+            CreatedDate = clock.GetUtcNow(),
             DisplayName = request.DisplayName
         };
 
-        return _userRepository.CreateAsync(user, cancellationToken);
+        return userRepository.CreateAsync(user, cancellationToken);
 
         //todo: create event
     }

@@ -7,51 +7,35 @@ using Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-public class PermissionBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse> where TCommand : notnull
+public class PermissionBehavior<TCommand, TResponse>(
+    IPermissionService permissionService,
+    ILogger<PermissionBehavior<TCommand, TResponse>> logger)
+    : IPipelineBehavior<TCommand, TResponse>
+    where TCommand : notnull
 {
-    private readonly IPermissionService _permissionService;
-    private readonly ILogger<PermissionBehavior<TCommand, TResponse>> _logger;
-
-    public PermissionBehavior(IPermissionService permissionService,
-        ILogger<PermissionBehavior<TCommand, TResponse>> logger)
-    {
-        _permissionService = permissionService;
-        _logger = logger;
-    }
-
     public async Task<TResponse> Handle(TCommand request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         if (request is IUserCommand command)
         {
-            _logger.LogDebug("Checking permission for command {Command}", CommandTypeName);
+            logger.LogDebug("Checking permission for command {Command}", typeof(TCommand).Name);
 
-            var result = await _permissionService.CheckAsync(command, cancellationToken);
+            var result = await permissionService.CheckAsync(command, cancellationToken);
+            if (!result.Success)
+            {
+                logger.LogDebug("Permission check failed for command {Command} with message {Message}",
+                    typeof(TCommand).Name, result.Message);
 
-            Handle(result);
+                throw new PermissionException(result.Message ?? "Permission denied");
+            }
+
+            logger.LogDebug("Permission check succeeded for command {Command}", typeof(TCommand).Name);
         }
         else
         {
-            _logger.LogDebug("Skipping permission check for command {Command}", CommandTypeName);
+            logger.LogDebug("Skipping permission check for command {Command}", typeof(TCommand).Name);
         }
 
         return await next(cancellationToken);
     }
-
-    private void Handle(PermissionCheckResult result)
-    {
-        if (result.Success)
-        {
-            _logger.LogDebug("Permission check succeeded for command {Command}", CommandTypeName);
-
-            return;
-        }
-
-        _logger.LogDebug("Permission check failed for command {Command} with message {Message}",
-            CommandTypeName, result.Message);
-
-        throw new PermissionException(result.Message!);
-    }
-
-    private static string CommandTypeName => typeof(TCommand).Name;
 }
