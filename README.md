@@ -37,20 +37,9 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 
 ### Example Usage
 
-1. Create a group called tea
+Each channel starts with a `tea` group containing *Earl Grey* and *English Breakfast*, so you can start a round straight away.
 
-    ```
-    /teatime groups add tea
-    ```
-
-2. Add some options to your group
-
-    ```
-    /teatime options add tea "Earl Grey"
-    /teatime options add tea "English Breakfast"
-    ```
-
-3. Start a new round of tea
+1. Start a new round of tea
 
     ```
     /teatime tea
@@ -58,7 +47,9 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 
     ![image](https://user-images.githubusercontent.com/709976/56972165-d810ba80-6bad-11e9-9b63-fdc50abeb068.png)
 
-4. Wait for everyone to join...
+2. Wait for everyone to join...
+
+    Click an option on the round message to join, or click a different option to change your order.
 
     > (for those who like commands)
 
@@ -68,7 +59,7 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 
     ![image](https://user-images.githubusercontent.com/709976/56972122-c4655400-6bad-11e9-8478-e1f15d4e9403.png)
 
-5. _(optional)_ Be a good sport and volunteer to make the round
+3. _(optional)_ Be a good sport and volunteer to make the round
 
     ```
     /teatime illmake
@@ -76,7 +67,7 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 
     ![image](https://user-images.githubusercontent.com/709976/56972594-9cc2bb80-6bae-11e9-916b-2c6c6e40bae4.png)
 
-6. End the round
+4. End the round
 
     ```
     /teatime end
@@ -84,7 +75,18 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 
     ![image](https://user-images.githubusercontent.com/709976/56973263-d9db7d80-6baf-11e9-8b3c-e0ff1fe3c2f3.png)
 
-7. Congratulations?
+5. Congratulations?
+
+### Customising groups
+
+Add your own groups and options, then start a round with the group name.
+
+```
+/teatime groups add coffee
+/teatime options add coffee "Flat White"
+/teatime options add coffee "Long Black"
+/teatime coffee
+```
 
 ## Running
 
@@ -95,13 +97,12 @@ The TeaTime docker image can be found on [Docker Hub](https://hub.docker.com/r/d
 An example `docker-compose.yml`
 
 ```yml
-version: '3'
 services:
   web:
     image: dockdockcontainer/teatime:latest
     restart: always
     ports:
-     - "80:80"
+     - "80:8080"
     environment:
       SELFHOST: https://demo.example
       MYSQL__HOST: localhost
@@ -116,24 +117,43 @@ services:
 
 #### Supported tags
 
-- latest
-- dev
+| Tag                                    | Published                                   |
+|----------------------------------------|---------------------------------------------|
+| `latest`                               | Each release, excluding pre-releases        |
+| `{major}.{minor}.{patch}` (eg `1.2.2`) | Each release                                |
+| `{major}.{minor}` (eg `1.2`)           | Each release, tracking the latest patch     |
+| `dev`                                  | Each commit to `dev`                        |
+| `sha-{short}`                          | Each commit to `dev`, pinned to that commit |
 
 #### Environment Variables
 
-| Variable                                  | Required                  | Description                                                                                                                                               |
-|-------------------------------------------|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| SELFHOST                                  | false                     | The host of the TeaTime application including the scheme, host and port. If not set, this will be generated from the request. Eg `https://runteatime.com` |
-| MYSQL__HOST                               | **true**                  | The mysql server host.                                                                                                                                    |
-| MYSQL__PORT                               | false (default `3306`)    | The mysql server port.                                                                                                                                    |
-| MYSQL__USERNAME                           | **true**                  | The mysql users username.                                                                                                                                 |
-| MYSQL__PASSWORD                           | **true**                  | The mysql users password.                                                                                                                                 |
-| MYSQL__DATABASE                           | false (default `teatime`) | The mysql database.                                                                                                                                       |
-| SLACK__OAUTH__ENABLED                     | false (default `false`)   | Set to `true` to enable the "Add to Slack" button".                                                                                                       |
-| SLACK__OAUTH__CLIENTID                    | **true** *if enabled*     | The "Client ID" for the Slack app.                                                                                                                        |
-| SLACK__OAUTH__CLIENTSECRET                | **true** *if enabled*     | The "Client Secret" for the Slack app.                                                                                                                    |
-| SLACK__REQUESTVERIFICATION__ENABLED       | false (default `false`)   | Set to `true` to enable Slack request verification                                                                                                        |
-| SLACK__REQUESTVERIFICATION__SIGNINGSECRET | **true** *if enabled*     | The "Signing Secret" for the Slack app.                                                                                                                   |
+| Variable                                  | Required                    | Description                                                                                                                                               |
+|-------------------------------------------|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| SELFHOST                                  | false                       | The host of the TeaTime application including the scheme, host and port. If not set, this will be generated from the request. Eg `https://runteatime.com` |
+| MYSQL__HOST                               | false (default `localhost`) | The mysql server host.                                                                                                                                    |
+| MYSQL__PORT                               | false (default `3306`)      | The mysql server port.                                                                                                                                    |
+| MYSQL__USERNAME                           | false (default `root`)      | The mysql users username.                                                                                                                                 |
+| MYSQL__PASSWORD                           | false (default `password`)  | The mysql users password.                                                                                                                                 |
+| MYSQL__DATABASE                           | false (default `teatime`)   | The mysql database.                                                                                                                                       |
+| SLACK__OAUTH__ENABLED                     | false (default `false`)     | Set to `true` to enable the "Add to Slack" button.                                                                                                        |
+| SLACK__OAUTH__CLIENTID                    | **true** *if enabled*       | The "Client ID" for the Slack app.                                                                                                                        |
+| SLACK__OAUTH__CLIENTSECRET                | **true** *if enabled*       | The "Client Secret" for the Slack app.                                                                                                                    |
+| SLACK__REQUESTVERIFICATION__ENABLED       | false (default `false`)     | Set to `true` to enable Slack request verification                                                                                                        |
+| SLACK__REQUESTVERIFICATION__SIGNINGSECRET | **true** *if enabled*       | The "Signing Secret" for the Slack app.                                                                                                                   |
+
+### Slack app
+
+Create a Slack app and point it at your TeaTime host (`SELFHOST` above).
+
+| Slack app setting                  | Value                                                  |
+|------------------------------------|--------------------------------------------------------|
+| Slash Commands                     | `/teatime` with Request URL `{SELFHOST}/slack/slash`   |
+| Interactivity & Shortcuts          | Request URL `{SELFHOST}/slack/interactions`            |
+| OAuth & Permissions, Redirect URLs | `{SELFHOST}/slack/callback` (only if OAuth is enabled) |
+| OAuth & Permissions, Bot scopes    | `commands`                                             |
+
+Interactivity must be enabled for the join buttons to work.
+Copy the app's Client ID, Client Secret and Signing Secret into the matching `SLACK__` variables.
 
 ## License
 
