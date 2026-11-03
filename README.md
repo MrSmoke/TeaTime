@@ -16,7 +16,8 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 | Description                       | Command                  |
 |-----------------------------------|--------------------------|
 | Show a list of available commands | `/teatime help`          |
-| Start a new round                 | `/teatime {group}`       |
+| Start a new round of tea          | `/teatime start`         |
+| Start a new round for a group     | `/teatime start {group}` |
 | Join a round                      | `/teatime join {option}` |
 | End a round                       | `/teatime end`           |
 | Volunteer to make the round       | `/teatime illmake`       |
@@ -42,7 +43,7 @@ Each channel starts with a `tea` group containing *Earl Grey* and *English Break
 1. Start a new round of tea
 
     ```
-    /teatime tea
+    /teatime start
     ```
 
     ![image](https://user-images.githubusercontent.com/709976/56972165-d810ba80-6bad-11e9-9b63-fdc50abeb068.png)
@@ -85,7 +86,7 @@ Add your own groups and options, then start a round with the group name.
 /teatime groups add coffee
 /teatime options add coffee "Flat White"
 /teatime options add coffee "Long Black"
-/teatime coffee
+/teatime start coffee
 ```
 
 ## Running
