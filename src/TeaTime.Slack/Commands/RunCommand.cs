@@ -25,7 +25,7 @@ public class RunCommand(
     ILogger<RunCommand> logger)
     : BaseCommand(slackService)
 {
-    [Command("")]
+    [Command("start")]
     public async Task<ICommandResult> Start(string group = "tea")
     {
         var context = await GetContextAsync();

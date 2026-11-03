@@ -36,7 +36,7 @@ public class CommandRoutingTests
         provider.ValidateCommandRouter();
 
         Assert.Equal(
-            ["", "end", "groups add", "groups remove", "help", "illmake", "join", "options add", "options remove"],
+            ["end", "groups add", "groups remove", "help", "illmake", "join", "options add", "options remove", "start"],
             provider.GetRequiredService<ICommandTable>().Keys.Order(StringComparer.Ordinal));
     }
 
@@ -55,7 +55,7 @@ public class CommandRoutingTests
 
     [Theory]
     [InlineData("options add tea earl grey")]
-    [InlineData("earl grey")]
+    [InlineData("start earl grey")]
     [InlineData("help me")]
     [InlineData("groups add")]
     [InlineData("join")]

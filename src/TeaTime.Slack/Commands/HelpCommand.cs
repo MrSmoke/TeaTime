@@ -15,7 +15,8 @@ public class HelpCommand : BaseCommand
     {
         const string helpMessage =
             "*Commands*\n" +
-            "`/teatime {group}` - Start a new round\n" +
+            "`/teatime start` - Start a new round of tea\n" +
+            "`/teatime start {group}` - Start a new round for another group, like `/teatime start coffee`\n" +
             "`/teatime join {option}` - Join the current round\n" +
             "`/teatime end` - End a round\n" +
             "`/teatime illmake` - Volunteer to make the round\n" +
@@ -27,8 +28,8 @@ public class HelpCommand : BaseCommand
             "Use double quotes for names with spaces, for example `/teatime options add tea \"earl grey\"`\n" +
             "\n\n" +
             "*Examples*\n" +
-            "To start a new round:\n" +
-            "`/teatime tea`";
+            "To start a new round of tea:\n" +
+            "`/teatime start`";
 
         return StringResult(helpMessage);
     }

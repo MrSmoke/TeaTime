@@ -71,7 +71,7 @@ internal static class ErrorStrings
     //Misc
     internal static string OptionUnknown() => "Unknown option";
 
-    internal static string CommandUnknown(string command) => $"Unknown command `{command}`";
+    internal static string CommandUnknown(string command) => $"Unknown command `{command}`. " + HelpCommandText;
     internal static string CommandFailed() => "Failed to run command";
     internal static string CommandBadArguments(string command) =>
         $"Invalid arguments for `{command}`. Use `/teatime help` to see the commands";
