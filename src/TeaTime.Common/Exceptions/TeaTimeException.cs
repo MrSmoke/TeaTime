@@ -2,9 +2,4 @@ namespace TeaTime.Common.Exceptions;
 
 using System;
 
-public class TeaTimeException : Exception
-{
-    public TeaTimeException(string message) : base(message)
-    {
-    }
-}
+public class TeaTimeException(string message) : Exception(message);

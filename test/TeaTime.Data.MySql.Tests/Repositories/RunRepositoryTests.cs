@@ -6,21 +6,14 @@ using Common.Models.Data;
 using MySql.Repositories;
 using Xunit;
 
-public class RunRepositoryTests : IClassFixture<DatabaseFixture>
+public class RunRepositoryTests(DatabaseFixture databaseFixture) : IClassFixture<DatabaseFixture>
 {
-    private readonly DatabaseFixture _databaseFixture;
-
-    public RunRepositoryTests(DatabaseFixture databaseFixture)
-    {
-        _databaseFixture = databaseFixture;
-    }
-
     //[Fact]
     [Fact(Skip = "Requires local mysql")]
     public async Task GetAsync_Returns()
     {
         // This is gross
-        var userRepo = new UserRepository(_databaseFixture.ConnectionFactory);
+        var userRepo = new UserRepository(databaseFixture.ConnectionFactory);
         var user = new User
         {
             Id = TestData.NewInt64(),
@@ -30,7 +23,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
         };
         await userRepo.CreateAsync(user, TestContext.Current.CancellationToken);
 
-        var roomRepo = new RoomRepository(_databaseFixture.ConnectionFactory);
+        var roomRepo = new RoomRepository(databaseFixture.ConnectionFactory);
         var room = new Room
         {
             Id = TestData.NewInt64(),
@@ -40,7 +33,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
         };
         await roomRepo.CreateAsync(room, TestContext.Current.CancellationToken);
 
-        var optionRepo = new OptionsRepository(_databaseFixture.ConnectionFactory, TimeProvider.System);
+        var optionRepo = new OptionsRepository(databaseFixture.ConnectionFactory, TimeProvider.System);
         var group = new RoomItemGroup
         {
             Id = TestData.NewInt64(),
@@ -61,7 +54,7 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
         };
         await optionRepo.CreateAsync(option, TestContext.Current.CancellationToken);
 
-        var runRepo = new RunRepository(_databaseFixture.ConnectionFactory);
+        var runRepo = new RunRepository(databaseFixture.ConnectionFactory);
         var run = new Run
         {
             Id = TestData.NewInt64(),

@@ -1,13 +1,9 @@
 namespace TeaTime.Common.Exceptions;
 
-public class RunEndException : TeaTimeException
+public class RunEndException(string message, RunEndException.RunEndExceptionReason reason)
+    : TeaTimeException("Failed to end run. " + message)
 {
-    public RunEndException(string message, RunEndExceptionReason reason) : base("Failed to end run. " + message)
-    {
-        Reason = reason;
-    }
-
-    public RunEndExceptionReason Reason { get; }
+    public RunEndExceptionReason Reason { get; } = reason;
 
     public enum RunEndExceptionReason
     {

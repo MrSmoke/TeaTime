@@ -4,12 +4,8 @@ using CommandRouter.Attributes;
 using CommandRouter.Results;
 using Services;
 
-public class HelpCommand : BaseCommand
+public class HelpCommand(ISlackService slackService) : BaseCommand(slackService)
 {
-    public HelpCommand(ISlackService slackService) : base(slackService)
-    {
-    }
-
     [Command("help")]
     public ICommandResult Help()
     {

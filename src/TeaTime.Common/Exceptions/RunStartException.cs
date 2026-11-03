@@ -1,13 +1,9 @@
 namespace TeaTime.Common.Exceptions;
 
-public class RunStartException : TeaTimeException
+public class RunStartException(string message, RunStartException.RunStartExceptionReason reason)
+    : TeaTimeException("Failed to start run. " + message)
 {
-    public RunStartException(string message, RunStartExceptionReason reason) : base("Failed to start run. " + message)
-    {
-        Reason = reason;
-    }
-
-    public RunStartExceptionReason Reason { get; }
+    public RunStartExceptionReason Reason { get; } = reason;
 
     public enum RunStartExceptionReason
     {

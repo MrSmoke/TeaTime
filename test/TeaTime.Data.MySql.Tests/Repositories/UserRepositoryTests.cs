@@ -5,20 +5,13 @@ using TeaTime.Common.Models.Data;
 using TeaTime.Data.MySql.Repositories;
 using Xunit;
 
-public class UserRepositoryTests : IClassFixture<DatabaseFixture>
+public class UserRepositoryTests(DatabaseFixture databaseFixture) : IClassFixture<DatabaseFixture>
 {
-    private readonly DatabaseFixture _databaseFixture;
-
-    public UserRepositoryTests(DatabaseFixture databaseFixture)
-    {
-        _databaseFixture = databaseFixture;
-    }
-
     //[Fact]
     [Fact(Skip = "Requires local mysql")]
     public async Task CreateAsync_GetAsync()
     {
-        var repo = new UserRepository(_databaseFixture.ConnectionFactory);
+        var repo = new UserRepository(databaseFixture.ConnectionFactory);
 
         var user = new User
         {
