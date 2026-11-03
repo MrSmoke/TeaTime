@@ -14,6 +14,9 @@ internal static class ResponseStrings
     internal static string RunUserJoined(string slackUserId) =>
         $"{StringHelpers.SlackUserId(slackUserId)} has joined this round!";
 
+    internal static string RunUserLeft(string slackUserId) =>
+        $"{StringHelpers.SlackUserId(slackUserId)} has left this round";
+
     internal static string RunUserOrderChanged(string from, string to) =>
         $"You have changed your order: {from} -> {to}";
 

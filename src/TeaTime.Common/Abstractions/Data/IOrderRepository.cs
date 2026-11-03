@@ -12,4 +12,6 @@ public interface IOrderRepository
     Task<Order?> GetAsync(long id, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<Order>> GetOrdersAsync(long runId, CancellationToken cancellationToken = default);
+
+    Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default);
 }

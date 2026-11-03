@@ -19,7 +19,8 @@ public class OrderEventHandler(
     ILogger<OrderEventHandler> logger,
     IOptionsRepository optionsRepository) :
     INotificationHandler<OrderPlacedEvent>,
-    INotificationHandler<OrderOptionChangedEvent>
+    INotificationHandler<OrderOptionChangedEvent>,
+    INotificationHandler<OrderDeletedEvent>
 {
     public async Task Handle(OrderPlacedEvent notification, CancellationToken cancellationToken)
     {
@@ -27,7 +28,9 @@ public class OrderEventHandler(
         if (slackUserId == null)
             return;
 
-        await SendMessageAsync(notification, ResponseStrings.RunUserJoined(slackUserId), ResponseType.Channel,
+        await SendMessageAsync(notification,
+            ResponseStrings.RunUserJoined(slackUserId),
+            ResponseType.Channel,
             cancellationToken);
     }
 
@@ -49,6 +52,18 @@ public class OrderEventHandler(
         await SendMessageAsync(notification, message, ResponseType.User, cancellationToken);
     }
 
+    public async Task Handle(OrderDeletedEvent notification, CancellationToken cancellationToken)
+    {
+        var slackUserId = await GetSlackUserIdAsync(notification.Order.UserId, cancellationToken);
+        if (slackUserId == null)
+            return;
+
+        await SendMessageAsync(notification,
+            ResponseStrings.RunUserLeft(slackUserId),
+            ResponseType.Channel,
+            cancellationToken);
+    }
+
     private async Task<string?> GetSlackUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
         var slackUserId = await linkRepository.GetLinkAsync(userId, LinkType.User, cancellationToken);
@@ -65,7 +80,9 @@ public class OrderEventHandler(
         if (!evt.TryGetCallbackState(out var callbackData))
             return;
 
-        await slackApiClient.PostResponseAsync(callbackData.ResponseUrl,
-            new SlashCommandResponse(message, responseType), cancellationToken);
+        await slackApiClient.PostResponseAsync(
+            callbackData.ResponseUrl,
+            new SlashCommandResponse(message, responseType),
+            cancellationToken);
     }
 }

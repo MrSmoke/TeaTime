@@ -9,7 +9,11 @@ public class StatisticsRepository(IMySqlConnectionFactory factory) : BaseReposit
 {
     public Task<long> CountGlobalOrdersMadeAsync(CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT count(*) FROM orders o JOIN runs r ON r.id = o.runId WHERE r.ended = 1";
+        const string sql = """
+                           SELECT count(*) FROM orders o
+                           JOIN runs r ON r.id = o.runId
+                           WHERE r.ended = 1 AND o.deleted = 0
+                           """;
 
         return SingleOrDefaultAsync<long>(sql, cancellationToken: cancellationToken);
     }

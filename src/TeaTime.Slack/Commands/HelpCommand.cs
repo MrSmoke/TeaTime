@@ -14,6 +14,7 @@ public class HelpCommand(ISlackService slackService) : BaseCommand(slackService)
             "`/teatime start` - Start a new round of tea\n" +
             "`/teatime start {group}` - Start a new round for another group, like `/teatime start coffee`\n" +
             "`/teatime join {option}` - Join the current round\n" +
+            "`/teatime leave` - Leave the current round\n" +
             "`/teatime end` - End a round\n" +
             "`/teatime illmake` - Volunteer to make the round\n" +
             "`/teatime groups add {name}` - Add a group\n" +
