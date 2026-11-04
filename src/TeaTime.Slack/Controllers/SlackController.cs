@@ -124,6 +124,7 @@ public class SlackController(
 
     [SlackVerifyRequest]
     [HttpPost("interactions")]
+    [HttpPost("interactive-messages")]
     public async Task<IActionResult> InteractionHook(InteractionRequest request)
     {
         if (string.IsNullOrWhiteSpace(request?.PayloadJson))
