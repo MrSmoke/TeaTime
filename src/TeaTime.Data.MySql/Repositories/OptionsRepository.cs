@@ -12,7 +12,7 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     : BaseRepository(factory), IOptionsRepository
 {
     private const string GroupSelectColumns = "id, name, roomId, createdBy, createdDate";
-    private const string OptionSelectColumns = "id, name, groupId, createdBy, createdDate, available";
+    private const string OptionSelectColumns = "id, name, available, groupId, createdBy, createdDate";
 
     public Task CreateGroupAsync(RoomItemGroup group, CancellationToken cancellationToken = default)
     {
@@ -27,7 +27,8 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     public Task UpdateGroupAsync(RoomItemGroup group, CancellationToken cancellationToken = default)
     {
         const string sql = """
-                           UPDATE option_groups SET name = @name
+                           UPDATE option_groups
+                           SET name = @name
                            WHERE id = @id AND deleted = 0
                            """;
 
@@ -37,7 +38,8 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     public Task DeleteGroupAsync(long groupId, CancellationToken cancellationToken = default)
     {
         const string sql = """
-                           UPDATE option_groups SET deleted = 1, deletedDate = @now
+                           UPDATE option_groups
+                           SET deleted = 1, deletedDate = @now
                            WHERE id = @groupId AND deleted = 0
                            """;
 
@@ -72,8 +74,8 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     public Task CreateAsync(Option option, CancellationToken cancellationToken = default)
     {
         const string sql = """
-                           INSERT INTO options (id, name, groupId, createdBy, createdDate, available)
-                           VALUES (@id, @name, @groupId, @createdBy, @createdDate, @available)
+                           INSERT INTO options (id, name, available, groupId, createdBy, createdDate)
+                           VALUES (@id, @name, @available, @groupId, @createdBy, @createdDate)
                            """;
 
         return ExecuteAsync(sql, option, cancellationToken);
@@ -92,7 +94,8 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     public Task UpdateAsync(Option option, CancellationToken cancellationToken = default)
     {
         const string sql = """
-                           UPDATE options SET name = @name
+                           UPDATE options
+                           SET name = @name
                            WHERE id = @id AND deleted = 0
                            """;
 
@@ -102,7 +105,8 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     public Task DeleteAsync(long optionId, CancellationToken cancellationToken = default)
     {
         const string sql = """
-                           UPDATE options SET deleted = 1, deletedDate = @now
+                           UPDATE options
+                           SET deleted = 1, deletedDate = @now
                            WHERE id = @optionId AND deleted = 0
                            """;
 

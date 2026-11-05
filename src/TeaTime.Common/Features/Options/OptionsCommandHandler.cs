@@ -18,9 +18,10 @@ public class OptionsCommandHandler(TimeProvider clock, IOptionsRepository option
         {
             Id = request.Id,
             Name = request.Name,
+            Available = true,
+            GroupId = request.GroupId,
             CreatedBy = request.UserId,
             CreatedDate = clock.GetUtcNow(),
-            GroupId = request.GroupId
         };
 
         return optionsRepository.CreateAsync(option, cancellationToken);
