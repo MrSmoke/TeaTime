@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Models.BlockKit;
+namespace TeaTime.Slack.Models.BlockKit;
 
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
