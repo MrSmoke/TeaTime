@@ -28,8 +28,8 @@ internal static class BlockBuilder
             new DividerBlock()
         ];
 
-        // Show 5 buttons per block to avoid the "more" button.
-        // Also only take MaxBlocks * ActionPerBlock to limit the number of rows.
+        // Show ActionsPerBlock buttons per block to avoid the "more" button.
+        // Also only take MaxActionBlocks * ActionsPerBlock to limit the number of rows.
         var outputOptions = options
             .Take(ActionsPerBlock * MaxActionBlocks)
             .Chunk(ActionsPerBlock);
