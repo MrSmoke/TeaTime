@@ -61,6 +61,25 @@ public class SlackControllerTests
         Assert.Equal("ephemeral", response.ResponseType);
     }
 
+    // Slack converts typed quotes to curly quotes, which must be straightened before the command is parsed
+    [Fact]
+    public async Task SlashCommandHook_CurlyQuotes_PassedToRunnerAsStraightQuotes()
+    {
+        var commandRunner = A.Fake<ICommandRunner>(o => o.Strict());
+        A.CallTo(() => commandRunner.RunAsync(A<string>._, A<IReadOnlyDictionary<string, object>?>._,
+                A<CancellationToken>._))
+            .ThrowsAsync(new CommandNotFoundException("options"));
+
+        var controller = new SlackController(commandRunner, A.Fake<ISlackService>(o => o.Strict()),
+            NullLogger<SlackController>.Instance);
+
+        await RunAsync(controller, "options add tea \u201Cearl grey\u201D");
+
+        A.CallTo(() => commandRunner.RunAsync("options add tea \"earl grey\"",
+                A<IReadOnlyDictionary<string, object>?>._, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
     [Fact]
     public async Task InteractionHook_UnsupportedType_IgnoredWithEmptyOk()
     {
