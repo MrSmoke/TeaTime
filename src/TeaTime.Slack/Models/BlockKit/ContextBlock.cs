@@ -1,10 +1,12 @@
 ﻿namespace TeaTime.Slack.Models.BlockKit;
 
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 public class ContextBlock : Block
 {
     public override string Type => "context";
 
-    public List<TextObject> Elements { get; set; } = [];
+    [JsonPropertyName("elements")]
+    public List<TextObject> Elements { get; } = [];
 }
