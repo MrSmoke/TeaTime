@@ -93,7 +93,7 @@ public class RunCommand(
         }
         catch (SlackTeaTimeException e)
         {
-            logger.LogInformation("Leave run rejected: {Message}", e.Message);
+            logger.LogInformation(e, "Leave run rejected");
             return Response(e.Message, ResponseType.User);
         }
     }

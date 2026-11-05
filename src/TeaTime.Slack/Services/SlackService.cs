@@ -163,12 +163,12 @@ internal class SlackService(ISender mediator,
         }
         catch (SlackTeaTimeException e)
         {
-            logger.LogInformation("Block action {ActionId} rejected: {Message}", action?.ActionId, e.Message);
+            logger.LogInformation(e, "Block action {ActionId} rejected", action?.ActionId);
             await ReplyAsync(requestPayload.ResponseUrl, e.Message, cancellationToken);
         }
         catch (PermissionException e)
         {
-            logger.LogInformation("Block action {ActionId} denied: {Message}", action?.ActionId, e.Message);
+            logger.LogInformation(e, "Block action {ActionId} denied", action?.ActionId);
             await ReplyAsync(requestPayload.ResponseUrl, e.Message, cancellationToken);
         }
         catch (Exception e)

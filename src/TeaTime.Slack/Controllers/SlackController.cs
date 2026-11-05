@@ -118,7 +118,7 @@ public class SlackController(
         }
         catch (PermissionException e)
         {
-            logger.LogInformation("Slash command denied: {Message}", e.Message);
+            logger.LogInformation(e, "Slash command denied");
             return Ok(e.Message, ResponseType.User);
         }
         catch (Exception e)
