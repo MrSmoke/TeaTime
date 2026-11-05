@@ -66,9 +66,7 @@ public class OptionsCommand(
         if (group.Options.Count == 0)
             return Response(ErrorStrings.ListOptions_GroupNoOptions(group.Name), ResponseType.User);
 
-        var optionNames = group.Options.Select(o => o.Name);
-
-        return Response(ResponseStrings.OptionList(group.Name, optionNames), ResponseType.User);
+        return Response(ResponseStrings.OptionList(group.Name, group.Options), ResponseType.User);
     }
 
     [Command("remove")]
@@ -96,5 +94,47 @@ public class OptionsCommand(
         await mediator.Send(command);
 
         return Response(ResponseStrings.OptionRemoved(optionName, groupName), ResponseType.User);
+    }
+
+    [Command("available")]
+    public Task<ICommandResult> MarkOptionAvailable(string? groupName, string? optionName)
+    {
+        return SetOptionAvailabilityAsync(groupName, optionName, available: true);
+    }
+
+    [Command("unavailable")]
+    public Task<ICommandResult> MarkOptionUnavailable(string? groupName, string? optionName)
+    {
+        return SetOptionAvailabilityAsync(groupName, optionName, available: false);
+    }
+
+    private async Task<ICommandResult> SetOptionAvailabilityAsync(string? groupName, string? optionName,
+        bool available)
+    {
+        if (string.IsNullOrWhiteSpace(groupName) || string.IsNullOrWhiteSpace(optionName))
+            return Response(ErrorStrings.SetOptionAvailability_BadArguments(available), ResponseType.User);
+
+        var context = await GetContextAsync();
+
+        var group = await mediator.Send(new GetRoomItemGroupByNameQuery(
+            RoomId: context.Room.Id,
+            UserId: context.User.Id,
+            Name: groupName));
+
+        if (group == null)
+            return Response(ErrorStrings.SetOptionAvailability_GroupInvalidName(groupName), ResponseType.User);
+
+        var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.Ordinal));
+        if (option == null)
+            return Response(ErrorStrings.SetOptionAvailability_UnknownOption(optionName), ResponseType.User);
+
+        if (option.Available != available)
+        {
+            var command = new SetOptionAvailabilityCommand(option.Id, context.User.Id, available);
+
+            await mediator.Send(command);
+        }
+
+        return Response(ResponseStrings.OptionAvailabilityChanged(option.Name, available), ResponseType.User);
     }
 }

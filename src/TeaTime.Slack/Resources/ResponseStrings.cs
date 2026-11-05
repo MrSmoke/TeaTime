@@ -2,6 +2,7 @@ namespace TeaTime.Slack.Resources;
 
 using System.Collections.Generic;
 using System.Linq;
+using Common.Models.Data;
 
 internal static class ResponseStrings
 {
@@ -10,6 +11,14 @@ internal static class ResponseStrings
 
     internal static string OptionRemoved(string optionName, string groupName) =>
         $"Removed option *{optionName}* from group *{groupName}*";
+
+    internal static string OptionAvailabilityChanged(string optionName, bool available)
+    {
+        if (available)
+            return $"*{optionName}* is now available";
+
+        return $"*{optionName}* is now unavailable";
+    }
 
     internal static string RunStarted(string slackUserId, string groupName) =>
         $"{StringHelpers.SlackUserId(slackUserId)} wants *{StringHelpers.EscapeMarkdown(groupName)}*!";
@@ -32,10 +41,16 @@ internal static class ResponseStrings
     internal static string IllMake(string slackUserId) =>
         $"{StringHelpers.SlackUserId(slackUserId)} has volunteered to make this round!";
 
-    internal static string OptionList(string groupName, IEnumerable<string> optionNames)
+    internal static string OptionList(string groupName, IReadOnlyCollection<Option> options)
     {
-        var lines = optionNames.Select(name => $"- {name}");
+        var available = options.Where(o => o.Available).Select(o => $"- {o.Name}");
+        var unavailable = options.Where(o => !o.Available).Select(o => $"- {o.Name}").ToList();
 
-        return $"Options for *{groupName}*\n" + string.Join('\n', lines);
+        var text = $"Options for *{groupName}*\n" + string.Join('\n', available);
+
+        if (unavailable.Count == 0)
+            return text;
+
+        return text + "\n\n*Unavailable*\n" + string.Join('\n', unavailable);
     }
 }

@@ -102,6 +102,17 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
         return ExecuteAsync(sql, option, cancellationToken);
     }
 
+    public Task SetAvailabilityAsync(long optionId, bool available, CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+                           UPDATE options
+                           SET available = @available
+                           WHERE id = @optionId AND deleted = 0
+                           """;
+
+        return ExecuteAsync(sql, new { optionId, available }, cancellationToken);
+    }
+
     public Task DeleteAsync(long optionId, CancellationToken cancellationToken = default)
     {
         const string sql = """

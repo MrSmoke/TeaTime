@@ -10,7 +10,8 @@ using Models.Data;
 
 public class OptionsCommandHandler(TimeProvider clock, IOptionsRepository optionsRepository) :
     IRequestHandler<CreateOptionCommand>,
-    IRequestHandler<DeleteOptionCommand>
+    IRequestHandler<DeleteOptionCommand>,
+    IRequestHandler<SetOptionAvailabilityCommand>
 {
     public Task Handle(CreateOptionCommand request, CancellationToken cancellationToken)
     {
@@ -30,5 +31,10 @@ public class OptionsCommandHandler(TimeProvider clock, IOptionsRepository option
     public Task Handle(DeleteOptionCommand request, CancellationToken cancellationToken)
     {
         return optionsRepository.DeleteAsync(request.OptionId, cancellationToken);
+    }
+
+    public Task Handle(SetOptionAvailabilityCommand request, CancellationToken cancellationToken)
+    {
+        return optionsRepository.SetAvailabilityAsync(request.OptionId, request.Available, cancellationToken);
     }
 }
