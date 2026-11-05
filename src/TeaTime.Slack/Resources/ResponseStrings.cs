@@ -9,7 +9,9 @@ internal static class ResponseStrings
         $"Removed option *{optionName}* from group *{groupName}*";
 
     internal static string RunStarted(string slackUserId, string groupName) =>
-        $"{StringHelpers.SlackUserId(slackUserId)} wants {groupName}!";
+        $"{StringHelpers.SlackUserId(slackUserId)} wants *{StringHelpers.EscapeMarkdown(groupName)}*!";
+
+    internal static string RunStartedHint() => "Pick an option below to join, or type `/teatime join {option}`";
 
     internal static string RunUserJoined(string slackUserId) =>
         $"{StringHelpers.SlackUserId(slackUserId)} has joined this round!";

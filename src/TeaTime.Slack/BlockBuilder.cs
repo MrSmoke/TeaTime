@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using Common.Models.Data;
 using Models.BlockKit;
+using Resources;
 
 internal static class BlockBuilder
 {
@@ -19,13 +20,12 @@ internal static class BlockBuilder
     internal static List<Block> BuildRunStarted(string text, IEnumerable<Option> options)
     {
         var contextBlock = new ContextBlock();
-        contextBlock.Elements.Add(TextObject.Markdown("Select an option below to join the round"));
+        contextBlock.Elements.Add(TextObject.Markdown(ResponseStrings.RunStartedHint()));
 
         List<Block> blocks =
         [
             new SectionBlock(TextObject.Markdown(text)),
-            contextBlock,
-            new DividerBlock()
+            contextBlock
         ];
 
         // Show ActionsPerBlock buttons per block to avoid the "more" button.
