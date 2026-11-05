@@ -46,6 +46,11 @@ public class SlackController(
             commandText = "help";
         }
 
+        // Slack likes to replace quotes so bring them back to normal ascii
+        commandText = commandText
+            .Replace('\u201C', '"')
+            .Replace('\u201D', '"');
+
         // Command text is user input so isn't logged
         logger.LogInformation("Received slash command from {SlackUserId} in {SlackChannelId} ({SlackTeamId})",
             slashCommand.UserId, slashCommand.ChannelId, slashCommand.TeamId);
