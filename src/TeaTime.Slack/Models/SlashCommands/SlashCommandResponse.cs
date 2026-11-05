@@ -1,6 +1,5 @@
 namespace TeaTime.Slack.Models.SlashCommands;
 
-using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using BlockKit;
@@ -11,7 +10,7 @@ using BlockKit;
 /// </summary>
 public class SlashCommandResponse(string? text, ResponseType responseType)
 {
-    public SlashCommandResponse() : this(null, SlashCommands.ResponseType.Channel)
+    public SlashCommandResponse() : this(null, ResponseType.Channel)
     {
     }
 
@@ -27,20 +26,6 @@ public class SlashCommandResponse(string? text, ResponseType responseType)
     [JsonPropertyName("replace_original")]
     public bool ReplaceOriginal { get; init; }
 
-    [JsonIgnore]
-    public ResponseType Type { get; init; } = responseType;
-
     [JsonPropertyName("response_type")]
-    public string ResponseType
-    {
-        get
-        {
-            return Type switch
-            {
-                SlashCommands.ResponseType.Channel => "in_channel",
-                SlashCommands.ResponseType.User => "ephemeral",
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
-    }
+    public ResponseType Type { get; init; } = responseType;
 }
