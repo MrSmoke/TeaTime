@@ -21,6 +21,7 @@ public class HelpCommand(ISlackService slackService) : BaseCommand(slackService)
             "`/teatime groups remove {name}` - Remove a group\n" +
             "`/teatime options add {group} {name}` - Add a new option for a group\n" +
             "`/teatime options remove {group} {name}` - Remove an option from a group\n" +
+            "`/teatime options list {group}` - List a group's options\n" +
             "\n" +
             "Use double quotes for names with spaces, for example `/teatime options add tea \"earl grey\"`\n" +
             "\n\n" +

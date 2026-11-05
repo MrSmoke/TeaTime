@@ -25,6 +25,7 @@ public class CommandRoutingTests
         { "options add tea", ErrorStrings.AddOption_BadArguments() },
         { "options add", ErrorStrings.AddOption_BadArguments() },
         { "options remove tea", ErrorStrings.RemoveOption_BadArguments() },
+        { "options list", ErrorStrings.ListOptions_BadArguments() },
         { "groups remove", ErrorStrings.RemoveGroup_BadArguments() }
     };
 
@@ -44,6 +45,7 @@ public class CommandRoutingTests
                 "join",
                 "leave",
                 "options add",
+                "options list",
                 "options remove",
                 "start"
             ],
