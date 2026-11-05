@@ -48,6 +48,30 @@ public class OptionsCommand(
         return Response(ResponseStrings.OptionAddedToGroup(optionName, group.Name), ResponseType.User);
     }
 
+    [Command("list")]
+    public async Task<ICommandResult> ListOptions(string? groupName)
+    {
+        if (string.IsNullOrWhiteSpace(groupName))
+            return Response(ErrorStrings.ListOptions_BadArguments(), ResponseType.User);
+
+        var context = await GetContextAsync();
+
+        var group = await mediator.Send(new GetRoomItemGroupByNameQuery(
+            RoomId: context.Room.Id,
+            UserId: context.User.Id,
+            Name: groupName));
+
+        if (group == null)
+            return Response(ErrorStrings.ListOptions_GroupInvalidName(groupName), ResponseType.User);
+
+        if (group.Options.Count == 0)
+            return Response(ErrorStrings.ListOptions_GroupNoOptions(group.Name), ResponseType.User);
+
+        var optionNames = group.Options.Select(o => o.Name);
+
+        return Response(ResponseStrings.OptionList(group.Name, optionNames), ResponseType.User);
+    }
+
     [Command("remove")]
     public async Task<ICommandResult> RemoveOption(string? groupName, string? optionName)
     {

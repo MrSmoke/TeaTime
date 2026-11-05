@@ -1,5 +1,8 @@
 namespace TeaTime.Slack.Resources;
 
+using System.Collections.Generic;
+using System.Linq;
+
 internal static class ResponseStrings
 {
     internal static string OptionAddedToGroup(string optionName, string groupName) =>
@@ -28,4 +31,11 @@ internal static class ResponseStrings
 
     internal static string IllMake(string slackUserId) =>
         $"{StringHelpers.SlackUserId(slackUserId)} has volunteered to make this round!";
+
+    internal static string OptionList(string groupName, IEnumerable<string> optionNames)
+    {
+        var lines = optionNames.Select(name => $"- *{name}*");
+
+        return $"Options for *{groupName}*\n" + string.Join('\n', lines);
+    }
 }

@@ -8,6 +8,7 @@ internal static class CommandStrings
     internal static string AddOption() => "You can add options by typing `/teatime options add {group} {option}`";
     internal static string AddOption(string groupName) => $"You can add options to this group by typing `/teatime options add {StringHelpers.QuoteArgument(groupName)} {{option}}`";
     internal static string AddOption(string groupName, string optionName) => $"You can create this option by typing `/teatime options add {StringHelpers.QuoteArgument(groupName)} {StringHelpers.QuoteArgument(optionName)}`";
+    internal static string ListOptions() => "You can list options by typing `/teatime options list {group}`";
     internal static string RemoveOption() => "You can remove options by typing `/teatime options remove {group} {option}`";
     internal static string RemoveGroup() => "You can remove groups by typing `/teatime groups remove {group}`";
 }

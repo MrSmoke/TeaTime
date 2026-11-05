@@ -36,6 +36,17 @@ internal static class ErrorStrings
         "Failed to remove option. Invalid command. " + CommandStrings.RemoveOption();
 
 
+    //List options
+    internal static string ListOptions_GroupInvalidName(string groupName) =>
+        $"Failed to list options. *{groupName}* is not a valid group.";
+
+    internal static string ListOptions_GroupNoOptions(string groupName) =>
+        $"Group *{groupName}* has no options. " + CommandStrings.AddOption(groupName);
+
+    internal static string ListOptions_BadArguments() =>
+        "Failed to list options. Invalid command. " + CommandStrings.ListOptions();
+
+
     //Remove group
     internal static string RemoveGroup_GroupInvalidName(string groupName) =>
         $"Failed to remove group. Unknown group *{groupName}*";
