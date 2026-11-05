@@ -26,6 +26,8 @@ public class CommandRoutingTests
         { "options add", ErrorStrings.AddOption_BadArguments() },
         { "options remove tea", ErrorStrings.RemoveOption_BadArguments() },
         { "options list", ErrorStrings.ListOptions_BadArguments() },
+        { "options available tea", ErrorStrings.SetOptionAvailability_BadArguments(available: true) },
+        { "options unavailable tea", ErrorStrings.SetOptionAvailability_BadArguments(available: false) },
         { "groups remove", ErrorStrings.RemoveGroup_BadArguments() }
     };
 
@@ -45,8 +47,10 @@ public class CommandRoutingTests
                 "join",
                 "leave",
                 "options add",
+                "options available",
                 "options list",
                 "options remove",
+                "options unavailable",
                 "start"
             ],
             provider.GetRequiredService<ICommandTable>().Keys.Order(StringComparer.Ordinal));
