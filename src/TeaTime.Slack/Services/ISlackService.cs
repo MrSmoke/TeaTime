@@ -14,6 +14,7 @@ public interface ISlackService
         CancellationToken cancellationToken = default);
 
     Task JoinRunAsync(SlashCommand slashCommand, string optionName, CancellationToken cancellationToken = default);
+    Task LeaveRunAsync(SlashCommand slashCommand, CancellationToken cancellationToken = default);
     Task HandleBlockActionsAsync(BlockActionsPayload requestPayload, CancellationToken cancellationToken = default);
 
     Task InstallAsync(OAuthTokenResponse response, CancellationToken cancellationToken = default);

@@ -36,14 +36,17 @@ public class OrdersQueryHandler(
         var userDict = (await users).ToDictionary(k => k.Id);
         var optionsDict = (await options).ToDictionary(k => k.Id);
 
-        return orders.Select(order => new OrderModel
-        {
-            Id = order.Id,
-            CreatedDate = order.CreatedDate,
-            Run = run,
-            User = userDict.GetValueOrDefault(order.UserId),
-            Option = optionsDict.GetValueOrDefault(order.OptionId)
-        });
+        return orders
+            .Select(order => new OrderModel
+            {
+                Id = order.Id,
+                CreatedDate = order.CreatedDate,
+                Run = run,
+                User = userDict.GetValueOrDefault(order.UserId),
+                Option = optionsDict.GetValueOrDefault(order.OptionId)
+            })
+            // Order by users display name for consistent ordering
+            .OrderBy(o => o.User?.DisplayName);
     }
 
     public async Task<Order?> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)

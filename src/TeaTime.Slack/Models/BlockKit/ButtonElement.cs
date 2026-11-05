@@ -21,4 +21,10 @@ public class ButtonElement
 
     [JsonPropertyName("value")]
     public string? Value { get; init; }
+
+    /// <summary>
+    /// Null for the default grey
+    /// </summary>
+    [JsonPropertyName("style")]
+    public ButtonStyle? Style { get; init; }
 }

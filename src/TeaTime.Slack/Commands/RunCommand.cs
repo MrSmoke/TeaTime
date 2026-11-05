@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using CommandRouter.Attributes;
 using CommandRouter.Results;
 using Common.Abstractions;
-using Common.Features.Orders.Commands;
 using Common.Features.Orders.Queries;
 using Common.Features.RoomItemGroups.Queries;
 using Common.Features.Rooms.Queries;
@@ -84,26 +83,19 @@ public class RunCommand(
     [Command("leave")]
     public async Task<ICommandResult> Leave()
     {
-        var context = await GetContextAsync();
+        var slashCommand = GetCommand();
 
-        var run = await mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
-        if (run == null)
-            return Response(ErrorStrings.LeaveRun_RunNotStarted(), ResponseType.User);
+        try
+        {
+            await SlackService.LeaveRunAsync(slashCommand);
 
-        if (run.Ended)
-            return Response(ErrorStrings.LeaveRun_RunEnded(), ResponseType.User);
-
-        var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, context.User.Id));
-        if (existingOrder is null)
-            return Response(ErrorStrings.LeaveRun_NotJoined(), ResponseType.User);
-
-        var command = new DeleteOrderCommand(existingOrder, context.User.Id);
-
-        command.AddCallbackState(context.Command.ToCallbackData());
-
-        await mediator.Send(command);
-
-        return Ok();
+            return Ok();
+        }
+        catch (SlackTeaTimeException e)
+        {
+            logger.LogInformation("Leave run rejected: {Message}", e.Message);
+            return Response(e.Message, ResponseType.User);
+        }
     }
 
     [Command("end")]
