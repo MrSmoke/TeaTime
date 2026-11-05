@@ -58,7 +58,7 @@ public class RunCommand(
         {
             Text = text,
             Type = ResponseType.Channel,
-            Blocks = BlockBuilder.BuildRunStarted(text, command.Id, roomItemGroup.Options)
+            Blocks = BlockBuilder.BuildRunStarted(text, roomItemGroup.Options)
         });
     }
 
