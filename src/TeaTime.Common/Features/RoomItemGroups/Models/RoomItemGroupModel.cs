@@ -5,5 +5,5 @@ using Common.Models.Data;
 
 public record RoomItemGroupModel : RoomItemGroup
 {
-    public IReadOnlyList<Option> Options { get; init; } = [];
+    public required IReadOnlyList<Option> Options { get; init; }
 }
