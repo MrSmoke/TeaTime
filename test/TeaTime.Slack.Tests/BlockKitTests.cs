@@ -1,7 +1,7 @@
 namespace TeaTime.Slack.Tests;
 
 using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json.Nodes;
 using Common.Models.Data;
@@ -12,43 +12,58 @@ using Xunit;
 
 public class BlockKitTests
 {
+    // Buttons are split into rows of 5 and keep the order the options were given in
     [Fact]
     public void BuildRunStarted_ChunksButtonsIntoActionsBlocks()
     {
-        var options = Enumerable.Range(1, 30).Select(CreateOption).ToList();
+        var options = Enumerable.Range(1, 12).Select(CreateOption).ToList();
 
         var blocks = BlockBuilder.BuildRunStarted("<@U1> started a run", options);
 
-        Assert.IsType<SectionBlock>(blocks[0]);
-        Assert.IsType<SectionBlock>(blocks[1]);
-
         var actions = blocks.OfType<ActionsBlock>().ToList();
-        Assert.Equal(2, actions.Count);
-        Assert.Equal(25, actions[0].Elements.Count);
-        Assert.Equal(5, actions[1].Elements.Count);
+        var rowSizes = actions.Select(a => a.Elements.Count);
+        Assert.Equal([5, 5, 2], rowSizes);
 
-        var last = actions[1].Elements[^1];
-        Assert.Equal("30", last.Value);
-        Assert.Equal(BlockBuilder.JoinOptionActionIdPrefix + "30", last.ActionId);
+        var values = actions.SelectMany(a => a.Elements).Select(e => e.Value);
+        var expected = options.Select(o => o.Id.ToString(CultureInfo.InvariantCulture));
+        Assert.Equal(expected, values);
     }
 
+    // Only the first 100 options get buttons, as 20 full rows
     [Fact]
-    public void BuildRunStarted_ActionIdsUniquePerBlock()
+    public void BuildRunStarted_CapsNumberOfButtons()
     {
-        var blocks = BlockBuilder.BuildRunStarted("text", Enumerable.Range(1, 10).Select(CreateOption));
+        var options = Enumerable.Range(1, 120).Select(CreateOption).ToList();
 
-        foreach (var block in blocks.OfType<ActionsBlock>())
-            Assert.Equal(block.Elements.Count, block.Elements.Select(e => e.ActionId).Distinct().Count());
+        var blocks = BlockBuilder.BuildRunStarted("<@U1> started a run", options);
+
+        var actions = blocks.OfType<ActionsBlock>().ToList();
+        Assert.Equal(20, actions.Count);
+        Assert.All(actions, a => Assert.Equal(5, a.Elements.Count));
+
+        var last = actions[^1].Elements[^1];
+        Assert.Equal("100", last.Value);
+        Assert.Equal(BlockBuilder.JoinOptionActionIdPrefix + "100", last.ActionId);
     }
 
     [Fact]
     public void Response_SerialisesBlocksAndOmitsNulls()
     {
+        var button = new ButtonElement
+        {
+            Text = TextObject.PlainText("Tea"),
+            ActionId = "join_option_7",
+            Value = "7"
+        };
+
+        var actionsBlock = new ActionsBlock();
+        actionsBlock.Elements.Add(button);
+
         var response = new SlashCommandResponse
         {
             Text = "fallback",
             Type = ResponseType.Channel,
-            Blocks = BlockBuilder.BuildRunStarted("hi", [CreateOption(7)])
+            Blocks = [new SectionBlock(TextObject.Markdown("hi")), actionsBlock]
         };
 
         var json = JsonNode.Parse(SlackJsonSerializer.Serialize(response))!.AsObject();
@@ -59,17 +74,22 @@ public class BlockKitTests
         Assert.False((bool)json["replace_original"]!);
         Assert.False(json.ContainsKey("attachments"));
 
-        var blocks = json["blocks"]!.AsArray();
-        Assert.Equal("section", (string?)blocks[0]!["type"]);
-        Assert.Equal("mrkdwn", (string?)blocks[0]!["text"]!["type"]);
-        Assert.False(blocks[0]!["text"]!.AsObject().ContainsKey("emoji"));
+        var blocks = Assert.IsType<JsonArray>(json["blocks"]);
+        Assert.Equal(2, blocks.Count);
 
-        var button = blocks[2]!["elements"]![0]!.AsObject();
-        Assert.Equal("actions", (string?)blocks[2]!["type"]);
-        Assert.Equal("button", (string?)button["type"]);
-        Assert.Equal("join_option_7", (string?)button["action_id"]);
-        Assert.Equal("7", (string?)button["value"]);
-        Assert.Equal("plain_text", (string?)button["text"]!["type"]);
+        var section = Assert.IsType<JsonObject>(blocks[0]);
+        var sectionText = Assert.IsType<JsonObject>(section["text"]);
+        Assert.Equal("section", (string?)section["type"]);
+        Assert.Equal("mrkdwn", (string?)sectionText["type"]);
+        Assert.False(sectionText.ContainsKey("emoji"));
+
+        var actions = Assert.IsType<JsonObject>(blocks[1]);
+        var buttonJson = Assert.IsType<JsonObject>(actions["elements"]?[0]);
+        Assert.Equal("actions", (string?)actions["type"]);
+        Assert.Equal("button", (string?)buttonJson["type"]);
+        Assert.Equal("join_option_7", (string?)buttonJson["action_id"]);
+        Assert.Equal("7", (string?)buttonJson["value"]);
+        Assert.Equal("plain_text", (string?)buttonJson["text"]?["type"]);
     }
 
     [Fact]
