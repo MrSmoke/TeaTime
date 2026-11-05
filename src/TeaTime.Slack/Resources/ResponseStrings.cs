@@ -34,7 +34,7 @@ internal static class ResponseStrings
 
     internal static string OptionList(string groupName, IEnumerable<string> optionNames)
     {
-        var lines = optionNames.Select(name => $"- *{name}*");
+        var lines = optionNames.Select(name => $"- {name}");
 
         return $"Options for *{groupName}*\n" + string.Join('\n', lines);
     }

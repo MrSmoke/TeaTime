@@ -9,10 +9,9 @@ public class ResponseStringsTests
     [Fact]
     public void OptionList_ListsEachOption()
     {
-        var expected =
-            "Options for *tea*\n" +
-            "- *Earl Grey*\n" +
-            "- *Green*";
+        const string expected = "Options for *tea*\n" +
+                                "- Earl Grey\n" +
+                                "- Green";
 
         Assert.Equal(expected, ResponseStrings.OptionList("tea", ["Earl Grey", "Green"]));
     }

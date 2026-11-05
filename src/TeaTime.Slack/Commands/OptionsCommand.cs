@@ -36,8 +36,7 @@ public class OptionsCommand(
         if (group == null)
             return Response(ErrorStrings.AddOption_GroupInvalidName(groupName), ResponseType.User);
 
-        var command =
-            new CreateOptionCommand(
+        var command = new CreateOptionCommand(
                 Id: await idGenerator.GenerateAsync(),
                 UserId: context.User.Id,
                 GroupId: group.Id,
