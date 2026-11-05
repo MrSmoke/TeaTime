@@ -45,11 +45,13 @@ public class SlackController(
             // If a slash command has no text, show the help menu
             commandText = "help";
         }
-
-        // Slack likes to replace quotes so bring them back to normal ascii
-        commandText = commandText
-            .Replace('\u201C', '"')
-            .Replace('\u201D', '"');
+        else
+        {
+            // Slack likes to replace quotes so bring them back to normal ascii
+            commandText = commandText
+                .Replace('\u201C', '"')
+                .Replace('\u201D', '"');
+        }
 
         // Command text is user input so isn't logged
         logger.LogInformation("Received slash command from {SlackUserId} in {SlackChannelId} ({SlackTeamId})",
