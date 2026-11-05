@@ -1,4 +1,4 @@
-﻿namespace TeaTime.Slack.Models.BlockKit;
+namespace TeaTime.Slack.Models.BlockKit;
 
 public class DividerBlock : Block
 {
