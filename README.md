@@ -19,8 +19,9 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 | Start a new round of tea          | `/teatime start`         |
 | Start a new round for a group     | `/teatime start {group}` |
 | Join a round                      | `/teatime join {option}` |
-| End a round                       | `/teatime end`           |
+| Leave the current round           | `/teatime leave`         |
 | Volunteer to make the round       | `/teatime illmake`       |
+| End a round                       | `/teatime end`           |
 
 #### Groups
 
@@ -34,6 +35,7 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 | Description                   | Command                                  |
 |-------------------------------|------------------------------------------|
 | Add a new option for a group  | `/teatime options add {group} {name}`    |
+| List a group's options        | `/teatime options list {group}`          |
 | Remove an option from a group | `/teatime options remove {group} {name}` |
 
 ### Example Usage
