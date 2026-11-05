@@ -10,15 +10,31 @@ internal static class BlockBuilder
 {
     internal const string JoinOptionActionIdPrefix = "join_option_";
 
+    // The number of actions (or buttons) per block.
+    private const int ActionsPerBlock = 5;
+
+    // We can have up to 50 blocks, but 20 for buttons is probably way too many anyway.
+    private const int MaxActionBlocks = 20;
+
     internal static List<Block> BuildRunStarted(string text, IEnumerable<Option> options)
     {
+        var contextBlock = new ContextBlock();
+        contextBlock.Elements.Add(TextObject.Markdown("Select an option below to join the round"));
+
         List<Block> blocks =
         [
             new SectionBlock(TextObject.Markdown(text)),
-            new SectionBlock(TextObject.PlainText("Select an option to join this round!"))
+            contextBlock,
+            new DividerBlock()
         ];
 
-        foreach (var chunk in options.Chunk(ActionsBlock.MaxElements))
+        // Show 5 buttons per block to avoid the "more" button.
+        // Also only take MaxBlocks * ActionPerBlock to limit the number of rows.
+        var outputOptions = options
+            .Take(ActionsPerBlock * MaxActionBlocks)
+            .Chunk(ActionsPerBlock);
+
+        foreach (var chunk in outputOptions)
         {
             var actions = new ActionsBlock();
             actions.Elements.AddRange(chunk.Select(CreateJoinButton));
