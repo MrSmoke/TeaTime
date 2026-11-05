@@ -124,6 +124,17 @@ internal class SlackService(ISender mediator,
         await JoinRunAsync(user.Id, room.Id, optionName, slashCommand.ToCallbackData(), cancellationToken);
     }
 
+    public async Task LeaveRunAsync(SlashCommand slashCommand, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(slashCommand);
+
+        var user = await GetOrCreateUserAsync(slashCommand.UserId, slashCommand.GetUserName(), cancellationToken);
+        var room = await GetOrCreateRoomAsync(slashCommand.ChannelId, slashCommand.ChannelName, user.Id,
+            cancellationToken);
+
+        await LeaveRunAsync(user.Id, room.Id, null, slashCommand.ToCallbackData(), cancellationToken);
+    }
+
     public async Task HandleBlockActionsAsync(BlockActionsPayload requestPayload,
         CancellationToken cancellationToken = default)
     {
@@ -136,23 +147,33 @@ internal class SlackService(ISender mediator,
             return;
         }
 
+        var action = requestPayload.Actions.FirstOrDefault();
+
         try
         {
-            await JoinRunAsync(requestPayload, requestPayload.ResponseUrl, cancellationToken);
+            if (action is null)
+                throw new InvalidOperationException("block_actions payload has no actions");
+
+            if (action.ActionId == BlockBuilder.LeaveRunActionId)
+                await LeaveRunAsync(requestPayload, action, requestPayload.ResponseUrl, cancellationToken);
+            else if (IsJoinAction(action))
+                await JoinRunAsync(requestPayload, action, requestPayload.ResponseUrl, cancellationToken);
+            else
+                throw new InvalidOperationException($"Unknown block action '{action.ActionId}'");
         }
         catch (SlackTeaTimeException e)
         {
-            logger.LogInformation("Join run rejected: {Message}", e.Message);
+            logger.LogInformation("Block action {ActionId} rejected: {Message}", action?.ActionId, e.Message);
             await ReplyAsync(requestPayload.ResponseUrl, e.Message, cancellationToken);
         }
         catch (PermissionException e)
         {
-            logger.LogInformation("Join run denied: {Message}", e.Message);
+            logger.LogInformation("Block action {ActionId} denied: {Message}", action?.ActionId, e.Message);
             await ReplyAsync(requestPayload.ResponseUrl, e.Message, cancellationToken);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Failed to join run");
+            logger.LogError(e, "Failed to handle block action {ActionId}", action?.ActionId);
             await ReplyAsync(requestPayload.ResponseUrl, ErrorStrings.General(), cancellationToken);
         }
     }
@@ -199,26 +220,63 @@ internal class SlackService(ISender mediator,
             cancellationToken);
     }
 
-    private async Task JoinRunAsync(BlockActionsPayload requestPayload, string responseUrl,
+    private async Task JoinRunAsync(BlockActionsPayload requestPayload, BlockAction action, string responseUrl,
+        CancellationToken cancellationToken = default)
+    {
+        if (!long.TryParse(action.Value, NumberStyles.None, CultureInfo.InvariantCulture, out var optionId))
+            throw new InvalidOperationException($"Invalid option id '{action.Value}'");
+
+        var (user, room) = await GetUserAndRoomAsync(requestPayload, cancellationToken);
+
+        await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData(responseUrl), cancellationToken);
+    }
+
+    private async Task LeaveRunAsync(BlockActionsPayload requestPayload, BlockAction action, string responseUrl,
+        CancellationToken cancellationToken = default)
+    {
+        if (!long.TryParse(action.Value, NumberStyles.None, CultureInfo.InvariantCulture, out var runId))
+            throw new InvalidOperationException($"Invalid run id '{action.Value}'");
+
+        var (user, room) = await GetUserAndRoomAsync(requestPayload, cancellationToken);
+
+        await LeaveRunAsync(user.Id, room.Id, runId, requestPayload.ToCallbackData(responseUrl), cancellationToken);
+    }
+
+    private async Task<(User User, Room Room)> GetUserAndRoomAsync(BlockActionsPayload requestPayload,
         CancellationToken cancellationToken = default)
     {
         var channel = requestPayload.Channel;
         if (channel is null)
             throw new InvalidOperationException("block_actions payload has no channel");
 
-        var action = requestPayload.Actions.FirstOrDefault(IsJoinAction);
-        if (action is null)
-            throw new InvalidOperationException("block_actions payload has no join action");
-
-        if (!long.TryParse(action.Value, NumberStyles.None, CultureInfo.InvariantCulture, out var optionId))
-            throw new InvalidOperationException($"Invalid option id '{action.Value}'");
-
         var usersName = requestPayload.User.Username ?? requestPayload.User.Name;
 
         var user = await GetOrCreateUserAsync(requestPayload.User.Id, usersName, cancellationToken);
         var room = await GetOrCreateRoomAsync(channel.Id, channel.Name, user.Id, cancellationToken);
 
-        await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData(responseUrl), cancellationToken);
+        return (user, room);
+    }
+
+    private async Task LeaveRunAsync(long userId, long roomId, long? expectedRunId, CallbackData callbackData,
+        CancellationToken cancellationToken = default)
+    {
+        var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId), cancellationToken);
+        if (run == null)
+            throw new SlackTeaTimeException(ErrorStrings.LeaveRun_RunNotStarted());
+
+        // A button from an older round's message means that round has already ended
+        if (run.Ended || (expectedRunId.HasValue && expectedRunId.Value != run.Id))
+            throw new SlackTeaTimeException(ErrorStrings.LeaveRun_RunEnded());
+
+        var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, userId), cancellationToken);
+        if (existingOrder is null)
+            throw new SlackTeaTimeException(ErrorStrings.LeaveRun_NotJoined());
+
+        var command = new DeleteOrderCommand(existingOrder, userId);
+
+        command.AddCallbackState(callbackData);
+
+        await mediator.Send(command, cancellationToken);
     }
 
     private async Task JoinRunAsync(long userId, long roomId, string optionName, CallbackData callbackData,
