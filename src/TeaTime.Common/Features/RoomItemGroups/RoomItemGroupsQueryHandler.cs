@@ -16,7 +16,7 @@ public class RoomItemGroupQueryHandler(IOptionsRepository optionsRepository) :
 {
     // StringComparer which handles numeric ordering so "10" is after "9" not "1".
     // This ensures all options are returned in the same order every time.
-    private static StringComparer ButtonOrderComparer => StringComparer.Create(
+    private static readonly StringComparer OptionNameComparer = StringComparer.Create(
         CultureInfo.InvariantCulture,
         CompareOptions.NumericOrdering | CompareOptions.IgnoreCase
     );
@@ -37,7 +37,7 @@ public class RoomItemGroupQueryHandler(IOptionsRepository optionsRepository) :
             CreatedBy = group.CreatedBy,
             CreatedDate = group.CreatedDate,
             RoomId = group.RoomId,
-            Options = [.. options.OrderBy(o => o.Name, ButtonOrderComparer)]
+            Options = [.. options.OrderBy(o => o.Name, OptionNameComparer)]
         };
 
         return model;
@@ -58,7 +58,7 @@ public class RoomItemGroupQueryHandler(IOptionsRepository optionsRepository) :
             CreatedBy = group.CreatedBy,
             CreatedDate = group.CreatedDate,
             RoomId = group.RoomId,
-            Options = [.. options.OrderBy(o => o.Name, ButtonOrderComparer)]
+            Options = [.. options.OrderBy(o => o.Name, OptionNameComparer)]
         };
 
         return model;
