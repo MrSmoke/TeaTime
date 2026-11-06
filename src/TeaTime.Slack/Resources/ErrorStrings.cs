@@ -11,7 +11,7 @@ internal static class ErrorStrings
         $"Failed to start round. *{groupName}* is not a valid group. " + CommandStrings.AddGroup(groupName);
 
     internal static string StartRun_GroupNoOptions(string groupName) =>
-        $"Cannot start round. *{groupName}* has no available options. " + CommandStrings.AddOption(groupName);
+        $"Cannot start round. *{groupName}* has no available options. " + HelpCommandText;
 
     internal static string StartRun_RunAlreadyStarted() =>
         "Cannot start round. There is already an active TeaTime running in this room. " + CommandStrings.JoinRound;
