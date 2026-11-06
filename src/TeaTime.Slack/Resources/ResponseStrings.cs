@@ -43,10 +43,15 @@ internal static class ResponseStrings
 
     internal static string OptionList(string groupName, IReadOnlyCollection<Option> options)
     {
-        var available = options.Where(o => o.Available).Select(o => $"- {o.Name}");
+        var available = options.Where(o => o.Available).Select(o => $"- {o.Name}").ToList();
         var unavailable = options.Where(o => !o.Available).Select(o => $"- {o.Name}").ToList();
 
-        var text = $"Options for *{groupName}*\n" + string.Join('\n', available);
+        var text = $"Options for *{groupName}*\n";
+
+        if (available.Count == 0)
+            text += "No options are currently available";
+        else
+            text += string.Join('\n', available);
 
         if (unavailable.Count == 0)
             return text;

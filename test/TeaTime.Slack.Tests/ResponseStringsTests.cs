@@ -35,6 +35,21 @@ public class ResponseStringsTests
         Assert.Equal(expected, ResponseStrings.OptionList("tea", options));
     }
 
+    // When every option is unavailable a note replaces the empty available list
+    [Fact]
+    public void OptionList_AllUnavailable_SaysNoneAvailable()
+    {
+        const string expected = "Options for *tea*\n" +
+                                "No options are currently available\n" +
+                                "\n" +
+                                "*Unavailable*\n" +
+                                "- Green";
+
+        Option[] options = [CreateOption("Green", available: false)];
+
+        Assert.Equal(expected, ResponseStrings.OptionList("tea", options));
+    }
+
     private static Option CreateOption(string name, bool available) => new()
     {
         Id = 1,
