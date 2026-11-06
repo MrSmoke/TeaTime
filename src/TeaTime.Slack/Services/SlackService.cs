@@ -266,6 +266,10 @@ internal class SlackService(ISender mediator,
         if (run == null)
             throw new SlackTeaTimeException(ErrorStrings.LeaveRun_RunNotStarted());
 
+        // Checked before the order lookup so an ended round replies ended rather than not joined
+        if (run.Ended)
+            throw new SlackTeaTimeException(ErrorStrings.LeaveRun_RunEnded());
+
         var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, userId), cancellationToken);
         if (existingOrder is null)
             throw new SlackTeaTimeException(ErrorStrings.LeaveRun_NotJoined());
@@ -320,6 +324,10 @@ internal class SlackService(ISender mediator,
         var run = await GetRunAsync(userId, roomId, runId, cancellationToken);
         if (run == null)
             throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
+
+        // Checked before the option lookup so an ended round replies ended rather than unknown option
+        if (run.Ended)
+            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded());
 
         var option = await mediator.Send(new GetOptionQuery(optionId), cancellationToken);
         if (option == null || option.GroupId != run.GroupId)

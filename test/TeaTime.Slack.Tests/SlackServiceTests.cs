@@ -305,6 +305,50 @@ public class SlackServiceTests
         Assert.Equal(1, command.OptionId);
     }
 
+    // A join button on an ended round's message says the round ended, even if the option is no longer in its group
+    [Fact]
+    public async Task HandleBlockActions_JoinEndedRun_RepliesRunEnded()
+    {
+        var replies = A.Captured<SlashCommandResponse>();
+        var mediator = CreateJoinMediator(optionGroupId: 200);
+
+        A.CallTo(() => mediator.Send(A<GetRunQuery>._, A<CancellationToken>._))
+            .Returns(CreateRun(roomId: 5, ended: true));
+
+        var service = CreateService(CreateApiClient(replies), mediator);
+
+        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"),
+            TestContext.Current.CancellationToken);
+
+        var reply = Assert.Single(replies.Values);
+        Assert.Equal(ErrorStrings.JoinRun_RunEnded(), reply.Text);
+
+        // Sent via a BaseCommand variable, so match on that type
+        A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    // A leave button on an ended round's message says the round ended, even if the user never joined it
+    [Fact]
+    public async Task HandleBlockActions_LeaveEndedRun_RepliesRunEnded()
+    {
+        var replies = A.Captured<SlashCommandResponse>();
+        var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
+
+        A.CallTo(() => mediator.Send(A<GetRunQuery>._, A<CancellationToken>._))
+            .Returns(CreateRun(roomId: 5, ended: true));
+
+        var service = CreateService(CreateApiClient(replies), mediator);
+        var payload = CreatePayload(ResponseUrl, actionId: BlockBuilder.LeaveRunActionId, value: "7");
+
+        await service.HandleBlockActionsAsync(payload, TestContext.Current.CancellationToken);
+
+        var reply = Assert.Single(replies.Values);
+        Assert.Equal(ErrorStrings.LeaveRun_RunEnded(), reply.Text);
+
+        // Sent via a BaseCommand variable, so match on that type
+        A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
     private static ISender CreateJoinMediator(long optionGroupId)
     {
         var now = DateTimeOffset.UtcNow;
@@ -347,13 +391,14 @@ public class SlackServiceTests
         return apiClient;
     }
 
-    private static Run CreateRun(long roomId) => new()
+    private static Run CreateRun(long roomId, bool ended = false) => new()
     {
         Id = 7,
         RoomId = roomId,
         UserId = 5,
         GroupId = RunGroupId,
         StartTime = DateTimeOffset.UtcNow,
+        Ended = ended,
         CreatedDate = DateTimeOffset.UtcNow
     };
 
@@ -366,12 +411,13 @@ public class SlackServiceTests
         apiClient,
         NullLogger<SlackService>.Instance);
 
-    private static BlockActionsPayload CreatePayload(string? responseUrl, string actionId) => new()
+    private static BlockActionsPayload CreatePayload(string? responseUrl, string actionId,
+        string value = JoinValue) => new()
     {
         Type = BlockActionsPayload.PayloadType,
         User = new InteractionUser { Id = "U1", Username = "steve" },
         Channel = new InteractionChannel { Id = "C1", Name = "general" },
         ResponseUrl = responseUrl,
-        Actions = [new BlockAction { ActionId = actionId, Value = JoinValue }]
+        Actions = [new BlockAction { ActionId = actionId, Value = value }]
     };
 }
