@@ -140,6 +140,7 @@ public class BlockKitTests
     {
         Id = id,
         Name = "option" + id,
+        Available = true,
         CreatedBy = 1,
         CreatedDate = DateTimeOffset.UtcNow,
         GroupId = 1

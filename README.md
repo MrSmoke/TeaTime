@@ -32,11 +32,13 @@ TeaTime allows your teams to start a round of tea, join with their choice of tea
 
 #### Options
 
-| Description                   | Command                                  |
-|-------------------------------|------------------------------------------|
-| Add a new option for a group  | `/teatime options add {group} {name}`    |
-| List a group's options        | `/teatime options list {group}`          |
-| Remove an option from a group | `/teatime options remove {group} {name}` |
+| Description                     | Command                                       |
+|---------------------------------|-----------------------------------------------|
+| Add a new option for a group    | `/teatime options add {group} {name}`         |
+| List a group's options          | `/teatime options list {group}`               |
+| Remove an option from a group   | `/teatime options remove {group} {name}`      |
+| Mark an option as available     | `/teatime options available {group} {name}`   |
+| Mark an option as unavailable   | `/teatime options unavailable {group} {name}` |
 
 ### Example Usage
 

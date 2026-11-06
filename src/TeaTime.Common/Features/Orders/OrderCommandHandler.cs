@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using Abstractions.Data;
 using Commands;
 using Events;
+using Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Models.Data;
 
 public class OrderCommandHandler(
     IOrderRepository orderRepository,
+    IOptionsRepository optionsRepository,
     TimeProvider clock,
     IEventPublisher eventPublisher,
     ILogger<OrderCommandHandler> logger) :
@@ -21,6 +23,8 @@ public class OrderCommandHandler(
 {
     public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
+        await EnsureOptionAvailableAsync(request.OptionId, cancellationToken);
+
         var order = new Order
         {
             Id = request.Id,
@@ -57,8 +61,11 @@ public class OrderCommandHandler(
             return;
         }
 
+        // If the option is the same, skip
         if (existing.OptionId == request.OptionId)
             return;
+
+        await EnsureOptionAvailableAsync(request.OptionId, cancellationToken);
 
         //store the previous id for the event
         var previousOptionId = existing.OptionId;
@@ -93,5 +100,17 @@ public class OrderCommandHandler(
         };
 
         await eventPublisher.PublishAsync(evt, cancellationToken);
+    }
+
+    private async Task EnsureOptionAvailableAsync(long optionId, CancellationToken cancellationToken)
+    {
+        // Deleted options aren't returned, so they count as unavailable too
+        var option = await optionsRepository.GetAsync(optionId, cancellationToken);
+
+        if (option is not { Available: true })
+        {
+            throw new OrderException($"Option {optionId} is unavailable",
+                OrderException.OrderExceptionReason.OptionUnavailable);
+        }
     }
 }

@@ -65,6 +65,7 @@ public class RoomItemGroupQueryHandlerTests
         {
             Id = i + 1,
             Name = name,
+            Available = true,
             GroupId = Group.Id,
             CreatedBy = 1,
             CreatedDate = DateTimeOffset.UnixEpoch

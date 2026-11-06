@@ -38,7 +38,9 @@ public class RunCommand(
         if (roomItemGroup == null)
             return Response(ErrorStrings.StartRun_GroupInvalidName(group), ResponseType.User);
 
-        if (!roomItemGroup.Options.Any())
+        // Filter out the options which are not available
+        var availableOptions = roomItemGroup.Options.Where(o => o.Available).ToList();
+        if (availableOptions.Count == 0)
             return Response(ErrorStrings.StartRun_GroupNoOptions(roomItemGroup.Name), ResponseType.User);
 
         var command = new StartRunCommand
@@ -58,7 +60,7 @@ public class RunCommand(
         {
             Text = text,
             Type = ResponseType.Channel,
-            Blocks = BlockBuilder.BuildRunStarted(text, roomItemGroup.Options)
+            Blocks = BlockBuilder.BuildRunStarted(text, availableOptions)
         });
     }
 
@@ -75,7 +77,7 @@ public class RunCommand(
         }
         catch (SlackTeaTimeException e)
         {
-            logger.LogInformation("Join run rejected: {Message}", e.Message);
+            logger.LogInformation(e, "Join run rejected");
             return Response(e.Message, ResponseType.User);
         }
     }

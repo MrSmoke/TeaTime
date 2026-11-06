@@ -11,7 +11,7 @@ internal static class ErrorStrings
         $"Failed to start round. *{groupName}* is not a valid group. " + CommandStrings.AddGroup(groupName);
 
     internal static string StartRun_GroupNoOptions(string groupName) =>
-        $"Cannot start round. *{groupName}* has no options. " + CommandStrings.AddOption(groupName);
+        $"Cannot start round. *{groupName}* has no available options. " + HelpCommandText;
 
     internal static string StartRun_RunAlreadyStarted() =>
         "Cannot start round. There is already an active TeaTime running in this room. " + CommandStrings.JoinRound;
@@ -20,6 +20,9 @@ internal static class ErrorStrings
     //Add option
     internal static string AddOption_GroupInvalidName(string groupName) =>
         $"Failed to add option. *{groupName}* is not a valid group. " + CommandStrings.AddGroup(groupName);
+
+    internal static string AddOption_DuplicateName(string optionName, string groupName) =>
+        $"Failed to add option. *{optionName}* already exists in *{groupName}*";
 
     internal static string AddOption_BadArguments() =>
         "Failed to add option. Invalid command. " + CommandStrings.AddOption();
@@ -34,6 +37,22 @@ internal static class ErrorStrings
 
     internal static string RemoveOption_BadArguments() =>
         "Failed to remove option. Invalid command. " + CommandStrings.RemoveOption();
+
+
+    //Set option availability
+    internal static string SetOptionAvailability_GroupInvalidName(string groupName) =>
+        $"Failed to update option. *{groupName}* is not a valid group.";
+
+    internal static string SetOptionAvailability_UnknownOption(string optionName) =>
+        $"Failed to update option. Unknown option *{optionName}*";
+
+    internal static string SetOptionAvailability_BadArguments(bool available)
+    {
+        if (available)
+            return "Failed to update option. Invalid command. " + CommandStrings.OptionAvailable();
+
+        return "Failed to update option. Invalid command. " + CommandStrings.OptionUnavailable();
+    }
 
 
     //List options
@@ -60,6 +79,9 @@ internal static class ErrorStrings
 
     internal static string JoinRun_OptionUnknown(string optionName, string groupName) =>
         $"Failed to join round. Unknown option *{optionName}*. " + CommandStrings.AddOption(groupName, optionName);
+
+    internal static string JoinRun_OptionUnavailable(string optionName) =>
+        $"Failed to join round. *{optionName}* is currently unavailable";
 
     internal static string JoinRun_RunEnded() => "Failed to join round. Round has already ended";
 
