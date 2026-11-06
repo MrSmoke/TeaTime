@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CommandRouter.Attributes;
 using CommandRouter.Results;
 using Common.Abstractions;
+using Common.Exceptions;
 using Common.Features.Options.Commands;
 using Common.Features.RoomItemGroups.Queries;
 using MediatR;
@@ -42,7 +43,14 @@ public class OptionsCommand(
                 GroupId: group.Id,
                 Name: optionName);
 
-        await mediator.Send(command);
+        try
+        {
+            await mediator.Send(command);
+        }
+        catch (OptionException e) when (e.Reason == OptionException.OptionExceptionReason.DuplicateName)
+        {
+            return Response(ErrorStrings.AddOption_DuplicateName(optionName, group.Name), ResponseType.User);
+        }
 
         return Response(ResponseStrings.OptionAddedToGroup(optionName, group.Name), ResponseType.User);
     }

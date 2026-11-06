@@ -21,6 +21,9 @@ internal static class ErrorStrings
     internal static string AddOption_GroupInvalidName(string groupName) =>
         $"Failed to add option. *{groupName}* is not a valid group. " + CommandStrings.AddGroup(groupName);
 
+    internal static string AddOption_DuplicateName(string optionName, string groupName) =>
+        $"Failed to add option. *{optionName}* already exists in *{groupName}*";
+
     internal static string AddOption_BadArguments() =>
         "Failed to add option. Invalid command. " + CommandStrings.AddOption();
 

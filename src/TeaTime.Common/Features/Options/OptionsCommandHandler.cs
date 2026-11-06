@@ -1,10 +1,12 @@
 namespace TeaTime.Common.Features.Options;
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Abstractions.Data;
 using Commands;
+using Exceptions;
 using MediatR;
 using Models.Data;
 
@@ -13,8 +15,17 @@ public class OptionsCommandHandler(TimeProvider clock, IOptionsRepository option
     IRequestHandler<DeleteOptionCommand>,
     IRequestHandler<SetOptionAvailabilityCommand>
 {
-    public Task Handle(CreateOptionCommand request, CancellationToken cancellationToken)
+    public async Task Handle(CreateOptionCommand request, CancellationToken cancellationToken)
     {
+        var existing = await optionsRepository.GetOptionsByGroupIdAsync(request.GroupId, cancellationToken);
+
+        // Names are matched ignoring case, so a second "earl grey" would make lookups ambiguous
+        if (existing.Any(o => o.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new OptionException($"Option {request.Name} already exists in group {request.GroupId}",
+                OptionException.OptionExceptionReason.DuplicateName);
+        }
+
         var option = new Option
         {
             Id = request.Id,
@@ -25,7 +36,7 @@ public class OptionsCommandHandler(TimeProvider clock, IOptionsRepository option
             CreatedDate = clock.GetUtcNow(),
         };
 
-        return optionsRepository.CreateAsync(option, cancellationToken);
+        await optionsRepository.CreateAsync(option, cancellationToken);
     }
 
     public Task Handle(DeleteOptionCommand request, CancellationToken cancellationToken)
