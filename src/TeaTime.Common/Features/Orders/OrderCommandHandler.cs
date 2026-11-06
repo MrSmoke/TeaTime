@@ -113,7 +113,10 @@ public class OrderCommandHandler(
         var run = await runRepository.GetAsync(runId, cancellationToken);
 
         if (run is not { Ended: false })
-            throw new OrderException($"Run {runId} has ended", OrderException.OrderExceptionReason.RunEnded);
+        {
+            throw new OrderException($"Run {runId} has ended or doesn't exist",
+                OrderException.OrderExceptionReason.RunEnded);
+        }
     }
 
     private async Task EnsureOptionAvailableAsync(long optionId, CancellationToken cancellationToken)
