@@ -1,21 +1,13 @@
 namespace TeaTime.Slack.Tests;
 
 using System;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
-using CommandRouter;
 using CommandRouter.Exceptions;
 using CommandRouter.Extensions;
 using CommandRouter.Routing;
-using Common.Abstractions;
-using FakeItEasy;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Resources;
-using Services;
 using Xunit;
 
 public class CommandRoutingTests
@@ -34,7 +26,7 @@ public class CommandRoutingTests
     [Fact]
     public void AddCommandRouter_RegistersEverySlackCommand()
     {
-        using var provider = CreateProvider();
+        using var provider = CommandTestHost.CreateProvider();
 
         provider.ValidateCommandRouter();
 
@@ -60,10 +52,9 @@ public class CommandRoutingTests
     [MemberData(nameof(MissingArgumentCommands))]
     public async Task RunAsync_MissingOptionalArgument_RepliesWithBadArguments(string command, string expected)
     {
-        using var provider = CreateProvider();
+        using var provider = CommandTestHost.CreateProvider();
 
-        // Check the JSON Slack receives, since Type isn't serialised
-        using var json = JsonDocument.Parse(await RunAsync(provider, command));
+        using var json = await CommandTestHost.RunJsonAsync(provider, command);
 
         Assert.Equal(expected, json.RootElement.GetProperty("text").GetString());
         Assert.Equal("ephemeral", json.RootElement.GetProperty("response_type").GetString());
@@ -77,45 +68,20 @@ public class CommandRoutingTests
     [InlineData("join")]
     public async Task RunAsync_ExtraOrMissingRequiredArgument_ThrowsParameterBindingException(string command)
     {
-        using var provider = CreateProvider();
+        using var provider = CommandTestHost.CreateProvider();
 
-        await Assert.ThrowsAsync<ParameterBindingException>(() => RunAsync(provider, command));
+        await Assert.ThrowsAsync<ParameterBindingException>(() => CommandTestHost.RunAsync(provider, command));
     }
 
     [Fact]
     public async Task RunAsync_Help_ReturnsHelpText()
     {
-        using var provider = CreateProvider();
+        using var provider = CommandTestHost.CreateProvider();
 
-        var help = await RunAsync(provider, "help");
+        var help = await CommandTestHost.RunAsync(provider, "help");
 
         Assert.StartsWith("*Commands*", help);
         Assert.Contains("`/teatime join {option}`", help);
         Assert.Contains("double quotes", help);
-    }
-
-    private static ServiceProvider CreateProvider()
-    {
-        var services = new ServiceCollection();
-        services.AddCommandRouter(typeof(ServiceCollectionExtension).Assembly);
-        services.AddLogging();
-
-        // Strict, so a test fails if a command touches any of these
-        services.AddSingleton(A.Fake<ISlackService>(o => o.Strict()));
-        services.AddSingleton(A.Fake<IMediator>(o => o.Strict()));
-        services.AddSingleton(A.Fake<IIdGenerator<long>>(o => o.Strict()));
-        services.AddSingleton(TimeProvider.System);
-
-        return services.BuildServiceProvider();
-    }
-
-    private static async Task<string> RunAsync(ServiceProvider provider, string command)
-    {
-        var result = await provider.GetRequiredService<ICommandRunner>().RunAsync(command);
-
-        using var stream = new MemoryStream();
-        await result.ExecuteAsync(stream);
-
-        return Encoding.UTF8.GetString(stream.ToArray());
     }
 }
