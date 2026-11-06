@@ -208,6 +208,7 @@ public class SlackServiceTests
         {
             Id = 1,
             Name = "Earl Grey",
+            Available = true,
             GroupId = RunGroupId,
             CreatedBy = 5,
             CreatedDate = DateTimeOffset.UtcNow
@@ -273,7 +274,15 @@ public class SlackServiceTests
                 CreatedDate = now
             });
         A.CallTo(() => mediator.Send(A<GetOptionQuery>._, A<CancellationToken>._))
-            .Returns(new Option { Id = 1, Name = "Earl Grey", GroupId = optionGroupId, CreatedBy = 5, CreatedDate = now });
+            .Returns(new Option
+            {
+                Id = 1,
+                Name = "Earl Grey",
+                Available = true,
+                GroupId = optionGroupId,
+                CreatedBy = 5,
+                CreatedDate = now
+            });
         A.CallTo(() => mediator.Send(A<GetUserOrderQuery>._, A<CancellationToken>._))
             .Returns((Order?)null);
 

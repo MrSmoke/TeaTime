@@ -48,6 +48,7 @@ public class RunRepositoryTests(DatabaseFixture databaseFixture) : IClassFixture
         {
             Id = TestData.NewInt64(),
             Name = TestData.NewString(),
+            Available = true,
             CreatedBy = user.Id,
             CreatedDate = TestData.MySqlNow(),
             GroupId = group.Id

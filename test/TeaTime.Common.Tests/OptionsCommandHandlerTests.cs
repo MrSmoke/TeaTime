@@ -55,6 +55,7 @@ public class OptionsCommandHandlerTests
         {
             Id = 1,
             Name = "Earl Grey",
+            Available = true,
             GroupId = GroupId,
             CreatedBy = 1,
             CreatedDate = DateTimeOffset.UnixEpoch
