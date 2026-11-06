@@ -1,7 +1,6 @@
 namespace TeaTime.Slack.Tests;
 
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Text.Json.Nodes;
 using Common.Models.Data;
@@ -25,7 +24,7 @@ public class BlockKitTests
         Assert.Equal([5, 5, 2], rowSizes);
 
         var values = actions.SelectMany(a => a.Elements).Select(e => e.Value);
-        var expected = options.Select(o => "9:" + o.Id.ToString(CultureInfo.InvariantCulture));
+        var expected = options.Select(o => "9:" + o.Id.ToString());
         Assert.Equal(expected, values);
     }
 
@@ -44,6 +43,27 @@ public class BlockKitTests
         var last = actions[^1].Elements[^1];
         Assert.Equal("9:100", last.Value);
         Assert.Equal(BlockBuilder.JoinOptionActionIdPrefix + "100", last.ActionId);
+    }
+
+    // A join value is exactly two numbers separated by a colon
+    [Theory]
+    [InlineData("7:1", true, 7, 1)]
+    [InlineData("1", false, 0, 0)]
+    [InlineData("a:b", false, 0, 0)]
+    [InlineData("1:2:3", false, 0, 0)]
+    [InlineData("", false, 0, 0)]
+    [InlineData(null, false, 0, 0)]
+    public void TryParseJoinValue_ParsesOnlyRunAndOptionIds(string? value, bool expected, long runId, long optionId)
+    {
+        var parsed = BlockBuilder.TryParseJoinValue(value, out var actualRunId, out var actualOptionId);
+
+        Assert.Equal(expected, parsed);
+
+        if (expected)
+        {
+            Assert.Equal(runId, actualRunId);
+            Assert.Equal(optionId, actualOptionId);
+        }
     }
 
     [Fact]
