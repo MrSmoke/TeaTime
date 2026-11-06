@@ -2,7 +2,6 @@ namespace TeaTime.Slack.Services;
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -236,7 +235,7 @@ internal class SlackService(ISender mediator,
     private async Task LeaveRunAsync(BlockActionsPayload requestPayload, BlockAction action, string responseUrl,
         CancellationToken cancellationToken = default)
     {
-        if (!long.TryParse(action.Value, NumberStyles.None, CultureInfo.InvariantCulture, out var runId))
+        if (!long.TryParse(action.Value, out var runId))
             throw new InvalidOperationException($"Invalid run id '{action.Value}'");
 
         var (user, room) = await GetUserAndRoomAsync(requestPayload, cancellationToken);
