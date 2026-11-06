@@ -202,17 +202,17 @@ public class SlackServiceTests
         Assert.Empty(replies.Values);
     }
 
-    // Buttons on an ended round's message stay clickable, but the order is rejected for that round
+    // A round ending after the button's run check still replies ended when the order is rejected
     [Fact]
-    public async Task HandleBlockActions_RunEnded_RepliesRunEnded()
+    public async Task HandleBlockActions_JoinRejectedRunEnded_RepliesRunEnded()
     {
         var idGenerator = A.Fake<IIdGenerator<long>>();
         A.CallTo(() => idGenerator.GenerateAsync(A<CancellationToken>._)).Returns(30L);
 
         var ended = new OrderException("Run 7 has ended", OrderException.OrderExceptionReason.RunEnded);
+        var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
 
         // Sent via a BaseCommand variable, so match on that type
-        var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
         A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).Throws(ended);
 
         var replies = A.Captured<SlashCommandResponse>();
@@ -347,6 +347,37 @@ public class SlackServiceTests
 
         // Sent via a BaseCommand variable, so match on that type
         A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    // A round ending after the leave button's run check still replies ended when the delete is rejected
+    [Fact]
+    public async Task HandleBlockActions_LeaveRejectedRunEnded_RepliesRunEnded()
+    {
+        var replies = A.Captured<SlashCommandResponse>();
+        var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
+
+        var existingOrder = new Order
+        {
+            Id = 40,
+            RunId = 7,
+            UserId = 5,
+            OptionId = 1,
+            CreatedDate = DateTimeOffset.UtcNow
+        };
+
+        A.CallTo(() => mediator.Send(A<GetUserOrderQuery>._, A<CancellationToken>._))
+            .Returns(existingOrder);
+
+        var ended = new OrderException("Run 7 has ended", OrderException.OrderExceptionReason.RunEnded);
+        A.CallTo(() => mediator.Send(A<DeleteOrderCommand>._, A<CancellationToken>._)).Throws(ended);
+
+        var service = CreateService(CreateApiClient(replies), mediator);
+        var payload = CreatePayload(ResponseUrl, actionId: BlockBuilder.LeaveRunActionId, value: "7");
+
+        await service.HandleBlockActionsAsync(payload, TestContext.Current.CancellationToken);
+
+        var reply = Assert.Single(replies.Values);
+        Assert.Equal(ErrorStrings.LeaveRun_RunEnded(), reply.Text);
     }
 
     private static ISender CreateJoinMediator(long optionGroupId)

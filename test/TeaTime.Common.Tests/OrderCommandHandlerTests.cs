@@ -107,6 +107,43 @@ public class OrderCommandHandlerTests
         A.CallTo(() => orderRepository.UpdateAsync(A<Order>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
+    // Switching an order on an active round to an available option saves it and publishes the change
+    [Fact]
+    public async Task Handle_Update_AvailableOption_UpdatesOrder()
+    {
+        var saved = A.Captured<Order>();
+        A.CallTo(() => orderRepository.UpdateAsync(saved._, A<CancellationToken>._)).Returns(Task.CompletedTask);
+
+        var published = A.Captured<OrderOptionChangedEvent>();
+        A.CallTo(() => eventPublisher.PublishAsync(published._, A<CancellationToken>._)).Returns(Task.CompletedTask);
+
+        var command = new UpdateOrderOptionCommand(ExistingOrder, UserId: 5, OptionId: AvailableOptionId);
+
+        await handler.Handle(command, TestContext.Current.CancellationToken);
+
+        var order = Assert.Single(saved.Values);
+        Assert.Equal(AvailableOptionId, order.OptionId);
+
+        var evt = Assert.Single(published.Values);
+        Assert.Equal(UnavailableOptionId, evt.PreviousOptionId);
+        Assert.Equal(AvailableOptionId, evt.OptionId);
+    }
+
+    // Leaving an active round deletes the order and publishes the removal
+    [Fact]
+    public async Task Handle_Delete_ActiveRun_DeletesOrder()
+    {
+        var published = A.Captured<OrderDeletedEvent>();
+        A.CallTo(() => eventPublisher.PublishAsync(published._, A<CancellationToken>._)).Returns(Task.CompletedTask);
+
+        var command = new DeleteOrderCommand(ExistingOrder, UserId: 5);
+
+        await handler.Handle(command, TestContext.Current.CancellationToken);
+
+        var evt = Assert.Single(published.Values);
+        Assert.Equal(ExistingOrder, evt.Order);
+    }
+
     // Orders can't be placed on a round that has ended
     [Fact]
     public async Task Handle_Create_RunEnded_Throws()
@@ -162,6 +199,9 @@ public class OrderCommandHandlerTests
 
         A.CallTo(() => repository.UpdateAsync(A<Order>._, A<CancellationToken>._))
             .Returns(Task.CompletedTask);
+
+        A.CallTo(() => repository.DeleteAsync(ExistingOrder.Id, A<CancellationToken>._))
+            .Returns(true);
 
         return repository;
     }
