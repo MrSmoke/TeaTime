@@ -12,20 +12,20 @@ using Xunit;
 
 public class BlockKitTests
 {
-    // Buttons are split into rows of 5 and keep the order the options were given in
+    // Buttons are split into rows of 5, keep the order the options were given in and carry the run id
     [Fact]
     public void BuildRunStarted_ChunksButtonsIntoActionsBlocks()
     {
         var options = Enumerable.Range(1, 12).Select(CreateOption).ToList();
 
-        var blocks = BlockBuilder.BuildRunStarted("<@U1> started a run", options);
+        var blocks = BlockBuilder.BuildRunStarted("<@U1> started a run", runId: 9, options);
 
         var actions = blocks.OfType<ActionsBlock>().ToList();
         var rowSizes = actions.Select(a => a.Elements.Count);
         Assert.Equal([5, 5, 2], rowSizes);
 
         var values = actions.SelectMany(a => a.Elements).Select(e => e.Value);
-        var expected = options.Select(o => o.Id.ToString(CultureInfo.InvariantCulture));
+        var expected = options.Select(o => "9:" + o.Id.ToString(CultureInfo.InvariantCulture));
         Assert.Equal(expected, values);
     }
 
@@ -35,14 +35,14 @@ public class BlockKitTests
     {
         var options = Enumerable.Range(1, 120).Select(CreateOption).ToList();
 
-        var blocks = BlockBuilder.BuildRunStarted("<@U1> started a run", options);
+        var blocks = BlockBuilder.BuildRunStarted("<@U1> started a run", runId: 9, options);
 
         var actions = blocks.OfType<ActionsBlock>().ToList();
         Assert.Equal(20, actions.Count);
         Assert.All(actions, a => Assert.Equal(5, a.Elements.Count));
 
         var last = actions[^1].Elements[^1];
-        Assert.Equal("100", last.Value);
+        Assert.Equal("9:100", last.Value);
         Assert.Equal(BlockBuilder.JoinOptionActionIdPrefix + "100", last.ActionId);
     }
 

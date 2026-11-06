@@ -19,10 +19,13 @@ public class OrderCommandHandlerTests
     private const long UnavailableOptionId = 2;
     private const long DeletedOptionId = 3;
 
+    private const long ActiveRunId = 7;
+    private const long EndedRunId = 8;
+
     private static readonly Order ExistingOrder = new()
     {
         Id = 20,
-        RunId = 7,
+        RunId = ActiveRunId,
         UserId = 5,
         OptionId = UnavailableOptionId,
         CreatedDate = DateTimeOffset.UnixEpoch
@@ -37,6 +40,7 @@ public class OrderCommandHandlerTests
         handler = new OrderCommandHandler(
             orderRepository: orderRepository,
             optionsRepository: CreateOptionsRepository(),
+            runRepository: CreateRunRepository(),
             clock: TimeProvider.System,
             eventPublisher: eventPublisher,
             logger: NullLogger<OrderCommandHandler>.Instance
@@ -50,7 +54,7 @@ public class OrderCommandHandlerTests
         var saved = A.Captured<Order>();
         A.CallTo(() => orderRepository.CreateAsync(saved._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
-        var command = new CreateOrderCommand(Id: 30, RunId: 7, UserId: 5, OptionId: AvailableOptionId);
+        var command = new CreateOrderCommand(Id: 30, RunId: ActiveRunId, UserId: 5, OptionId: AvailableOptionId);
 
         await handler.Handle(command, TestContext.Current.CancellationToken);
 
@@ -65,7 +69,7 @@ public class OrderCommandHandlerTests
     [InlineData(DeletedOptionId)]
     public async Task Handle_Create_OptionNotAvailable_Throws(long optionId)
     {
-        var command = new CreateOrderCommand(Id: 30, RunId: 7, UserId: 5, OptionId: optionId);
+        var command = new CreateOrderCommand(Id: 30, RunId: ActiveRunId, UserId: 5, OptionId: optionId);
 
         var e = await Assert.ThrowsAsync<OrderException>(
             () => handler.Handle(command, TestContext.Current.CancellationToken));
@@ -103,6 +107,49 @@ public class OrderCommandHandlerTests
         A.CallTo(() => orderRepository.UpdateAsync(A<Order>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
+    // Orders can't be placed on a round that has ended
+    [Fact]
+    public async Task Handle_Create_RunEnded_Throws()
+    {
+        var command = new CreateOrderCommand(Id: 30, RunId: EndedRunId, UserId: 5, OptionId: AvailableOptionId);
+
+        var e = await Assert.ThrowsAsync<OrderException>(
+            () => handler.Handle(command, TestContext.Current.CancellationToken));
+
+        Assert.Equal(OrderException.OrderExceptionReason.RunEnded, e.Reason);
+        A.CallTo(() => orderRepository.CreateAsync(A<Order>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    // Orders on a round that has ended can't switch option
+    [Fact]
+    public async Task Handle_Update_RunEnded_Throws()
+    {
+        var order = ExistingOrder with { RunId = EndedRunId };
+        A.CallTo(() => orderRepository.GetAsync(order.Id, A<CancellationToken>._)).Returns(order);
+
+        var command = new UpdateOrderOptionCommand(order, UserId: 5, OptionId: AvailableOptionId);
+
+        var e = await Assert.ThrowsAsync<OrderException>(
+            () => handler.Handle(command, TestContext.Current.CancellationToken));
+
+        Assert.Equal(OrderException.OrderExceptionReason.RunEnded, e.Reason);
+        A.CallTo(() => orderRepository.UpdateAsync(A<Order>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    // Orders on a round that has ended can't be removed
+    [Fact]
+    public async Task Handle_Delete_RunEnded_Throws()
+    {
+        var order = ExistingOrder with { RunId = EndedRunId };
+        var command = new DeleteOrderCommand(order, UserId: 5);
+
+        var e = await Assert.ThrowsAsync<OrderException>(
+            () => handler.Handle(command, TestContext.Current.CancellationToken));
+
+        Assert.Equal(OrderException.OrderExceptionReason.RunEnded, e.Reason);
+        A.CallTo(() => orderRepository.DeleteAsync(A<long>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
     private static IOrderRepository CreateOrderRepository()
     {
         var repository = A.Fake<IOrderRepository>(o => o.Strict());
@@ -136,6 +183,19 @@ public class OrderCommandHandlerTests
         return repository;
     }
 
+    private static IRunRepository CreateRunRepository()
+    {
+        var repository = A.Fake<IRunRepository>(o => o.Strict());
+
+        A.CallTo(() => repository.GetAsync(ActiveRunId, A<CancellationToken>._))
+            .Returns(CreateRun(ActiveRunId, ended: false));
+
+        A.CallTo(() => repository.GetAsync(EndedRunId, A<CancellationToken>._))
+            .Returns(CreateRun(EndedRunId, ended: true));
+
+        return repository;
+    }
+
     private static IEventPublisher CreateEventPublisher()
     {
         var publisher = A.Fake<IEventPublisher>(o => o.Strict());
@@ -145,6 +205,17 @@ public class OrderCommandHandlerTests
 
         return publisher;
     }
+
+    private static Run CreateRun(long id, bool ended) => new()
+    {
+        Id = id,
+        RoomId = 1,
+        UserId = 5,
+        GroupId = 1,
+        StartTime = DateTimeOffset.UnixEpoch,
+        Ended = ended,
+        CreatedDate = DateTimeOffset.UnixEpoch
+    };
 
     private static Option CreateOption(long id, bool available) => new()
     {

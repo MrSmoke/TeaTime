@@ -14,6 +14,7 @@ using Common.Features.Orders.Queries;
 using Common.Features.RoomItemGroups.Models;
 using Common.Features.RoomItemGroups.Queries;
 using Common.Features.Rooms.Queries;
+using Common.Features.Runs.Queries;
 using Common.Features.Users.Commands;
 using Common.Features.Users.Queries;
 using Common.Models.Data;
@@ -32,20 +33,22 @@ public class SlackServiceTests
 
     private const long RunGroupId = 100;
 
+    // A join button for option 1 in run 7
+    private const string JoinValue = "7:1";
+
     [Fact]
     public async Task HandleBlockActions_JoinFails_RepliesEphemerallyViaResponseUrl()
     {
-        var apiClient = A.Fake<ISlackApiClient>();
-        var service = CreateService(apiClient);
+        var replies = A.Captured<SlashCommandResponse>();
+        var service = CreateService(CreateApiClient(replies));
 
         // No join action, so the join fails before touching the domain
         await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "something_else"),
             TestContext.Current.CancellationToken);
 
-        A.CallTo(() => apiClient.PostResponseAsync(ResponseUrl,
-                A<SlashCommandResponse>.That.Matches(r =>
-                    r.Text == ErrorStrings.General() && r.Type == ResponseType.User), A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
+        var reply = Assert.Single(replies.Values);
+        Assert.Equal(ErrorStrings.General(), reply.Text);
+        Assert.Equal(ResponseType.User, reply.Type);
     }
 
     [Fact]
@@ -103,17 +106,16 @@ public class SlackServiceTests
     [Fact]
     public async Task HandleBlockActions_OptionFromAnotherGroup_RepliesUnknownAndDoesNotOrder()
     {
-        var apiClient = A.Fake<ISlackApiClient>();
+        var replies = A.Captured<SlashCommandResponse>();
         var mediator = CreateJoinMediator(optionGroupId: 200);
-        var service = CreateService(apiClient, mediator);
+        var service = CreateService(CreateApiClient(replies), mediator);
 
         await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"),
             TestContext.Current.CancellationToken);
 
-        A.CallTo(() => apiClient.PostResponseAsync(ResponseUrl,
-                A<SlashCommandResponse>.That.Matches(r => r.Text == ErrorStrings.OptionUnknown()),
-                A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
+        var reply = Assert.Single(replies.Values);
+        Assert.Equal(ErrorStrings.OptionUnknown(), reply.Text);
+
         // Sent via a BaseCommand variable, so match on that type
         A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
@@ -132,45 +134,43 @@ public class SlackServiceTests
         var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
         A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).Throws(unavailable);
 
-        var reply = A.Captured<SlashCommandResponse>();
-        var apiClient = A.Fake<ISlackApiClient>();
-        A.CallTo(() => apiClient.PostResponseAsync(ResponseUrl, reply._, A<CancellationToken>._))
-            .Returns(Task.CompletedTask);
-
-        var service = CreateService(apiClient, mediator, idGenerator);
+        var replies = A.Captured<SlashCommandResponse>();
+        var service = CreateService(CreateApiClient(replies), mediator, idGenerator);
         var payload = CreatePayload(ResponseUrl, actionId: "join_option_1");
 
         await service.HandleBlockActionsAsync(payload, TestContext.Current.CancellationToken);
 
-        var response = reply.GetLastValue();
-        Assert.Equal(ErrorStrings.JoinRun_OptionUnavailable("Earl Grey"), response.Text);
-        Assert.Equal(ResponseType.User, response.Type);
+        var reply = Assert.Single(replies.Values);
+        Assert.Equal(ErrorStrings.JoinRun_OptionUnavailable("Earl Grey"), reply.Text);
+        Assert.Equal(ResponseType.User, reply.Type);
     }
 
     [Fact]
     public async Task HandleBlockActions_OptionFromRunGroup_CreatesOrder()
     {
-        var apiClient = A.Fake<ISlackApiClient>();
+        var replies = A.Captured<SlashCommandResponse>();
         var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
         var idGenerator = A.Fake<IIdGenerator<long>>();
         A.CallTo(() => idGenerator.GenerateAsync(A<CancellationToken>._)).Returns(30L);
-        var service = CreateService(apiClient, mediator, idGenerator);
+        var service = CreateService(CreateApiClient(replies), mediator, idGenerator);
+
+        // Sent via a BaseCommand variable, so capture on that type
+        var sent = A.Captured<BaseCommand>();
+        A.CallTo(() => mediator.Send(sent._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
         await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"),
             TestContext.Current.CancellationToken);
 
-        // Sent via a BaseCommand variable, so match on that type
-        A.CallTo(() => mediator.Send(A<BaseCommand>.That.Matches(c => c is CreateOrderCommand && ((CreateOrderCommand)c).OptionId == 1),
-                A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
-        A.CallTo(() => apiClient.PostResponseAsync(A<string>._, A<SlashCommandResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+        var command = Assert.IsType<CreateOrderCommand>(Assert.Single(sent.Values));
+        Assert.Equal(1, command.OptionId);
+        Assert.Empty(replies.Values);
     }
 
     // Clicking a button when already in the round changes the existing order instead of creating another
     [Fact]
     public async Task HandleBlockActions_AlreadyOrdered_UpdatesExistingOrder()
     {
-        var apiClient = A.Fake<ISlackApiClient>();
+        var replies = A.Captured<SlashCommandResponse>();
         var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
 
         var existingOrder = new Order
@@ -186,43 +186,65 @@ public class SlackServiceTests
             .Returns(existingOrder);
 
         // Strict id generator by default, so creating a new order would fail the test
-        var service = CreateService(apiClient, mediator);
+        var service = CreateService(CreateApiClient(replies), mediator);
+
+        // Sent via a BaseCommand variable, so capture on that type
+        var sent = A.Captured<BaseCommand>();
+        A.CallTo(() => mediator.Send(sent._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
         await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"),
             TestContext.Current.CancellationToken);
 
-        // Sent via a BaseCommand variable, so match on that type
-        A.CallTo(() => mediator.Send(
-                A<BaseCommand>.That.Matches(c =>
-                    c is UpdateOrderOptionCommand
-                    && ((UpdateOrderOptionCommand)c).Order == existingOrder
-                    && ((UpdateOrderOptionCommand)c).UserId == 5
-                    && ((UpdateOrderOptionCommand)c).OptionId == 1),
-                A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
-        A.CallTo(() => apiClient.PostResponseAsync(A<string>._, A<SlashCommandResponse>._, A<CancellationToken>._))
-            .MustNotHaveHappened();
+        var command = Assert.IsType<UpdateOrderOptionCommand>(Assert.Single(sent.Values));
+        Assert.Equal(existingOrder, command.Order);
+        Assert.Equal(5, command.UserId);
+        Assert.Equal(1, command.OptionId);
+        Assert.Empty(replies.Values);
     }
 
-    // Buttons on an ended round's message stay clickable, but there's no current run to join
+    // Buttons on an ended round's message stay clickable, but the order is rejected for that round
     [Fact]
-    public async Task HandleBlockActions_NoCurrentRun_RepliesNotStartedAndDoesNotOrder()
+    public async Task HandleBlockActions_RunEnded_RepliesRunEnded()
     {
-        var apiClient = A.Fake<ISlackApiClient>();
+        var idGenerator = A.Fake<IIdGenerator<long>>();
+        A.CallTo(() => idGenerator.GenerateAsync(A<CancellationToken>._)).Returns(30L);
+
+        var ended = new OrderException("Run 7 has ended", OrderException.OrderExceptionReason.RunEnded);
+
+        // Sent via a BaseCommand variable, so match on that type
         var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
+        A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).Throws(ended);
 
-        A.CallTo(() => mediator.Send(A<GetCurrentRunQuery>._, A<CancellationToken>._))
-            .Returns((Run?)null);
-
-        var service = CreateService(apiClient, mediator);
+        var replies = A.Captured<SlashCommandResponse>();
+        var service = CreateService(CreateApiClient(replies), mediator, idGenerator);
 
         await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"),
             TestContext.Current.CancellationToken);
 
-        A.CallTo(() => apiClient.PostResponseAsync(ResponseUrl,
-                A<SlashCommandResponse>.That.Matches(r => r.Text == ErrorStrings.JoinRun_RunNotStarted()),
-                A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
+        var reply = Assert.Single(replies.Values);
+        Assert.Equal(ErrorStrings.JoinRun_RunEnded(), reply.Text);
+
+        // The button's run is used, not the room's current run
+        A.CallTo(() => mediator.Send(A<GetCurrentRunQuery>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    // A button carrying a run from another room doesn't order into it
+    [Fact]
+    public async Task HandleBlockActions_RunFromAnotherRoom_RepliesNotStartedAndDoesNotOrder()
+    {
+        var replies = A.Captured<SlashCommandResponse>();
+        var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
+
+        A.CallTo(() => mediator.Send(A<GetRunQuery>._, A<CancellationToken>._))
+            .Returns(CreateRun(roomId: 6));
+
+        var service = CreateService(CreateApiClient(replies), mediator);
+
+        await service.HandleBlockActionsAsync(CreatePayload(ResponseUrl, actionId: "join_option_1"),
+            TestContext.Current.CancellationToken);
+
+        var reply = Assert.Single(replies.Values);
+        Assert.Equal(ErrorStrings.JoinRun_RunNotStarted(), reply.Text);
 
         // Sent via a BaseCommand variable, so match on that type
         A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).MustNotHaveHappened();
@@ -273,13 +295,14 @@ public class SlackServiceTests
             ChannelName = "general"
         };
 
+        // Sent via a BaseCommand variable, so capture on that type
+        var sent = A.Captured<BaseCommand>();
+        A.CallTo(() => mediator.Send(sent._, A<CancellationToken>._)).Returns(Task.CompletedTask);
+
         await service.JoinRunAsync(slashCommand, "earl grey", TestContext.Current.CancellationToken);
 
-        // Sent via a BaseCommand variable, so match on that type
-        A.CallTo(() => mediator.Send(
-                A<BaseCommand>.That.Matches(c => c is CreateOrderCommand && ((CreateOrderCommand)c).OptionId == 1),
-                A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
+        var command = Assert.IsType<CreateOrderCommand>(Assert.Single(sent.Values));
+        Assert.Equal(1, command.OptionId);
     }
 
     private static ISender CreateJoinMediator(long optionGroupId)
@@ -294,15 +317,9 @@ public class SlackServiceTests
         A.CallTo(() => mediator.Send(A<GetRoomQuery>._, A<CancellationToken>._))
             .Returns(new Room { Id = 5, Name = "general", CreatedBy = 5, CreatedDate = now });
         A.CallTo(() => mediator.Send(A<GetCurrentRunQuery>._, A<CancellationToken>._))
-            .Returns(new Run
-            {
-                Id = 7,
-                RoomId = 5,
-                UserId = 5,
-                GroupId = RunGroupId,
-                StartTime = now,
-                CreatedDate = now
-            });
+            .Returns(CreateRun(roomId: 5));
+        A.CallTo(() => mediator.Send(A<GetRunQuery>.That.Matches(q => q.RunId == 7), A<CancellationToken>._))
+            .Returns(CreateRun(roomId: 5));
         A.CallTo(() => mediator.Send(A<GetOptionQuery>._, A<CancellationToken>._))
             .Returns(new Option
             {
@@ -319,6 +336,27 @@ public class SlackServiceTests
         return mediator;
     }
 
+    // Strict, so a reply anywhere but the response url fails the test
+    private static ISlackApiClient CreateApiClient(Captured<SlashCommandResponse> replies)
+    {
+        var apiClient = A.Fake<ISlackApiClient>(o => o.Strict());
+
+        A.CallTo(() => apiClient.PostResponseAsync(ResponseUrl, replies._, A<CancellationToken>._))
+            .Returns(Task.CompletedTask);
+
+        return apiClient;
+    }
+
+    private static Run CreateRun(long roomId) => new()
+    {
+        Id = 7,
+        RoomId = roomId,
+        UserId = 5,
+        GroupId = RunGroupId,
+        StartTime = DateTimeOffset.UtcNow,
+        CreatedDate = DateTimeOffset.UtcNow
+    };
+
     private static SlackService CreateService(ISlackApiClient apiClient, ISender? mediator = null,
         IIdGenerator<long>? idGenerator = null) => new(
         mediator ?? A.Fake<ISender>(o => o.Strict()),
@@ -334,6 +372,6 @@ public class SlackServiceTests
         User = new InteractionUser { Id = "U1", Username = "steve" },
         Channel = new InteractionChannel { Id = "C1", Name = "general" },
         ResponseUrl = responseUrl,
-        Actions = [new BlockAction { ActionId = actionId, Value = "1" }]
+        Actions = [new BlockAction { ActionId = actionId, Value = JoinValue }]
     };
 }
