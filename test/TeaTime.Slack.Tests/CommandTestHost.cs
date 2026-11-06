@@ -21,19 +21,34 @@ internal static class CommandTestHost
 {
     public const long UserId = 5;
     public const long RoomId = 3;
+    public const long NewId = 100;
 
     // Unset dependencies are strict fakes, so a test fails if a command touches them
-    public static ServiceProvider CreateProvider(ISlackService? slackService = null, IMediator? mediator = null)
+    public static ServiceProvider CreateProvider(
+        ISlackService? slackService = null,
+        IMediator? mediator = null,
+        IIdGenerator<long>? idGenerator = null)
     {
         var services = new ServiceCollection();
         services.AddCommandRouter(typeof(ServiceCollectionExtension).Assembly);
         services.AddLogging();
         services.AddSingleton(slackService ?? A.Fake<ISlackService>(o => o.Strict()));
         services.AddSingleton(mediator ?? A.Fake<IMediator>(o => o.Strict()));
-        services.AddSingleton(A.Fake<IIdGenerator<long>>(o => o.Strict()));
+        services.AddSingleton(idGenerator ?? A.Fake<IIdGenerator<long>>(o => o.Strict()));
         services.AddSingleton(TimeProvider.System);
 
         return services.BuildServiceProvider();
+    }
+
+    // Every generated id is NewId
+    public static IIdGenerator<long> CreateIdGenerator()
+    {
+        var idGenerator = A.Fake<IIdGenerator<long>>(o => o.Strict());
+
+        A.CallTo(() => idGenerator.GenerateAsync(A<CancellationToken>._))
+            .Returns(NewId);
+
+        return idGenerator;
     }
 
     // Every command resolves to the same user and room

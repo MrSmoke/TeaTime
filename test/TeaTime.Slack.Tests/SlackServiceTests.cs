@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Client;
 using Common.Abstractions;
 using Common.Collections;
+using Common.Exceptions;
 using Common.Features.Links.Queries;
 using Common.Features.Options.Queries;
 using Common.Features.Orders.Commands;
@@ -115,6 +116,35 @@ public class SlackServiceTests
             .MustHaveHappenedOnceExactly();
         // Sent via a BaseCommand variable, so match on that type
         A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    // Clicking a button for an option that has since been marked unavailable replies with its name
+    [Fact]
+    public async Task HandleBlockActions_OptionUnavailable_RepliesUnavailable()
+    {
+        var idGenerator = A.Fake<IIdGenerator<long>>();
+        A.CallTo(() => idGenerator.GenerateAsync(A<CancellationToken>._)).Returns(30L);
+
+        var unavailable = new OrderException("Option 1 is unavailable",
+            OrderException.OrderExceptionReason.OptionUnavailable);
+
+        // Sent via a BaseCommand variable, so match on that type
+        var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
+        A.CallTo(() => mediator.Send(A<BaseCommand>._, A<CancellationToken>._)).Throws(unavailable);
+
+        var reply = A.Captured<SlashCommandResponse>();
+        var apiClient = A.Fake<ISlackApiClient>();
+        A.CallTo(() => apiClient.PostResponseAsync(ResponseUrl, reply._, A<CancellationToken>._))
+            .Returns(Task.CompletedTask);
+
+        var service = CreateService(apiClient, mediator, idGenerator);
+        var payload = CreatePayload(ResponseUrl, actionId: "join_option_1");
+
+        await service.HandleBlockActionsAsync(payload, TestContext.Current.CancellationToken);
+
+        var response = reply.GetLastValue();
+        Assert.Equal(ErrorStrings.JoinRun_OptionUnavailable("Earl Grey"), response.Text);
+        Assert.Equal(ResponseType.User, response.Type);
     }
 
     [Fact]

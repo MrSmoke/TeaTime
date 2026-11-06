@@ -4,18 +4,33 @@ using System;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Exceptions;
 using Common.Features.Options.Commands;
-using Common.Features.RoomItemGroups.Models;
 using Common.Features.RoomItemGroups.Queries;
-using Common.Models.Data;
 using FakeItEasy;
 using MediatR;
+using Resources;
 using Xunit;
 
 public class OptionsCommandTests
 {
-    private const long GroupId = 2;
     private const long OptionId = 1;
+
+    // Adding a name that already exists ignoring case is rejected with a friendly reply
+    [Fact]
+    public async Task Add_DuplicateName_RepliesAlreadyExists()
+    {
+        var mediator = CreateMediator(available: true);
+
+        var duplicate = new OptionException("Option earl grey already exists",
+            OptionException.OptionExceptionReason.DuplicateName);
+
+        A.CallTo(() => mediator.Send(A<CreateOptionCommand>._, A<CancellationToken>._)).Throws(duplicate);
+
+        var reply = await RunAsync(mediator, "options add tea \"earl grey\"");
+
+        Assert.Equal(ErrorStrings.AddOption_DuplicateName("earl grey", "tea"), reply);
+    }
 
     // Removing an option matches its name ignoring case and replies with the stored name
     [Fact]
@@ -56,10 +71,13 @@ public class OptionsCommandTests
     // The room has a "tea" group holding a single "Earl Grey" option
     private static IMediator CreateMediator(bool available)
     {
+        var earlGrey = SlackTestData.CreateOption(OptionId, "Earl Grey", available);
+        var group = SlackTestData.CreateGroup("tea", earlGrey);
+
         var mediator = A.Fake<IMediator>(o => o.Strict());
 
         A.CallTo(() => mediator.Send(A<GetRoomItemGroupByNameQuery>._, A<CancellationToken>._))
-            .Returns(CreateTeaGroup(available));
+            .Returns(group);
 
         A.CallTo(() => mediator.Send(A<DeleteOptionCommand>._, A<CancellationToken>._))
             .Returns(Task.CompletedTask);
@@ -70,34 +88,12 @@ public class OptionsCommandTests
         return mediator;
     }
 
-    private static RoomItemGroupModel CreateTeaGroup(bool available)
-    {
-        var earlGrey = new Option
-        {
-            Id = OptionId,
-            Name = "Earl Grey",
-            Available = available,
-            GroupId = GroupId,
-            CreatedBy = CommandTestHost.UserId,
-            CreatedDate = DateTimeOffset.UnixEpoch
-        };
-
-        return new RoomItemGroupModel
-        {
-            Id = GroupId,
-            Name = "tea",
-            RoomId = CommandTestHost.RoomId,
-            CreatedBy = CommandTestHost.UserId,
-            CreatedDate = DateTimeOffset.UnixEpoch,
-            Options = [earlGrey]
-        };
-    }
-
     private static async Task<string?> RunAsync(IMediator mediator, string command)
     {
         var slackService = CommandTestHost.CreateSlackService();
+        var idGenerator = CommandTestHost.CreateIdGenerator();
 
-        await using var provider = CommandTestHost.CreateProvider(slackService, mediator);
+        await using var provider = CommandTestHost.CreateProvider(slackService, mediator, idGenerator);
         using var json = await CommandTestHost.RunJsonAsync(provider, command);
 
         return json.RootElement.GetProperty("text").GetString();

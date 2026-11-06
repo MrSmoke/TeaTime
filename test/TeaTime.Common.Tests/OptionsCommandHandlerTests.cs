@@ -35,17 +35,19 @@ public class OptionsCommandHandlerTests
     [Fact]
     public async Task Handle_Create_NewName_SavesOption()
     {
+        var saved = A.Captured<Option>();
         var repository = CreateRepository();
-        var handler = new OptionsCommandHandler(TimeProvider.System, repository);
+        A.CallTo(() => repository.CreateAsync(saved._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
+        var handler = new OptionsCommandHandler(TimeProvider.System, repository);
         var command = new CreateOptionCommand(Id: 10, UserId: 1, GroupId: GroupId, Name: "Green");
 
         await handler.Handle(command, TestContext.Current.CancellationToken);
 
-        A.CallTo(() => repository.CreateAsync(
-                A<Option>.That.Matches(o => o.Id == 10 && o.Name == "Green" && o.Available),
-                A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
+        var option = saved.GetLastValue();
+        Assert.Equal(10, option.Id);
+        Assert.Equal("Green", option.Name);
+        Assert.True(option.Available);
     }
 
     // The group already holds an "Earl Grey" option
