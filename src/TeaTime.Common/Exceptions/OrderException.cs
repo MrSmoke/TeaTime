@@ -12,6 +12,11 @@ public class OrderException(string message, OrderException.OrderExceptionReason 
         /// <summary>
         /// The option is unavailable or has been deleted
         /// </summary>
-        OptionUnavailable = 1
+        OptionUnavailable = 1,
+
+        /// <summary>
+        /// The run has ended or doesn't exist, so its orders can't change
+        /// </summary>
+        RunEnded = 2
     }
 }

@@ -14,6 +14,7 @@ using Models.Data;
 public class OrderCommandHandler(
     IOrderRepository orderRepository,
     IOptionsRepository optionsRepository,
+    IRunRepository runRepository,
     TimeProvider clock,
     IEventPublisher eventPublisher,
     ILogger<OrderCommandHandler> logger) :
@@ -23,6 +24,7 @@ public class OrderCommandHandler(
 {
     public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
+        await EnsureRunActiveAsync(request.RunId, cancellationToken);
         await EnsureOptionAvailableAsync(request.OptionId, cancellationToken);
 
         var order = new Order
@@ -61,6 +63,8 @@ public class OrderCommandHandler(
             return;
         }
 
+        await EnsureRunActiveAsync(existing.RunId, cancellationToken);
+
         // If the option is the same, skip
         if (existing.OptionId == request.OptionId)
             return;
@@ -90,6 +94,8 @@ public class OrderCommandHandler(
 
     public async Task Handle(DeleteOrderCommand request, CancellationToken cancellationToken)
     {
+        await EnsureRunActiveAsync(request.Order.RunId, cancellationToken);
+
         // Nothing was deleted, so don't publish an event
         if (!await orderRepository.DeleteAsync(request.Order.Id, cancellationToken))
             return;
@@ -100,6 +106,17 @@ public class OrderCommandHandler(
         };
 
         await eventPublisher.PublishAsync(evt, cancellationToken);
+    }
+
+    private async Task EnsureRunActiveAsync(long runId, CancellationToken cancellationToken)
+    {
+        var run = await runRepository.GetAsync(runId, cancellationToken);
+
+        if (run is not { Ended: false })
+        {
+            throw new OrderException($"Run {runId} has ended or doesn't exist",
+                OrderException.OrderExceptionReason.RunEnded);
+        }
     }
 
     private async Task EnsureOptionAvailableAsync(long optionId, CancellationToken cancellationToken)

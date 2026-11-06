@@ -2,7 +2,6 @@ namespace TeaTime.Slack.Services;
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +17,7 @@ using Common.Features.Orders.Queries;
 using Common.Features.RoomItemGroups.Queries;
 using Common.Features.Rooms.Commands;
 using Common.Features.Rooms.Queries;
+using Common.Features.Runs.Queries;
 using Common.Features.Users.Commands;
 using Common.Features.Users.Queries;
 using Common.Models;
@@ -223,18 +223,19 @@ internal class SlackService(ISender mediator,
     private async Task JoinRunAsync(BlockActionsPayload requestPayload, BlockAction action, string responseUrl,
         CancellationToken cancellationToken = default)
     {
-        if (!long.TryParse(action.Value, NumberStyles.None, CultureInfo.InvariantCulture, out var optionId))
-            throw new InvalidOperationException($"Invalid option id '{action.Value}'");
+        if (!BlockBuilder.TryParseJoinValue(action.Value, out var runId, out var optionId))
+            throw new InvalidOperationException($"Invalid join value '{action.Value}'");
 
         var (user, room) = await GetUserAndRoomAsync(requestPayload, cancellationToken);
+        var callbackData = requestPayload.ToCallbackData(responseUrl);
 
-        await JoinRunAsync(user.Id, room.Id, optionId, requestPayload.ToCallbackData(responseUrl), cancellationToken);
+        await JoinRunAsync(user.Id, room.Id, runId, optionId, callbackData, cancellationToken);
     }
 
     private async Task LeaveRunAsync(BlockActionsPayload requestPayload, BlockAction action, string responseUrl,
         CancellationToken cancellationToken = default)
     {
-        if (!long.TryParse(action.Value, NumberStyles.None, CultureInfo.InvariantCulture, out var runId))
+        if (!long.TryParse(action.Value, out var runId))
             throw new InvalidOperationException($"Invalid run id '{action.Value}'");
 
         var (user, room) = await GetUserAndRoomAsync(requestPayload, cancellationToken);
@@ -257,15 +258,15 @@ internal class SlackService(ISender mediator,
         return (user, room);
     }
 
-    private async Task LeaveRunAsync(long userId, long roomId, long? expectedRunId, CallbackData callbackData,
+    private async Task LeaveRunAsync(long userId, long roomId, long? runId, CallbackData callbackData,
         CancellationToken cancellationToken = default)
     {
-        var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId), cancellationToken);
+        var run = await GetRunAsync(userId, roomId, runId, cancellationToken);
         if (run == null)
             throw new SlackTeaTimeException(ErrorStrings.LeaveRun_RunNotStarted());
 
-        // A button from an older round's message means that round has already ended
-        if (run.Ended || (expectedRunId.HasValue && expectedRunId.Value != run.Id))
+        // Checked before the order lookup so an ended round replies ended rather than not joined
+        if (run.Ended)
             throw new SlackTeaTimeException(ErrorStrings.LeaveRun_RunEnded());
 
         var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, userId), cancellationToken);
@@ -276,7 +277,14 @@ internal class SlackService(ISender mediator,
 
         command.AddCallbackState(callbackData);
 
-        await mediator.Send(command, cancellationToken);
+        try
+        {
+            await mediator.Send(command, cancellationToken);
+        }
+        catch (OrderException e) when (e.Reason == OrderException.OrderExceptionReason.RunEnded)
+        {
+            throw new SlackTeaTimeException(ErrorStrings.LeaveRun_RunEnded(), e);
+        }
     }
 
     private async Task JoinRunAsync(long userId, long roomId, string optionName, CallbackData callbackData,
@@ -309,14 +317,17 @@ internal class SlackService(ISender mediator,
         await JoinRunInternalAsync(userId, run, option, callbackData, cancellationToken);
     }
 
-    private async Task JoinRunAsync(long userId, long roomId, long optionId, CallbackData callbackData,
+    private async Task JoinRunAsync(long userId, long roomId, long runId, long optionId, CallbackData callbackData,
         CancellationToken cancellationToken = default)
     {
-        var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId), cancellationToken);
+        var run = await GetRunAsync(userId, roomId, runId, cancellationToken);
         if (run == null)
             throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
 
-        // Buttons on an old round's message can still be clicked, and may be for a different group to the active round
+        // Checked before the option lookup so an ended round replies ended rather than unknown option
+        if (run.Ended)
+            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded());
+
         var option = await mediator.Send(new GetOptionQuery(optionId), cancellationToken);
         if (option == null || option.GroupId != run.GroupId)
             throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
@@ -328,9 +339,6 @@ internal class SlackService(ISender mediator,
         CancellationToken cancellationToken = default)
     {
         BaseCommand command;
-
-        if (run.Ended)
-            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded());
 
         //check if we need to join or update
         var existingOrder = await mediator.Send(new GetUserOrderQuery(run.Id, userId), cancellationToken);
@@ -360,5 +368,25 @@ internal class SlackService(ISender mediator,
         {
             throw new SlackTeaTimeException(ErrorStrings.JoinRun_OptionUnavailable(option.Name), e);
         }
+        catch (OrderException e) when (e.Reason == OrderException.OrderExceptionReason.RunEnded)
+        {
+            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded(), e);
+        }
+    }
+
+    private async Task<Run?> GetRunAsync(long userId, long roomId, long? runId,
+        CancellationToken cancellationToken = default)
+    {
+        // Slash commands act on the current run, buttons act on the run their message was posted for
+        if (!runId.HasValue)
+            return await mediator.Send(new GetCurrentRunQuery(roomId, userId), cancellationToken);
+
+        var run = await mediator.Send(new GetRunQuery(runId.Value), cancellationToken);
+
+        // A run id from another room's message is treated as no run
+        if (run == null || run.RoomId != roomId)
+            return null;
+
+        return run;
     }
 }

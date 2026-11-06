@@ -60,7 +60,7 @@ public class RunCommand(
         {
             Text = text,
             Type = ResponseType.Channel,
-            Blocks = BlockBuilder.BuildRunStarted(text, availableOptions)
+            Blocks = BlockBuilder.BuildRunStarted(text, command.Id, availableOptions)
         });
     }
 
