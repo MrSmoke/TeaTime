@@ -1,7 +1,6 @@
 namespace TeaTime.Slack;
 
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Common.Models.Data;
 using Models.BlockKit;
@@ -13,13 +12,16 @@ internal static class BlockBuilder
 
     internal const string LeaveRunActionId = "leave_run";
 
+    // Separates the run id and option id in a join button's value
+    private const char JoinValueSeparator = ':';
+
     // The number of actions (or buttons) per block.
     private const int ActionsPerBlock = 5;
 
     // We can have up to 50 blocks, but 20 for buttons is probably way too many anyway.
     private const int MaxActionBlocks = 20;
 
-    internal static List<Block> BuildRunStarted(string text, IEnumerable<Option> options)
+    internal static List<Block> BuildRunStarted(string text, long runId, IEnumerable<Option> options)
     {
         var contextBlock = new ContextBlock();
         contextBlock.Elements.Add(TextObject.Markdown(ResponseStrings.RunStartedHint()));
@@ -39,7 +41,8 @@ internal static class BlockBuilder
         foreach (var chunk in outputOptions)
         {
             var actions = new ActionsBlock();
-            actions.Elements.AddRange(chunk.Select(CreateJoinButton));
+            var buttons = chunk.Select(o => CreateJoinButton(runId, o));
+            actions.Elements.AddRange(buttons);
             blocks.Add(actions);
         }
 
@@ -53,15 +56,30 @@ internal static class BlockBuilder
         return blocks;
     }
 
-    private static ButtonElement CreateJoinButton(Option option)
+    internal static bool TryParseJoinValue(string? value, out long runId, out long optionId)
     {
-        var id = option.Id.ToString(CultureInfo.InvariantCulture);
+        runId = 0;
+        optionId = 0;
+
+        var parts = value?.Split(JoinValueSeparator);
+        if (parts is not { Length: 2 })
+            return false;
+
+        return long.TryParse(parts[0], out runId) && long.TryParse(parts[1], out optionId);
+    }
+
+    private static ButtonElement CreateJoinButton(long runId, Option option)
+    {
+        var id = option.Id.ToString();
+
+        // The run id ties a click to this round, so an old round's message can't change the current round
+        var value = $"{runId}{JoinValueSeparator}{id}";
 
         return new ButtonElement
         {
             Text = TextObject.PlainText(option.Name),
             ActionId = JoinOptionActionIdPrefix + id,
-            Value = id
+            Value = value
         };
     }
 
@@ -72,7 +90,7 @@ internal static class BlockBuilder
         {
             Text = TextObject.PlainText("Leave round"),
             ActionId = LeaveRunActionId,
-            Value = runId.ToString(CultureInfo.InvariantCulture)
+            Value = runId.ToString()
         };
     }
 }
