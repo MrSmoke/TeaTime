@@ -85,7 +85,7 @@ public class OptionsCommand(
         if (group == null)
             return Response(ErrorStrings.RemoveOption_GroupInvalidName(groupName), ResponseType.User);
 
-        var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.Ordinal));
+        var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.OrdinalIgnoreCase));
         if (option == null)
             return Response(ErrorStrings.RemoveOption_UnknownOption(optionName), ResponseType.User);
 
@@ -93,7 +93,7 @@ public class OptionsCommand(
 
         await mediator.Send(command);
 
-        return Response(ResponseStrings.OptionRemoved(optionName, groupName), ResponseType.User);
+        return Response(ResponseStrings.OptionRemoved(option.Name, group.Name), ResponseType.User);
     }
 
     [Command("available")]
@@ -124,7 +124,7 @@ public class OptionsCommand(
         if (group == null)
             return Response(ErrorStrings.SetOptionAvailability_GroupInvalidName(groupName), ResponseType.User);
 
-        var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.Ordinal));
+        var option = group.Options.FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.OrdinalIgnoreCase));
         if (option == null)
             return Response(ErrorStrings.SetOptionAvailability_UnknownOption(optionName), ResponseType.User);
 
