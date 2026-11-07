@@ -53,7 +53,7 @@ jobs:
         with:
           push: ${{ env.PUSH == 'true' }}
           build-args: |
-            VERSION_SUFFIX=dev.${{ steps.sha.outputs.short }}
+            VERSION_SUFFIX=dev+${{ steps.sha.outputs.short }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
