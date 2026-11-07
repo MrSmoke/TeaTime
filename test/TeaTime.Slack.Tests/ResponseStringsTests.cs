@@ -50,6 +50,19 @@ public class ResponseStringsTests
         Assert.Equal(expected, ResponseStrings.OptionList("tea", options));
     }
 
+    // Option names can't form mentions or links, and text Slack already escaped isn't escaped twice
+    [Theory]
+    [InlineData("<!channel>", "- &lt;!channel&gt;")]
+    [InlineData("&lt;!channel&gt;", "- &lt;!channel&gt;")]
+    [InlineData("Tea & Biscuits", "- Tea &amp; Biscuits")]
+    [InlineData("Tea &amp; Biscuits", "- Tea &amp; Biscuits")]
+    public void OptionList_EscapesOptionNames(string name, string expectedLine)
+    {
+        Option[] options = [CreateOption(name, available: true)];
+
+        Assert.Equal("Options for *tea*\n" + expectedLine, ResponseStrings.OptionList("tea", options));
+    }
+
     private static Option CreateOption(string name, bool available) => new()
     {
         Id = 1,

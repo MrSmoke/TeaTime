@@ -58,7 +58,7 @@ internal class RunEndedHandler(
                 .Append("- ")
                 .Append(username)
                 .Append(": ")
-                .Append(o.Option?.Name ?? "unknown");
+                .Append(StringHelpers.EscapeMarkdown(o.Option?.Name ?? "unknown"));
 
             if (i < orders.Count - 1)
                 messageBuilder.Append('\n');
@@ -78,6 +78,6 @@ internal class RunEndedHandler(
 
         var runner = await userRepository.GetAsync(userId, cancellationToken);
 
-        return runner?.DisplayName ?? "Unknown";
+        return StringHelpers.EscapeMarkdown(runner?.DisplayName ?? "Unknown");
     }
 }

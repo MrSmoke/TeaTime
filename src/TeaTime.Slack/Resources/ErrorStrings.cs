@@ -1,5 +1,7 @@
 namespace TeaTime.Slack.Resources;
 
+using static StringHelpers;
+
 internal static class ErrorStrings
 {
     private const string HelpCommandText = "Type `/teatime help` for help";
@@ -8,10 +10,11 @@ internal static class ErrorStrings
 
     //Start
     internal static string StartRun_GroupInvalidName(string groupName) =>
-        $"Failed to start round. *{groupName}* is not a valid group. " + CommandStrings.AddGroup(groupName);
+        $"Failed to start round. *{EscapeMarkdown(groupName)}* is not a valid group. " +
+        CommandStrings.AddGroup(groupName);
 
     internal static string StartRun_GroupNoOptions(string groupName) =>
-        $"Cannot start round. *{groupName}* has no available options. " + HelpCommandText;
+        $"Cannot start round. *{EscapeMarkdown(groupName)}* has no available options. " + HelpCommandText;
 
     internal static string StartRun_RunAlreadyStarted() =>
         "Cannot start round. There is already an active TeaTime running in this room. " + CommandStrings.JoinRound;
@@ -19,10 +22,11 @@ internal static class ErrorStrings
 
     //Add option
     internal static string AddOption_GroupInvalidName(string groupName) =>
-        $"Failed to add option. *{groupName}* is not a valid group. " + CommandStrings.AddGroup(groupName);
+        $"Failed to add option. *{EscapeMarkdown(groupName)}* is not a valid group. " +
+        CommandStrings.AddGroup(groupName);
 
     internal static string AddOption_DuplicateName(string optionName, string groupName) =>
-        $"Failed to add option. *{optionName}* already exists in *{groupName}*";
+        $"Failed to add option. *{EscapeMarkdown(optionName)}* already exists in *{EscapeMarkdown(groupName)}*";
 
     internal static string AddOption_BadArguments() =>
         "Failed to add option. Invalid command. " + CommandStrings.AddOption();
@@ -30,10 +34,10 @@ internal static class ErrorStrings
 
     //Remove option
     internal static string RemoveOption_GroupInvalidName(string groupName) =>
-        $"Failed to remove option. *{groupName}* is not a valid group.";
+        $"Failed to remove option. *{EscapeMarkdown(groupName)}* is not a valid group.";
 
     internal static string RemoveOption_UnknownOption(string optionName) =>
-        $"Failed to remove option. Unknown option *{optionName}*";
+        $"Failed to remove option. Unknown option *{EscapeMarkdown(optionName)}*";
 
     internal static string RemoveOption_BadArguments() =>
         "Failed to remove option. Invalid command. " + CommandStrings.RemoveOption();
@@ -41,10 +45,10 @@ internal static class ErrorStrings
 
     //Set option availability
     internal static string SetOptionAvailability_GroupInvalidName(string groupName) =>
-        $"Failed to update option. *{groupName}* is not a valid group.";
+        $"Failed to update option. *{EscapeMarkdown(groupName)}* is not a valid group.";
 
     internal static string SetOptionAvailability_UnknownOption(string optionName) =>
-        $"Failed to update option. Unknown option *{optionName}*";
+        $"Failed to update option. Unknown option *{EscapeMarkdown(optionName)}*";
 
     internal static string SetOptionAvailability_BadArguments(bool available)
     {
@@ -57,10 +61,10 @@ internal static class ErrorStrings
 
     //List options
     internal static string ListOptions_GroupInvalidName(string groupName) =>
-        $"Failed to list options. *{groupName}* is not a valid group.";
+        $"Failed to list options. *{EscapeMarkdown(groupName)}* is not a valid group.";
 
     internal static string ListOptions_GroupNoOptions(string groupName) =>
-        $"Group *{groupName}* has no options. " + CommandStrings.AddOption(groupName);
+        $"Group *{EscapeMarkdown(groupName)}* has no options. " + CommandStrings.AddOption(groupName);
 
     internal static string ListOptions_BadArguments() =>
         "Failed to list options. Invalid command. " + CommandStrings.ListOptions();
@@ -68,7 +72,7 @@ internal static class ErrorStrings
 
     //Remove group
     internal static string RemoveGroup_GroupInvalidName(string groupName) =>
-        $"Failed to remove group. Unknown group *{groupName}*";
+        $"Failed to remove group. Unknown group *{EscapeMarkdown(groupName)}*";
 
     internal static string RemoveGroup_BadArguments() =>
         "Failed to remove group. Invalid command. " + CommandStrings.RemoveGroup();
@@ -78,10 +82,11 @@ internal static class ErrorStrings
     internal static string JoinRun_RunNotStarted() => "Cannot join round. There is no TeaTime running. " + CommandStrings.StartRound;
 
     internal static string JoinRun_OptionUnknown(string optionName, string groupName) =>
-        $"Failed to join round. Unknown option *{optionName}*. " + CommandStrings.AddOption(groupName, optionName);
+        $"Failed to join round. Unknown option *{EscapeMarkdown(optionName)}*. " +
+        CommandStrings.AddOption(groupName, optionName);
 
     internal static string JoinRun_OptionUnavailable(string optionName) =>
-        $"Failed to join round. *{optionName}* is currently unavailable";
+        $"Failed to join round. *{EscapeMarkdown(optionName)}* is currently unavailable";
 
     internal static string JoinRun_RunEnded() => "Failed to join round. Round has already ended";
 
