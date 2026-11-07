@@ -47,7 +47,7 @@ internal static class ResponseStrings
         var available = options.Where(o => o.Available).Select(o => $"- {EscapeMarkdown(o.Name)}").ToList();
         var unavailable = options.Where(o => !o.Available).Select(o => $"- {EscapeMarkdown(o.Name)}").ToList();
 
-        var text = $"Options for *{EscapeMarkdown(groupName)}*\n";
+        var text = "*Available*\n";
 
         if (available.Count == 0)
             text += "No options are currently available";

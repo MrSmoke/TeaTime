@@ -11,7 +11,7 @@ public class ResponseStringsTests
     [Fact]
     public void OptionList_ListsEachOption()
     {
-        const string expected = "Options for *tea*\n" +
+        const string expected = "*Available*\n" +
                                 "- Earl Grey\n" +
                                 "- Green";
 
@@ -24,7 +24,7 @@ public class ResponseStringsTests
     [Fact]
     public void OptionList_ListsUnavailableOptionsSeparately()
     {
-        const string expected = "Options for *tea*\n" +
+        const string expected = "*Available*\n" +
                                 "- Earl Grey\n" +
                                 "\n" +
                                 "*Unavailable*\n" +
@@ -39,7 +39,7 @@ public class ResponseStringsTests
     [Fact]
     public void OptionList_AllUnavailable_SaysNoneAvailable()
     {
-        const string expected = "Options for *tea*\n" +
+        const string expected = "*Available*\n" +
                                 "No options are currently available\n" +
                                 "\n" +
                                 "*Unavailable*\n" +
@@ -60,7 +60,7 @@ public class ResponseStringsTests
     {
         Option[] options = [CreateOption(name, available: true)];
 
-        Assert.Equal("Options for *tea*\n" + expectedLine, ResponseStrings.OptionList("tea", options));
+        Assert.Equal("*Available*\n" + expectedLine, ResponseStrings.OptionList("tea", options));
     }
 
     private static Option CreateOption(string name, bool available) => new()
