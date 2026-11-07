@@ -121,7 +121,31 @@ internal class SlackService(ISender mediator,
         var room = await GetOrCreateRoomAsync(slashCommand.ChannelId, slashCommand.ChannelName, user.Id,
             cancellationToken);
 
-        await JoinRunAsync(user.Id, room.Id, optionName, slashCommand.ToCallbackData(), cancellationToken);
+        var run = await mediator.Send(new GetCurrentRunQuery(room.Id, user.Id), cancellationToken);
+        if (run == null)
+            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
+
+        var group = await mediator.Send(new GetRoomItemGroupQuery(
+                RoomId: run.RoomId,
+                UserId: user.Id,
+                GroupId: run.GroupId),
+            cancellationToken);
+
+        if (group == null)
+        {
+            logger.LogWarning("Failed to find group {GroupId} in room {RoomId} for run {RunId}",
+                run.GroupId, room.Id, run.Id);
+
+            throw new SlackTeaTimeException(ErrorStrings.General());
+        }
+
+        var option = group.Options
+            .FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.OrdinalIgnoreCase));
+
+        if (option == null)
+            throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
+
+        await JoinRunInternalAsync(user.Id, run, option, slashCommand.ToCallbackData(), cancellationToken);
     }
 
     public async Task LeaveRunAsync(SlashCommand slashCommand, CancellationToken cancellationToken = default)
@@ -155,11 +179,17 @@ internal class SlackService(ISender mediator,
                 throw new InvalidOperationException("block_actions payload has no actions");
 
             if (action.ActionId == BlockBuilder.LeaveRunActionId)
+            {
                 await LeaveRunAsync(requestPayload, action, requestPayload.ResponseUrl, cancellationToken);
+            }
             else if (IsJoinAction(action))
+            {
                 await JoinRunAsync(requestPayload, action, requestPayload.ResponseUrl, cancellationToken);
+            }
             else
+            {
                 throw new InvalidOperationException($"Unknown block action '{action.ActionId}'");
+            }
         }
         catch (SlackTeaTimeException e)
         {
@@ -202,7 +232,7 @@ internal class SlackService(ISender mediator,
         ];
 
         if (!string.IsNullOrEmpty(response.Team.Name))
-            entries.Add(new(Constants.FieldKeys.TeamName, response.Team.Name));
+            entries.Add(new HashEntry(Constants.FieldKeys.TeamName, response.Team.Name));
 
         await hash.SetAsync(hashKey, entries, cancellationToken);
     }
@@ -229,7 +259,19 @@ internal class SlackService(ISender mediator,
         var (user, room) = await GetUserAndRoomAsync(requestPayload, cancellationToken);
         var callbackData = requestPayload.ToCallbackData(responseUrl);
 
-        await JoinRunAsync(user.Id, room.Id, runId, optionId, callbackData, cancellationToken);
+        var run = await GetRunAsync(user.Id, room.Id, runId, cancellationToken);
+        if (run == null)
+            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
+
+        // Checked before the option lookup so an ended round replies ended rather than unknown option
+        if (run.Ended)
+            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded());
+
+        var option = await mediator.Send(new GetOptionQuery(optionId), cancellationToken);
+        if (option == null || option.GroupId != run.GroupId)
+            throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
+
+        await JoinRunInternalAsync(user.Id, run, option, callbackData, cancellationToken);
     }
 
     private async Task LeaveRunAsync(BlockActionsPayload requestPayload, BlockAction action, string responseUrl,
@@ -285,54 +327,6 @@ internal class SlackService(ISender mediator,
         {
             throw new SlackTeaTimeException(ErrorStrings.LeaveRun_RunEnded(), e);
         }
-    }
-
-    private async Task JoinRunAsync(long userId, long roomId, string optionName, CallbackData callbackData,
-        CancellationToken cancellationToken = default)
-    {
-        var run = await mediator.Send(new GetCurrentRunQuery(roomId, userId), cancellationToken);
-        if (run == null)
-            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
-
-        var group = await mediator.Send(new GetRoomItemGroupQuery(
-                RoomId: run.RoomId,
-                UserId: userId,
-                GroupId: run.GroupId),
-            cancellationToken);
-
-        if (group == null)
-        {
-            logger.LogWarning("Failed to find group {GroupId} in room {RoomId} for run {RunId}",
-                run.GroupId, roomId, run.Id);
-
-            throw new SlackTeaTimeException(ErrorStrings.General());
-        }
-
-        var option = group.Options
-            .FirstOrDefault(o => o.Name.Equals(optionName, StringComparison.OrdinalIgnoreCase));
-
-        if (option == null)
-            throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
-
-        await JoinRunInternalAsync(userId, run, option, callbackData, cancellationToken);
-    }
-
-    private async Task JoinRunAsync(long userId, long roomId, long runId, long optionId, CallbackData callbackData,
-        CancellationToken cancellationToken = default)
-    {
-        var run = await GetRunAsync(userId, roomId, runId, cancellationToken);
-        if (run == null)
-            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunNotStarted());
-
-        // Checked before the option lookup so an ended round replies ended rather than unknown option
-        if (run.Ended)
-            throw new SlackTeaTimeException(ErrorStrings.JoinRun_RunEnded());
-
-        var option = await mediator.Send(new GetOptionQuery(optionId), cancellationToken);
-        if (option == null || option.GroupId != run.GroupId)
-            throw new SlackTeaTimeException(ErrorStrings.OptionUnknown());
-
-        await JoinRunInternalAsync(userId, run, option, callbackData, cancellationToken);
     }
 
     private async Task JoinRunInternalAsync(long userId, Run run, Option option, CallbackData callbackData,
