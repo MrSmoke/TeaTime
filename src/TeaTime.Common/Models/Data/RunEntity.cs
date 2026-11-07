@@ -2,7 +2,7 @@ namespace TeaTime.Common.Models.Data;
 
 using System;
 
-public record Run : BaseDataObject
+public record RunEntity : BaseEntity
 {
     /// <summary>
     /// The room in which the run is associated to

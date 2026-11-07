@@ -7,9 +7,9 @@ using MediatR;
 using Models.Data;
 using Queries;
 
-public class UserQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUserQuery, User?>
+public class UserQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUserQuery, UserEntity?>
 {
-    public Task<User?> Handle(GetUserQuery request, CancellationToken cancellationToken)
+    public Task<UserEntity?> Handle(GetUserQuery request, CancellationToken cancellationToken)
     {
         return userRepository.GetAsync(request.UserId, cancellationToken);
     }

@@ -39,7 +39,7 @@ internal class SlackService(ISender mediator,
     ILogger<SlackService> logger)
     : ISlackService
 {
-    public async Task<User> GetOrCreateUserAsync(string userId, string? name,
+    public async Task<UserEntity> GetOrCreateUserAsync(string userId, string? name,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userId);
@@ -66,7 +66,7 @@ internal class SlackService(ISender mediator,
 
         //this is not great because its not really a proper entity model, but it will do for now
         //we shouldn't query here because the command COULD eventually be eventual consistency
-        return new User
+        return new UserEntity
         {
             Id = command.Id,
             DisplayName = command.DisplayName,
@@ -75,7 +75,7 @@ internal class SlackService(ISender mediator,
         };
     }
 
-    public async Task<Room> GetOrCreateRoomAsync(string channelId, string? channelName, long userId,
+    public async Task<RoomEntity> GetOrCreateRoomAsync(string channelId, string? channelName, long userId,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(channelId);
@@ -102,7 +102,7 @@ internal class SlackService(ISender mediator,
         //add link
         await mediator.Send(new CreateLinkCommand(command.Id, LinkType.Room, channelId), cancellationToken);
 
-        return new Room
+        return new RoomEntity
         {
             Id = command.Id,
             Name = command.Name,
@@ -285,7 +285,7 @@ internal class SlackService(ISender mediator,
         await LeaveRunAsync(user.Id, room.Id, runId, requestPayload.ToCallbackData(responseUrl), cancellationToken);
     }
 
-    private async Task<(User User, Room Room)> GetUserAndRoomAsync(BlockActionsPayload requestPayload,
+    private async Task<(UserEntity User, RoomEntity Room)> GetUserAndRoomAsync(BlockActionsPayload requestPayload,
         CancellationToken cancellationToken = default)
     {
         var channel = requestPayload.Channel;
@@ -329,7 +329,7 @@ internal class SlackService(ISender mediator,
         }
     }
 
-    private async Task JoinRunInternalAsync(long userId, Run run, Option option, CallbackData callbackData,
+    private async Task JoinRunInternalAsync(long userId, RunEntity run, OptionEntity option, CallbackData callbackData,
         CancellationToken cancellationToken = default)
     {
         BaseCommand command;
@@ -368,7 +368,7 @@ internal class SlackService(ISender mediator,
         }
     }
 
-    private async Task<Run?> GetRunAsync(long userId, long roomId, long? runId,
+    private async Task<RunEntity?> GetRunAsync(long userId, long roomId, long? runId,
         CancellationToken cancellationToken = default)
     {
         // Slash commands act on the current run, buttons act on the run their message was posted for

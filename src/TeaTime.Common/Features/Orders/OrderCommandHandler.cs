@@ -27,7 +27,7 @@ public class OrderCommandHandler(
         await EnsureRunActiveAsync(request.RunId, cancellationToken);
         await EnsureOptionAvailableAsync(request.OptionId, cancellationToken);
 
-        var order = new Order
+        var order = new OrderEntity
         {
             Id = request.Id,
             CreatedDate = clock.GetUtcNow(),

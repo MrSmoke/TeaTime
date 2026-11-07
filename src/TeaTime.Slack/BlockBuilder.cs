@@ -21,7 +21,7 @@ internal static class BlockBuilder
     // We can have up to 50 blocks, but 20 for buttons is probably way too many anyway.
     private const int MaxActionBlocks = 20;
 
-    internal static List<Block> BuildRunStarted(string text, long runId, IEnumerable<Option> options)
+    internal static List<Block> BuildRunStarted(string text, long runId, IEnumerable<OptionEntity> options)
     {
         var contextBlock = new ContextBlock();
         contextBlock.Elements.Add(TextObject.Markdown(ResponseStrings.RunStartedHint()));
@@ -68,7 +68,7 @@ internal static class BlockBuilder
         return long.TryParse(parts[0], out runId) && long.TryParse(parts[1], out optionId);
     }
 
-    private static ButtonElement CreateJoinButton(long runId, Option option)
+    private static ButtonElement CreateJoinButton(long runId, OptionEntity option)
     {
         var id = option.Id.ToString();
 

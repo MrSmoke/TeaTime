@@ -1,6 +1,6 @@
 namespace TeaTime.Common.Models.Data;
 
-public abstract record BaseNamedDataObject : BaseDataObject
+public abstract record BaseNamedEntity : BaseEntity
 {
     /// <summary>
     /// The name of the object

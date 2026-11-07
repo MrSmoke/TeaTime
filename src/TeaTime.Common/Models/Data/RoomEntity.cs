@@ -1,6 +1,6 @@
 namespace TeaTime.Common.Models.Data;
 
-public record Room : BaseNamedDataObject
+public record RoomEntity : BaseNamedEntity
 {
     /// <summary>
     /// The id of the user who created this room

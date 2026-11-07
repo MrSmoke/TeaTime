@@ -56,8 +56,8 @@ internal static class CommandTestHost
     {
         var now = DateTimeOffset.UnixEpoch;
 
-        var user = new User { Id = UserId, Username = "slack_U1", DisplayName = "steve", CreatedDate = now };
-        var room = new Room { Id = RoomId, Name = "general", CreatedBy = UserId, CreatedDate = now };
+        var user = new UserEntity { Id = UserId, Username = "slack_U1", DisplayName = "steve", CreatedDate = now };
+        var room = new RoomEntity { Id = RoomId, Name = "general", CreatedBy = UserId, CreatedDate = now };
 
         var slackService = A.Fake<ISlackService>(o => o.Strict());
 

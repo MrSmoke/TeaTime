@@ -11,9 +11,9 @@ public interface ISlackService
 {
     Task InstallAsync(OAuthTokenResponse response, CancellationToken cancellationToken = default);
 
-    Task<User> GetOrCreateUserAsync(string userId, string? name, CancellationToken cancellationToken = default);
+    Task<UserEntity> GetOrCreateUserAsync(string userId, string? name, CancellationToken cancellationToken = default);
 
-    Task<Room> GetOrCreateRoomAsync(string channelId, string? channelName, long userId,
+    Task<RoomEntity> GetOrCreateRoomAsync(string channelId, string? channelName, long userId,
         CancellationToken cancellationToken = default);
 
     Task JoinRunAsync(SlashCommand slashCommand, string optionName, CancellationToken cancellationToken = default);

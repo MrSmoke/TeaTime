@@ -6,10 +6,10 @@ using Models.Data;
 
 public interface IRunRepository
 {
-    Task CreateAsync(Run run, CancellationToken cancellationToken = default);
-    Task<Run?> GetAsync(long runId, CancellationToken cancellationToken = default);
-    Task<Run?> GetCurrentRunAsync(long roomId, CancellationToken cancellationToken = default);
-    Task UpdateAsync(Run run, CancellationToken cancellationToken = default);
+    Task CreateAsync(RunEntity run, CancellationToken cancellationToken = default);
+    Task<RunEntity?> GetAsync(long runId, CancellationToken cancellationToken = default);
+    Task<RunEntity?> GetCurrentRunAsync(long roomId, CancellationToken cancellationToken = default);
+    Task UpdateAsync(RunEntity run, CancellationToken cancellationToken = default);
 
-    Task CreateResultAsync(RunResult result, CancellationToken cancellationToken = default);
+    Task CreateResultAsync(RunResultEntity result, CancellationToken cancellationToken = default);
 }

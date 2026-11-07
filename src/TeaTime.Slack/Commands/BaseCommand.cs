@@ -39,12 +39,12 @@ public abstract class BaseCommand(ISlackService slackService) : Command
         return StringResult(SlackJsonSerializer.Serialize(response));
     }
 
-    private Task<User> GetOrCreateUserAsync(SlashCommand slashCommand, CancellationToken cancellationToken = default)
+    private Task<UserEntity> GetOrCreateUserAsync(SlashCommand slashCommand, CancellationToken cancellationToken = default)
     {
         return SlackService.GetOrCreateUserAsync(slashCommand.UserId, slashCommand.GetUserName(), cancellationToken);
     }
 
-    private Task<Room> GetOrCreateRoomAsync(SlashCommand slashCommand, long userId,
+    private Task<RoomEntity> GetOrCreateRoomAsync(SlashCommand slashCommand, long userId,
         CancellationToken cancellationToken = default)
     {
         return SlackService.GetOrCreateRoomAsync(slashCommand.ChannelId, slashCommand.ChannelName, userId,

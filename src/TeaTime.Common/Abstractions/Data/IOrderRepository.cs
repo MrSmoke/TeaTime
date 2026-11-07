@@ -7,11 +7,11 @@ using Models.Data;
 
 public interface IOrderRepository
 {
-    Task CreateAsync(Order order, CancellationToken cancellationToken = default);
-    Task UpdateAsync(Order order, CancellationToken cancellationToken = default);
-    Task<Order?> GetAsync(long id, CancellationToken cancellationToken = default);
+    Task CreateAsync(OrderEntity order, CancellationToken cancellationToken = default);
+    Task UpdateAsync(OrderEntity order, CancellationToken cancellationToken = default);
+    Task<OrderEntity?> GetAsync(long id, CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<Order>> GetOrdersAsync(long runId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<OrderEntity>> GetOrdersAsync(long runId, CancellationToken cancellationToken = default);
 
     Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default);
 }

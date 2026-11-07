@@ -42,7 +42,7 @@ internal static class ResponseStrings
     internal static string IllMake(string slackUserId) =>
         $"{SlackUserId(slackUserId)} has volunteered to make this round!";
 
-    internal static string OptionList(string groupName, IReadOnlyCollection<Option> options)
+    internal static string OptionList(string groupName, IReadOnlyCollection<OptionEntity> options)
     {
         var available = options.Where(o => o.Available).Select(o => $"- {EscapeMarkdown(o.Name)}").ToList();
         var unavailable = options.Where(o => !o.Available).Select(o => $"- {EscapeMarkdown(o.Name)}").ToList();

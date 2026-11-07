@@ -9,7 +9,7 @@ using Factories;
 
 public class IllMakeRepository(IMySqlConnectionFactory factory) : BaseRepository(factory), IIllMakeRepository
 {
-    public Task CreateAsync(IllMake obj, CancellationToken cancellationToken = default)
+    public Task CreateAsync(IllMakeEntity obj, CancellationToken cancellationToken = default)
     {
         const string sql =
             "INSERT INTO illmakes (id, runId, userId, createdDate) VALUES (@id, @runId, @userId, @createdDate)";
@@ -17,10 +17,10 @@ public class IllMakeRepository(IMySqlConnectionFactory factory) : BaseRepository
         return ExecuteAsync(sql, obj, cancellationToken);
     }
 
-    public Task<IEnumerable<IllMake>> GetAllByRunAsync(long runId, CancellationToken cancellationToken = default)
+    public Task<IEnumerable<IllMakeEntity>> GetAllByRunAsync(long runId, CancellationToken cancellationToken = default)
     {
         const string sql = "SELECT * FROM illmakes WHERE runId = @runId";
 
-        return QueryAsync<IllMake>(sql, new { runId }, cancellationToken);
+        return QueryAsync<IllMakeEntity>(sql, new { runId }, cancellationToken);
     }
 }

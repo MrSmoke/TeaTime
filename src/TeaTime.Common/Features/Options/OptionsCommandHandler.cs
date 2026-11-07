@@ -26,7 +26,7 @@ public class OptionsCommandHandler(TimeProvider clock, IOptionsRepository option
                 OptionException.OptionExceptionReason.DuplicateName);
         }
 
-        var option = new Option
+        var option = new OptionEntity
         {
             Id = request.Id,
             Name = request.Name,

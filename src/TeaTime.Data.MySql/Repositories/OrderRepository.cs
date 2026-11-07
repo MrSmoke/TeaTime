@@ -13,7 +13,7 @@ public class OrderRepository(IMySqlConnectionFactory factory, TimeProvider syste
 {
     private const string SelectColumns = "id, runId, userId, optionId, createdDate";
 
-    public Task CreateAsync(Order order, CancellationToken cancellationToken = default)
+    public Task CreateAsync(OrderEntity order, CancellationToken cancellationToken = default)
     {
         const string sql = """
                            INSERT INTO orders
@@ -24,7 +24,7 @@ public class OrderRepository(IMySqlConnectionFactory factory, TimeProvider syste
         return ExecuteAsync(sql, order, cancellationToken);
     }
 
-    public Task UpdateAsync(Order order, CancellationToken cancellationToken = default)
+    public Task UpdateAsync(OrderEntity order, CancellationToken cancellationToken = default)
     {
         //todo: update modified date (also add modified date)
         const string sql = "UPDATE orders SET optionId = @optionId WHERE id = @id AND deleted = 0";
@@ -32,18 +32,18 @@ public class OrderRepository(IMySqlConnectionFactory factory, TimeProvider syste
         return ExecuteAsync(sql, order, cancellationToken);
     }
 
-    public Task<Order?> GetAsync(long id, CancellationToken cancellationToken = default)
+    public Task<OrderEntity?> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         const string sql = "SELECT " + SelectColumns + " FROM orders WHERE id = @id AND deleted = 0";
 
-        return SingleOrDefaultAsync<Order>(sql, new { id }, cancellationToken);
+        return SingleOrDefaultAsync<OrderEntity>(sql, new { id }, cancellationToken);
     }
 
-    public Task<IEnumerable<Order>> GetOrdersAsync(long runId, CancellationToken cancellationToken = default)
+    public Task<IEnumerable<OrderEntity>> GetOrdersAsync(long runId, CancellationToken cancellationToken = default)
     {
         const string sql = "SELECT " + SelectColumns + " FROM orders WHERE runId = @runId AND deleted = 0";
 
-        return QueryAsync<Order>(sql, new { runId }, cancellationToken);
+        return QueryAsync<OrderEntity>(sql, new { runId }, cancellationToken);
     }
 
     public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default)

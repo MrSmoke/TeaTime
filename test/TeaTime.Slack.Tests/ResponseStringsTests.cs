@@ -15,7 +15,7 @@ public class ResponseStringsTests
                                 "- Earl Grey\n" +
                                 "- Green";
 
-        Option[] options = [CreateOption("Earl Grey", available: true), CreateOption("Green", available: true)];
+        OptionEntity[] options = [CreateOption("Earl Grey", available: true), CreateOption("Green", available: true)];
 
         Assert.Equal(expected, ResponseStrings.OptionList("tea", options));
     }
@@ -30,7 +30,7 @@ public class ResponseStringsTests
                                 "*Unavailable*\n" +
                                 "- Green";
 
-        Option[] options = [CreateOption("Green", available: false), CreateOption("Earl Grey", available: true)];
+        OptionEntity[] options = [CreateOption("Green", available: false), CreateOption("Earl Grey", available: true)];
 
         Assert.Equal(expected, ResponseStrings.OptionList("tea", options));
     }
@@ -45,7 +45,7 @@ public class ResponseStringsTests
                                 "*Unavailable*\n" +
                                 "- Green";
 
-        Option[] options = [CreateOption("Green", available: false)];
+        OptionEntity[] options = [CreateOption("Green", available: false)];
 
         Assert.Equal(expected, ResponseStrings.OptionList("tea", options));
     }
@@ -58,12 +58,12 @@ public class ResponseStringsTests
     [InlineData("Tea &amp; Biscuits", "- Tea &amp; Biscuits")]
     public void OptionList_EscapesOptionNames(string name, string expectedLine)
     {
-        Option[] options = [CreateOption(name, available: true)];
+        OptionEntity[] options = [CreateOption(name, available: true)];
 
         Assert.Equal("*Available*\n" + expectedLine, ResponseStrings.OptionList("tea", options));
     }
 
-    private static Option CreateOption(string name, bool available) => new()
+    private static OptionEntity CreateOption(string name, bool available) => new()
     {
         Id = 1,
         Name = name,

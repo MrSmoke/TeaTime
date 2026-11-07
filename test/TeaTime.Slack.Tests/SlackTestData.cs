@@ -8,7 +8,7 @@ internal static class SlackTestData
 {
     public const long GroupId = 2;
 
-    public static Option CreateOption(long id, string name, bool available = true) => new()
+    public static OptionEntity CreateOption(long id, string name, bool available = true) => new()
     {
         Id = id,
         Name = name,
@@ -18,7 +18,7 @@ internal static class SlackTestData
         CreatedDate = DateTimeOffset.UnixEpoch
     };
 
-    public static RoomItemGroupModel CreateGroup(string name, params Option[] options) => new()
+    public static RoomItemGroupModel CreateGroup(string name, params OptionEntity[] options) => new()
     {
         Id = GroupId,
         Name = name,

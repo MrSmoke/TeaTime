@@ -23,7 +23,7 @@ public class RunCommandHandler(
     //Start run
     public async Task Handle(StartRunCommand request, CancellationToken cancellationToken)
     {
-        var run = new Run
+        var run = new RunEntity
         {
             Id = request.Id,
             CreatedDate = clock.GetUtcNow(),
@@ -59,7 +59,7 @@ public class RunCommandHandler(
         }, cancellationToken);
 
         //store result
-        var runResult = new RunResult
+        var runResult = new RunResultEntity
         {
             RunId = request.Run.Id,
             RunnerUserId = runnerUserId,

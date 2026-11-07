@@ -2,7 +2,7 @@ namespace TeaTime.Common.Models.Data;
 
 using System;
 
-public abstract record BaseDataObject
+public abstract record BaseEntity
 {
     public required long Id { get; init; }
 

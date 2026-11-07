@@ -8,7 +8,7 @@ using Factories;
 
 public class RoomRepository(IMySqlConnectionFactory factory) : BaseRepository(factory), IRoomRepository
 {
-    public Task CreateAsync(Room room, CancellationToken cancellationToken = default)
+    public Task CreateAsync(RoomEntity room, CancellationToken cancellationToken = default)
     {
         const string sql = "INSERT INTO rooms " +
                            "(id, name, createdBy, createdDate) VALUES " +
@@ -17,10 +17,10 @@ public class RoomRepository(IMySqlConnectionFactory factory) : BaseRepository(fa
         return ExecuteAsync(sql, room, cancellationToken);
     }
 
-    public Task<Room?> GetAsync(long id, CancellationToken cancellationToken = default)
+    public Task<RoomEntity?> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         const string sql = "SELECT id, name, createdBy, createdDate FROM rooms WHERE id = @id";
 
-        return SingleOrDefaultAsync<Room>(sql, new { id }, cancellationToken);
+        return SingleOrDefaultAsync<RoomEntity>(sql, new { id }, cancellationToken);
     }
 }

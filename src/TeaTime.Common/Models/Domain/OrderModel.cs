@@ -2,9 +2,9 @@ namespace TeaTime.Common.Models.Domain;
 
 using Data;
 
-public record OrderModel : BaseDataObject
+public record OrderModel : BaseEntity
 {
-    public required Run Run { get; init; }
-    public required User? User { get; init; }
-    public required Option? Option { get; init; }
+    public required RunEntity Run { get; init; }
+    public required UserEntity? User { get; init; }
+    public required OptionEntity? Option { get; init; }
 }

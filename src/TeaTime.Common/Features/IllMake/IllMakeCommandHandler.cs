@@ -12,7 +12,7 @@ public class IllMakeCommandHandler(IIllMakeRepository repository, TimeProvider c
 {
     public Task Handle(IllMakeCommand request, CancellationToken cancellationToken)
     {
-        var model = new IllMake
+        var model = new IllMakeEntity
         {
             Id = request.Id,
             RunId = request.RunId,

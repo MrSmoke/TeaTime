@@ -109,7 +109,7 @@ public class PermissionBehaviorTests
         return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true });
     }
 
-    private static Order CreateOrder(long userId) => new()
+    private static OrderEntity CreateOrder(long userId) => new()
     {
         Id = 10,
         CreatedDate = DateTimeOffset.UnixEpoch,

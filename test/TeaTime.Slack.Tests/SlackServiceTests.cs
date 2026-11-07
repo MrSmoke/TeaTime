@@ -173,7 +173,7 @@ public class SlackServiceTests
         var replies = A.Captured<SlashCommandResponse>();
         var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
 
-        var existingOrder = new Order
+        var existingOrder = new OrderEntity
         {
             Id = 40,
             RunId = 7,
@@ -256,7 +256,7 @@ public class SlackServiceTests
     {
         var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
 
-        var option = new Option
+        var option = new OptionEntity
         {
             Id = 1,
             Name = "Earl Grey",
@@ -356,7 +356,7 @@ public class SlackServiceTests
         var replies = A.Captured<SlashCommandResponse>();
         var mediator = CreateJoinMediator(optionGroupId: RunGroupId);
 
-        var existingOrder = new Order
+        var existingOrder = new OrderEntity
         {
             Id = 40,
             RunId = 7,
@@ -388,15 +388,15 @@ public class SlackServiceTests
         A.CallTo(() => mediator.Send(A<GetObjectIdByLinkValueQuery>._, A<CancellationToken>._))
             .Returns((long?)5);
         A.CallTo(() => mediator.Send(A<GetUserQuery>._, A<CancellationToken>._))
-            .Returns(new User { Id = 5, Username = "slack_U1", DisplayName = "steve", CreatedDate = now });
+            .Returns(new UserEntity { Id = 5, Username = "slack_U1", DisplayName = "steve", CreatedDate = now });
         A.CallTo(() => mediator.Send(A<GetRoomQuery>._, A<CancellationToken>._))
-            .Returns(new Room { Id = 5, Name = "general", CreatedBy = 5, CreatedDate = now });
+            .Returns(new RoomEntity { Id = 5, Name = "general", CreatedBy = 5, CreatedDate = now });
         A.CallTo(() => mediator.Send(A<GetCurrentRunQuery>._, A<CancellationToken>._))
             .Returns(CreateRun(roomId: 5));
         A.CallTo(() => mediator.Send(A<GetRunQuery>.That.Matches(q => q.RunId == 7), A<CancellationToken>._))
             .Returns(CreateRun(roomId: 5));
         A.CallTo(() => mediator.Send(A<GetOptionQuery>._, A<CancellationToken>._))
-            .Returns(new Option
+            .Returns(new OptionEntity
             {
                 Id = 1,
                 Name = "Earl Grey",
@@ -406,7 +406,7 @@ public class SlackServiceTests
                 CreatedDate = now
             });
         A.CallTo(() => mediator.Send(A<GetUserOrderQuery>._, A<CancellationToken>._))
-            .Returns((Order?)null);
+            .Returns((OrderEntity?)null);
 
         return mediator;
     }
@@ -422,7 +422,7 @@ public class SlackServiceTests
         return apiClient;
     }
 
-    private static Run CreateRun(long roomId, bool ended = false) => new()
+    private static RunEntity CreateRun(long roomId, bool ended = false) => new()
     {
         Id = 7,
         RoomId = roomId,

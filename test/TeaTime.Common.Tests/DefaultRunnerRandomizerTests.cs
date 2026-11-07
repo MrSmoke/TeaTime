@@ -24,7 +24,7 @@ public class DefaultRunnerRandomizerTests
         {
             new()
             {
-                User = new User
+                User = new UserEntity
                 {
                     Id = 5,
                     Username = "test",
@@ -38,7 +38,7 @@ public class DefaultRunnerRandomizerTests
             },
             new()
             {
-                User = new User
+                User = new UserEntity
                 {
                     Id = 6,
                     Username = "test",
@@ -52,7 +52,7 @@ public class DefaultRunnerRandomizerTests
             },
             new()
             {
-                User = new User
+                User = new UserEntity
                 {
                     Id = 7,
                     Username = "test",
@@ -66,7 +66,7 @@ public class DefaultRunnerRandomizerTests
             },
             new()
             {
-                User = new User
+                User = new UserEntity
                 {
                     Id = 8,
                     Username = "test",

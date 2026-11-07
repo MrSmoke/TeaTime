@@ -2,7 +2,7 @@ namespace TeaTime.Common.Models.Data;
 
 using System;
 
-public record RunResult
+public record RunResultEntity
 {
     public required long RunId { get; init; }
 

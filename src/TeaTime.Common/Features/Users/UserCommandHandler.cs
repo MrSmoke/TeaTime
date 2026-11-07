@@ -12,7 +12,7 @@ public class UserCommandHandler(IUserRepository userRepository, TimeProvider clo
 {
     public Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        var user = new User
+        var user = new UserEntity
         {
             Id = request.Id,
             Username = request.Username,

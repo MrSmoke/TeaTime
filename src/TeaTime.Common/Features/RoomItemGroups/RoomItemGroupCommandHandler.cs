@@ -14,7 +14,7 @@ public class RoomItemGroupCommandHandler(IOptionsRepository optionsRepository, T
 {
     public Task Handle(CreateRoomItemGroupCommand request, CancellationToken cancellationToken)
     {
-        var roomGroup = new RoomItemGroup
+        var roomGroup = new RoomItemGroupEntity
         {
             Id = request.Id,
             Name = request.Name,

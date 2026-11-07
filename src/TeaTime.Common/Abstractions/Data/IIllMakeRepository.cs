@@ -7,6 +7,6 @@ using Models.Data;
 
 public interface IIllMakeRepository
 {
-    Task CreateAsync(IllMake obj, CancellationToken cancellationToken = default);
-    Task<IEnumerable<IllMake>> GetAllByRunAsync(long runId, CancellationToken cancellationToken = default);
+    Task CreateAsync(IllMakeEntity obj, CancellationToken cancellationToken = default);
+    Task<IEnumerable<IllMakeEntity>> GetAllByRunAsync(long runId, CancellationToken cancellationToken = default);
 }

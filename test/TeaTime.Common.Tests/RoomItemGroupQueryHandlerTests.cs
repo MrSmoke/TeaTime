@@ -17,7 +17,7 @@ public class RoomItemGroupQueryHandlerTests
 
     private static readonly string[] SortedNames = ["Apple", "banana", "Option 2", "option 9", "Option 10"];
 
-    private static readonly RoomItemGroup Group = new()
+    private static readonly RoomItemGroupEntity Group = new()
     {
         Id = 1,
         Name = "drinks",
@@ -61,7 +61,7 @@ public class RoomItemGroupQueryHandlerTests
 
     private static IOptionsRepository CreateRepository()
     {
-        var options = UnsortedNames.Select((name, i) => new Option
+        var options = UnsortedNames.Select((name, i) => new OptionEntity
         {
             Id = i + 1,
             Name = name,

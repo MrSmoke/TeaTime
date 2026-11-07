@@ -7,7 +7,7 @@ using Models.Data;
 
 public interface IUserRepository
 {
-    Task CreateAsync(User user, CancellationToken cancellationToken = default);
-    Task<User?> GetAsync(long id, CancellationToken cancellationToken = default);
-    Task<IEnumerable<User>> GetManyAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default);
+    Task CreateAsync(UserEntity user, CancellationToken cancellationToken = default);
+    Task<UserEntity?> GetAsync(long id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<UserEntity>> GetManyAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default);
 }

@@ -3,7 +3,7 @@ namespace TeaTime.Common.Features.RoomItemGroups.Models;
 using System.Collections.Generic;
 using Common.Models.Data;
 
-public record RoomItemGroupModel : RoomItemGroup
+public record RoomItemGroupModel : RoomItemGroupEntity
 {
-    public required IReadOnlyList<Option> Options { get; init; }
+    public required IReadOnlyList<OptionEntity> Options { get; init; }
 }

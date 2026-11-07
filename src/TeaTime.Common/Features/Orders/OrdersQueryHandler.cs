@@ -17,7 +17,7 @@ public class OrdersQueryHandler(
     IOptionsRepository optionsRepository,
     IRunRepository runRepository) :
     IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>,
-    IRequestHandler<GetUserOrderQuery, Order?>
+    IRequestHandler<GetUserOrderQuery, OrderEntity?>
 {
     public async Task<IEnumerable<OrderModel>> Handle(GetRunOrdersQuery request,
         CancellationToken cancellationToken)
@@ -49,7 +49,7 @@ public class OrdersQueryHandler(
             .OrderBy(o => o.User?.DisplayName);
     }
 
-    public async Task<Order?> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
+    public async Task<OrderEntity?> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
     {
         var orders = await orderRepository.GetOrdersAsync(request.RunId, cancellationToken);
 

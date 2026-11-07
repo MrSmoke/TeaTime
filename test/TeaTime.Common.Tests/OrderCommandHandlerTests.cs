@@ -22,7 +22,7 @@ public class OrderCommandHandlerTests
     private const long ActiveRunId = 7;
     private const long EndedRunId = 8;
 
-    private static readonly Order ExistingOrder = new()
+    private static readonly OrderEntity ExistingOrder = new()
     {
         Id = 20,
         RunId = ActiveRunId,
@@ -51,7 +51,7 @@ public class OrderCommandHandlerTests
     [Fact]
     public async Task Handle_Create_AvailableOption_SavesOrder()
     {
-        var saved = A.Captured<Order>();
+        var saved = A.Captured<OrderEntity>();
         A.CallTo(() => orderRepository.CreateAsync(saved._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
         var command = new CreateOrderCommand(Id: 30, RunId: ActiveRunId, UserId: 5, OptionId: AvailableOptionId);
@@ -75,7 +75,7 @@ public class OrderCommandHandlerTests
             () => handler.Handle(command, TestContext.Current.CancellationToken));
 
         Assert.Equal(OrderException.OrderExceptionReason.OptionUnavailable, e.Reason);
-        A.CallTo(() => orderRepository.CreateAsync(A<Order>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => orderRepository.CreateAsync(A<OrderEntity>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
     // Switching an existing order to an unavailable or deleted option is rejected
@@ -93,7 +93,7 @@ public class OrderCommandHandlerTests
             () => handler.Handle(command, TestContext.Current.CancellationToken));
 
         Assert.Equal(OrderException.OrderExceptionReason.OptionUnavailable, e.Reason);
-        A.CallTo(() => orderRepository.UpdateAsync(A<Order>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => orderRepository.UpdateAsync(A<OrderEntity>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
     // Picking the option already ordered is a no-op, even once that option has become unavailable
@@ -104,14 +104,14 @@ public class OrderCommandHandlerTests
 
         await handler.Handle(command, TestContext.Current.CancellationToken);
 
-        A.CallTo(() => orderRepository.UpdateAsync(A<Order>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => orderRepository.UpdateAsync(A<OrderEntity>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
     // Switching an order on an active round to an available option saves it and publishes the change
     [Fact]
     public async Task Handle_Update_AvailableOption_UpdatesOrder()
     {
-        var saved = A.Captured<Order>();
+        var saved = A.Captured<OrderEntity>();
         A.CallTo(() => orderRepository.UpdateAsync(saved._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
         var published = A.Captured<OrderOptionChangedEvent>();
@@ -154,7 +154,7 @@ public class OrderCommandHandlerTests
             () => handler.Handle(command, TestContext.Current.CancellationToken));
 
         Assert.Equal(OrderException.OrderExceptionReason.RunEnded, e.Reason);
-        A.CallTo(() => orderRepository.CreateAsync(A<Order>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => orderRepository.CreateAsync(A<OrderEntity>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
     // Orders on a round that has ended can't switch option
@@ -170,7 +170,7 @@ public class OrderCommandHandlerTests
             () => handler.Handle(command, TestContext.Current.CancellationToken));
 
         Assert.Equal(OrderException.OrderExceptionReason.RunEnded, e.Reason);
-        A.CallTo(() => orderRepository.UpdateAsync(A<Order>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => orderRepository.UpdateAsync(A<OrderEntity>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
     // Orders on a round that has ended can't be removed
@@ -194,10 +194,10 @@ public class OrderCommandHandlerTests
         A.CallTo(() => repository.GetAsync(ExistingOrder.Id, A<CancellationToken>._))
             .Returns(ExistingOrder);
 
-        A.CallTo(() => repository.CreateAsync(A<Order>._, A<CancellationToken>._))
+        A.CallTo(() => repository.CreateAsync(A<OrderEntity>._, A<CancellationToken>._))
             .Returns(Task.CompletedTask);
 
-        A.CallTo(() => repository.UpdateAsync(A<Order>._, A<CancellationToken>._))
+        A.CallTo(() => repository.UpdateAsync(A<OrderEntity>._, A<CancellationToken>._))
             .Returns(Task.CompletedTask);
 
         A.CallTo(() => repository.DeleteAsync(ExistingOrder.Id, A<CancellationToken>._))
@@ -218,7 +218,7 @@ public class OrderCommandHandlerTests
             .Returns(CreateOption(UnavailableOptionId, available: false));
 
         A.CallTo(() => repository.GetAsync(DeletedOptionId, A<CancellationToken>._))
-            .Returns((Option?)null);
+            .Returns((OptionEntity?)null);
 
         return repository;
     }
@@ -246,7 +246,7 @@ public class OrderCommandHandlerTests
         return publisher;
     }
 
-    private static Run CreateRun(long id, bool ended) => new()
+    private static RunEntity CreateRun(long id, bool ended) => new()
     {
         Id = id,
         RoomId = 1,
@@ -257,7 +257,7 @@ public class OrderCommandHandlerTests
         CreatedDate = DateTimeOffset.UnixEpoch
     };
 
-    private static Option CreateOption(long id, bool available) => new()
+    private static OptionEntity CreateOption(long id, bool available) => new()
     {
         Id = id,
         Name = "option" + id,

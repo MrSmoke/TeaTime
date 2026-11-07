@@ -13,7 +13,7 @@ public class UserRepositoryTests(DatabaseFixture databaseFixture) : IClassFixtur
     {
         var repo = new UserRepository(databaseFixture.ConnectionFactory);
 
-        var user = new User
+        var user = new UserEntity
         {
             Id = TestData.NewInt64(),
             Username = TestData.NewString(),

@@ -10,7 +10,7 @@ public class RunRepository(IMySqlConnectionFactory factory) : BaseRepository(fac
 {
     private const string Columns = "id, roomId, userId, groupId, startTime, endTime, ended, createdDate";
 
-    public Task CreateAsync(Run run, CancellationToken cancellationToken = default)
+    public Task CreateAsync(RunEntity run, CancellationToken cancellationToken = default)
     {
         const string sql = "INSERT INTO runs " +
                            "(" + Columns + ") VALUES " +
@@ -19,30 +19,30 @@ public class RunRepository(IMySqlConnectionFactory factory) : BaseRepository(fac
         return ExecuteAsync(sql, run, cancellationToken);
     }
 
-    public Task<Run?> GetAsync(long runId, CancellationToken cancellationToken = default)
+    public Task<RunEntity?> GetAsync(long runId, CancellationToken cancellationToken = default)
     {
         const string sql =
             "SELECT " + Columns + " FROM runs WHERE id = @runId";
 
-        return SingleOrDefaultAsync<Run>(sql, new { runId }, cancellationToken);
+        return SingleOrDefaultAsync<RunEntity>(sql, new { runId }, cancellationToken);
     }
 
-    public Task<Run?> GetCurrentRunAsync(long roomId, CancellationToken cancellationToken = default)
+    public Task<RunEntity?> GetCurrentRunAsync(long roomId, CancellationToken cancellationToken = default)
     {
         const string sql =
             "SELECT " + Columns + " FROM runs WHERE roomId = @roomId AND ended = 0 order by createdDate desc";
 
-        return QueryFirstOrDefaultAsync<Run>(sql, new { roomId }, cancellationToken);
+        return QueryFirstOrDefaultAsync<RunEntity>(sql, new { roomId }, cancellationToken);
     }
 
-    public Task UpdateAsync(Run run, CancellationToken cancellationToken = default)
+    public Task UpdateAsync(RunEntity run, CancellationToken cancellationToken = default)
     {
         const string sql = "UPDATE runs SET ended = @ended WHERE id = @id";
 
         return ExecuteAsync(sql, run, cancellationToken);
     }
 
-    public Task CreateResultAsync(RunResult result, CancellationToken cancellationToken = default)
+    public Task CreateResultAsync(RunResultEntity result, CancellationToken cancellationToken = default)
     {
         const string sql = "INSERT INTO run_results " +
                            "(runId, runnerUserId, endedTime) VALUES " +

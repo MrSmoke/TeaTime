@@ -17,7 +17,7 @@ public class RoomCommandHandler(
 {
     public async Task Handle(CreateRoomCommand request, CancellationToken cancellationToken)
     {
-        var room = new Room
+        var room = new RoomEntity
         {
             Id = request.Id,
             Name = request.Name,

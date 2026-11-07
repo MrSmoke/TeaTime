@@ -6,6 +6,6 @@ using Models.Data;
 
 public interface IRoomRepository
 {
-    Task CreateAsync(Room room, CancellationToken cancellationToken = default);
-    Task<Room?> GetAsync(long id, CancellationToken cancellationToken = default);
+    Task CreateAsync(RoomEntity room, CancellationToken cancellationToken = default);
+    Task<RoomEntity?> GetAsync(long id, CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,6 @@
 namespace TeaTime.Common.Models.Data;
 
-public record RoomItemGroup : BaseNamedDataObject
+public record RoomItemGroupEntity : BaseNamedEntity
 {
     public required long RoomId { get; init; }
 

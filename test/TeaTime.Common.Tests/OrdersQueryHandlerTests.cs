@@ -15,7 +15,7 @@ using Xunit;
 
 public class OrdersQueryHandlerTests
 {
-    private static readonly Run Run = new()
+    private static readonly RunEntity Run = new()
     {
         Id = 1,
         RoomId = 1,
@@ -55,8 +55,8 @@ public class OrdersQueryHandlerTests
     [Fact]
     public async Task Handle_GetRunOrders_MissingUserSortsFirst()
     {
-        var users = new List<User> { CreateUser(id: 1, "Alice") };
-        List<Order> orders = [CreateOrder(id: 10, userId: 1), CreateOrder(id: 20, userId: 99)];
+        var users = new List<UserEntity> { CreateUser(id: 1, "Alice") };
+        List<OrderEntity> orders = [CreateOrder(id: 10, userId: 1), CreateOrder(id: 20, userId: 99)];
 
         SetupOrders(orders, users);
 
@@ -70,7 +70,7 @@ public class OrdersQueryHandlerTests
     [Fact]
     public async Task Handle_GetRunOrders_UnknownRun_Throws()
     {
-        A.CallTo(() => _runRepository.GetAsync(A<long>._, A<CancellationToken>._)).Returns((Run?)null);
+        A.CallTo(() => _runRepository.GetAsync(A<long>._, A<CancellationToken>._)).Returns((RunEntity?)null);
 
         var query = new GetRunOrdersQuery(RunId: 404, UserId: 1);
 
@@ -78,7 +78,7 @@ public class OrdersQueryHandlerTests
             () => CreateHandler().Handle(query, TestContext.Current.CancellationToken));
     }
 
-    private static User CreateUser(long id, string displayName) => new()
+    private static UserEntity CreateUser(long id, string displayName) => new()
     {
         Id = id,
         DisplayName = displayName,
@@ -86,7 +86,7 @@ public class OrdersQueryHandlerTests
         CreatedDate = DateTimeOffset.UnixEpoch
     };
 
-    private static Order CreateOrder(long id, long userId) => new()
+    private static OrderEntity CreateOrder(long id, long userId) => new()
     {
         Id = id,
         RunId = Run.Id,
@@ -95,7 +95,7 @@ public class OrdersQueryHandlerTests
         CreatedDate = DateTimeOffset.UnixEpoch
     };
 
-    private void SetupOrders(List<Order> orders, List<User> users)
+    private void SetupOrders(List<OrderEntity> orders, List<UserEntity> users)
     {
         A.CallTo(() => _orderRepository.GetOrdersAsync(Run.Id, A<CancellationToken>._)).Returns(orders);
         A.CallTo(() => _userRepository.GetManyAsync(A<IEnumerable<long>>._, A<CancellationToken>._)).Returns(users);

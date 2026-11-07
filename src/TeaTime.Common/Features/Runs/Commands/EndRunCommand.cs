@@ -8,4 +8,4 @@ using Models.Domain;
 /// <summary>
 /// The command to end a run
 /// </summary>
-public record EndRunCommand(Run Run, long UserId, IEnumerable<OrderModel> Orders) : BaseCommand, IUserCommand;
+public record EndRunCommand(RunEntity Run, long UserId, IEnumerable<OrderModel> Orders) : BaseCommand, IUserCommand;

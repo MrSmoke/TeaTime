@@ -14,7 +14,7 @@ public class RunRepositoryTests(DatabaseFixture databaseFixture) : IClassFixture
     {
         // This is gross
         var userRepo = new UserRepository(databaseFixture.ConnectionFactory);
-        var user = new User
+        var user = new UserEntity
         {
             Id = TestData.NewInt64(),
             Username = TestData.NewString(),
@@ -24,7 +24,7 @@ public class RunRepositoryTests(DatabaseFixture databaseFixture) : IClassFixture
         await userRepo.CreateAsync(user, TestContext.Current.CancellationToken);
 
         var roomRepo = new RoomRepository(databaseFixture.ConnectionFactory);
-        var room = new Room
+        var room = new RoomEntity
         {
             Id = TestData.NewInt64(),
             Name = TestData.NewString(),
@@ -34,7 +34,7 @@ public class RunRepositoryTests(DatabaseFixture databaseFixture) : IClassFixture
         await roomRepo.CreateAsync(room, TestContext.Current.CancellationToken);
 
         var optionRepo = new OptionsRepository(databaseFixture.ConnectionFactory, TimeProvider.System);
-        var group = new RoomItemGroup
+        var group = new RoomItemGroupEntity
         {
             Id = TestData.NewInt64(),
             Name = TestData.NewString(),
@@ -44,7 +44,7 @@ public class RunRepositoryTests(DatabaseFixture databaseFixture) : IClassFixture
         };
         await optionRepo.CreateGroupAsync(group, TestContext.Current.CancellationToken);
 
-        var option = new Option
+        var option = new OptionEntity
         {
             Id = TestData.NewInt64(),
             Name = TestData.NewString(),
@@ -56,7 +56,7 @@ public class RunRepositoryTests(DatabaseFixture databaseFixture) : IClassFixture
         await optionRepo.CreateAsync(option, TestContext.Current.CancellationToken);
 
         var runRepo = new RunRepository(databaseFixture.ConnectionFactory);
-        var run = new Run
+        var run = new RunEntity
         {
             Id = TestData.NewInt64(),
             CreatedDate = TestData.MySqlNow(),

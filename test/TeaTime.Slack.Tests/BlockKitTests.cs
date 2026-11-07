@@ -156,7 +156,7 @@ public class BlockKitTests
         Assert.Equal("42", action.Value);
     }
 
-    private static Option CreateOption(int id) => new()
+    private static OptionEntity CreateOption(int id) => new()
     {
         Id = id,
         Name = "option" + id,

@@ -9,24 +9,24 @@ using Factories;
 
 public class UserRepository(IMySqlConnectionFactory factory) : BaseRepository(factory), IUserRepository
 {
-    public Task CreateAsync(User user, CancellationToken cancellationToken = default)
+    public Task CreateAsync(UserEntity user, CancellationToken cancellationToken = default)
     {
         const string sql = "INSERT INTO users (id, username, displayName, createdDate) VALUES (@id, @username, @displayName, @createdDate)";
 
         return ExecuteAsync(sql, user, cancellationToken);
     }
 
-    public Task<User?> GetAsync(long id, CancellationToken cancellationToken = default)
+    public Task<UserEntity?> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         const string sql = "SELECT id, username, displayName, createdDate FROM users WHERE id = @id";
 
-        return SingleOrDefaultAsync<User>(sql, new { id }, cancellationToken);
+        return SingleOrDefaultAsync<UserEntity>(sql, new { id }, cancellationToken);
     }
 
-    public Task<IEnumerable<User>> GetManyAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default)
+    public Task<IEnumerable<UserEntity>> GetManyAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default)
     {
         const string sql = "SELECT id, username, displayName, createdDate FROM users WHERE id IN @ids";
 
-        return QueryAsync<User>(sql, new { ids }, cancellationToken);
+        return QueryAsync<UserEntity>(sql, new { ids }, cancellationToken);
     }
 }

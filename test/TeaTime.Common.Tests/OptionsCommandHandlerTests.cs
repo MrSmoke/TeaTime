@@ -28,14 +28,14 @@ public class OptionsCommandHandlerTests
             () => handler.Handle(command, TestContext.Current.CancellationToken));
 
         Assert.Equal(OptionException.OptionExceptionReason.DuplicateName, e.Reason);
-        A.CallTo(() => repository.CreateAsync(A<Option>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => repository.CreateAsync(A<OptionEntity>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
     // A new name is saved as an available option
     [Fact]
     public async Task Handle_Create_NewName_SavesOption()
     {
-        var saved = A.Captured<Option>();
+        var saved = A.Captured<OptionEntity>();
         var repository = CreateRepository();
         A.CallTo(() => repository.CreateAsync(saved._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
@@ -53,7 +53,7 @@ public class OptionsCommandHandlerTests
     // The group already holds an "Earl Grey" option
     private static IOptionsRepository CreateRepository()
     {
-        var earlGrey = new Option
+        var earlGrey = new OptionEntity
         {
             Id = 1,
             Name = "Earl Grey",
@@ -68,7 +68,7 @@ public class OptionsCommandHandlerTests
         A.CallTo(() => repository.GetOptionsByGroupIdAsync(GroupId, A<CancellationToken>._))
             .Returns([earlGrey]);
 
-        A.CallTo(() => repository.CreateAsync(A<Option>._, A<CancellationToken>._))
+        A.CallTo(() => repository.CreateAsync(A<OptionEntity>._, A<CancellationToken>._))
             .Returns(Task.CompletedTask);
 
         return repository;

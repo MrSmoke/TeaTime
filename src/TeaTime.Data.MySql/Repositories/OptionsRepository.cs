@@ -14,7 +14,7 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
     private const string GroupSelectColumns = "id, name, roomId, createdBy, createdDate";
     private const string OptionSelectColumns = "id, name, available, groupId, createdBy, createdDate";
 
-    public Task CreateGroupAsync(RoomItemGroup group, CancellationToken cancellationToken = default)
+    public Task CreateGroupAsync(RoomItemGroupEntity group, CancellationToken cancellationToken = default)
     {
         const string sql = """
                            INSERT INTO option_groups (id, name, roomId, createdBy, createdDate)
@@ -24,7 +24,7 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
         return ExecuteAsync(sql, group, cancellationToken);
     }
 
-    public Task UpdateGroupAsync(RoomItemGroup group, CancellationToken cancellationToken = default)
+    public Task UpdateGroupAsync(RoomItemGroupEntity group, CancellationToken cancellationToken = default)
     {
         const string sql = """
                            UPDATE option_groups
@@ -50,17 +50,17 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
         }, cancellationToken);
     }
 
-    public Task<RoomItemGroup?> GetGroupAsync(long groupId, CancellationToken cancellationToken = default)
+    public Task<RoomItemGroupEntity?> GetGroupAsync(long groupId, CancellationToken cancellationToken = default)
     {
         const string sql = $"""
                            SELECT {GroupSelectColumns} FROM option_groups
                            WHERE id = @groupId AND deleted = 0
                            """;
 
-        return SingleOrDefaultAsync<RoomItemGroup>(sql, new { groupId }, cancellationToken);
+        return SingleOrDefaultAsync<RoomItemGroupEntity>(sql, new { groupId }, cancellationToken);
     }
 
-    public Task<RoomItemGroup?> GetGroupByNameAsync(long roomId, string name,
+    public Task<RoomItemGroupEntity?> GetGroupByNameAsync(long roomId, string name,
         CancellationToken cancellationToken = default)
     {
         const string sql = $"""
@@ -68,10 +68,10 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
                            WHERE roomId = @roomId AND name = @name AND deleted = 0
                            """;
 
-        return SingleOrDefaultAsync<RoomItemGroup>(sql, new { roomId, name }, cancellationToken);
+        return SingleOrDefaultAsync<RoomItemGroupEntity>(sql, new { roomId, name }, cancellationToken);
     }
 
-    public Task CreateAsync(Option option, CancellationToken cancellationToken = default)
+    public Task CreateAsync(OptionEntity option, CancellationToken cancellationToken = default)
     {
         const string sql = """
                            INSERT INTO options (id, name, available, groupId, createdBy, createdDate)
@@ -81,17 +81,17 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
         return ExecuteAsync(sql, option, cancellationToken);
     }
 
-    public Task<Option?> GetAsync(long optionId, CancellationToken cancellationToken = default)
+    public Task<OptionEntity?> GetAsync(long optionId, CancellationToken cancellationToken = default)
     {
         const string sql = $"""
                            SELECT {OptionSelectColumns} FROM options
                            WHERE id = @optionId AND deleted = 0
                            """;
 
-        return SingleOrDefaultAsync<Option>(sql, new { optionId }, cancellationToken);
+        return SingleOrDefaultAsync<OptionEntity>(sql, new { optionId }, cancellationToken);
     }
 
-    public Task UpdateAsync(Option option, CancellationToken cancellationToken = default)
+    public Task UpdateAsync(OptionEntity option, CancellationToken cancellationToken = default)
     {
         const string sql = """
                            UPDATE options
@@ -128,17 +128,17 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
         }, cancellationToken);
     }
 
-    public Task<IEnumerable<Option>> GetManyAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default)
+    public Task<IEnumerable<OptionEntity>> GetManyAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default)
     {
         const string sql = $"""
                            SELECT {OptionSelectColumns} FROM options
                            WHERE id IN @ids AND deleted = 0
                            """;
 
-        return QueryAsync<Option>(sql, new { ids }, cancellationToken);
+        return QueryAsync<OptionEntity>(sql, new { ids }, cancellationToken);
     }
 
-    public Task<IEnumerable<Option>> GetOptionsByGroupIdAsync(long groupId,
+    public Task<IEnumerable<OptionEntity>> GetOptionsByGroupIdAsync(long groupId,
         CancellationToken cancellationToken = default)
     {
         const string sql = $"""
@@ -146,6 +146,6 @@ public class OptionsRepository(IMySqlConnectionFactory factory, TimeProvider sys
                            WHERE groupId = @groupId AND deleted = 0
                            """;
 
-        return QueryAsync<Option>(sql, new { groupId }, cancellationToken);
+        return QueryAsync<OptionEntity>(sql, new { groupId }, cancellationToken);
     }
 }
