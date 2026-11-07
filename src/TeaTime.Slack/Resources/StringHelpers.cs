@@ -2,6 +2,7 @@ namespace TeaTime.Slack.Resources;
 
 using System;
 using System.Linq;
+using System.Net;
 
 internal static class StringHelpers
 {
@@ -14,7 +15,8 @@ internal static class StringHelpers
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        return value
+        // Slack may have already escaped the text, so decode first to avoid escaping it twice
+        return WebUtility.HtmlDecode(value)
             .Replace("&", "&amp;", StringComparison.Ordinal)
             .Replace("<", "&lt;", StringComparison.Ordinal)
             .Replace(">", "&gt;", StringComparison.Ordinal);

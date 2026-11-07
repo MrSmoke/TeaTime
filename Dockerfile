@@ -18,8 +18,14 @@ COPY sql/ sql/
 COPY src/ src/
 
 # Build
+# VERSION overrides the whole version for release builds
+# VERSION_SUFFIX is appended to the props VersionPrefix for dev builds
+ARG VERSION
+ARG VERSION_SUFFIX
 WORKDIR /build/
-RUN dotnet build src/TeaTime/TeaTime.csproj --no-restore -c Release
+RUN dotnet build src/TeaTime/TeaTime.csproj --no-restore -c Release \
+    ${VERSION:+-p:Version=$VERSION} \
+    ${VERSION_SUFFIX:+-p:VersionSuffix=$VERSION_SUFFIX}
 
 # Publish
 FROM build AS publish
