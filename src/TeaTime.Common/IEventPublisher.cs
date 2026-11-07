@@ -1,10 +1,10 @@
-namespace TeaTime.Common
-{
-    using System.Threading.Tasks;
-    using Abstractions;
+namespace TeaTime.Common;
 
-    public interface IEventPublisher
-    {
-        Task PublishAsync<T>(T eventModel) where T : IEvent;
-    }
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions;
+
+public interface IEventPublisher
+{
+    Task PublishAsync<T>(T eventModel, CancellationToken cancellationToken = default) where T : IEvent;
 }

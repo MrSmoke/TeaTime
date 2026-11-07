@@ -12,7 +12,7 @@ public class RoomRunLockService(ILockRepository lockRepository, ILogger<RoomRunL
     public async Task<bool> CreateLockAsync(long roomId, CancellationToken cancellationToken = default)
     {
         var key = GetLockKey(roomId);
-        var result = await lockRepository.CreateLockAsync(key);
+        var result = await lockRepository.CreateLockAsync(key, cancellationToken);
 
         logger.LogDebug("Create run lock for room {RoomId} with key {Key} result = {Result}", roomId, key, result);
 
@@ -22,7 +22,7 @@ public class RoomRunLockService(ILockRepository lockRepository, ILogger<RoomRunL
     public async Task<bool> DeleteLockAsync(long roomId, CancellationToken cancellationToken = default)
     {
         var key = GetLockKey(roomId);
-        var result = await lockRepository.DeleteLockAsync(key);
+        var result = await lockRepository.DeleteLockAsync(key, cancellationToken);
 
         logger.LogDebug("Delete run lock for room {RoomId} with key {Key} result = {Result}", roomId, key, result);
 

@@ -3,6 +3,7 @@ namespace TeaTime.Slack.Services;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,33 +60,6 @@ public class SignedSecretsRequestVerifier(
         return Verify(slackSignature, timestamp, requestBody);
     }
 
-    private bool Verify(string signature, long timestamp, string requestBody)
-    {
-        ArgumentNullException.ThrowIfNull(signature);
-        ArgumentNullException.ThrowIfNull(requestBody);
-
-        var options = GetOptions();
-        var now = timeProvider.GetUtcNow().ToUnixTimeSeconds();
-
-        if (now - timestamp > options.ClockSkew.TotalSeconds)
-        {
-            logger.LogWarning("Request verification failed. Too much time has passed since timestamp");
-            return false;
-        }
-
-        // todo: store the bytes and use OnChange to update
-        var signingSecret = options.SigningSecret ?? throw new InvalidOperationException("SigningSecret missing");
-        var keyBytes = Encoding.UTF8.GetBytes(signingSecret);
-
-        // Hash our data
-        var signatureString = VersionNumber + ':' + timestamp + ':' + requestBody;
-        var hashString = HashHelper.HashStringSha256(keyBytes, signatureString);
-        var mySignature = VersionNumber + '=' + hashString;
-
-        // Compare
-        return mySignature.Equals(signature);
-    }
-
     private static bool TryGetSignature(HttpRequest request, [NotNullWhen(true)] out string? signature)
     {
         if (!request.Headers.TryGetValue(SignatureHeaderKey, out var slackSignatureValues))
@@ -105,6 +79,37 @@ public class SignedSecretsRequestVerifier(
         return true;
     }
 
+    private bool Verify(string signature, long timestamp, string requestBody)
+    {
+        ArgumentNullException.ThrowIfNull(signature);
+        ArgumentNullException.ThrowIfNull(requestBody);
+
+        var options = GetOptions();
+        var now = timeProvider.GetUtcNow().ToUnixTimeSeconds();
+
+        // Range check rather than Math.Abs(now - timestamp), which overflows on extreme header values
+        var skew = (long)options.ClockSkew.TotalSeconds;
+        if (timestamp < now - skew || timestamp > now + skew)
+        {
+            logger.LogWarning("Request verification failed. Timestamp outside allowed clock skew");
+            return false;
+        }
+
+        // todo: store the bytes and use OnChange to update
+        var signingSecret = options.SigningSecret ?? throw new InvalidOperationException("SigningSecret missing");
+        var keyBytes = Encoding.UTF8.GetBytes(signingSecret);
+
+        // Hash our data
+        var signatureString = VersionNumber + ':' + timestamp + ':' + requestBody;
+        var hashString = HashHelper.HashStringSha256(keyBytes, signatureString);
+        var mySignature = VersionNumber + '=' + hashString;
+
+        // Constant-time compare to avoid timing attacks
+        return CryptographicOperations.FixedTimeEquals(
+            Encoding.ASCII.GetBytes(mySignature),
+            Encoding.ASCII.GetBytes(signature));
+    }
+
     private void LogFailure(string reason) => logger.LogWarning("Request verification failed. {Reason}", reason);
 
     private SignedSecretsRequestVerifierOptions GetOptions()
@@ -113,9 +118,6 @@ public class SignedSecretsRequestVerifier(
 
         if (!options.Enabled)
             throw new InvalidOperationException("Request Verification is not enabled");
-
-        if (!options.IsValid())
-            throw new InvalidOperationException("Request Verification is not configured");
 
         return options;
     }

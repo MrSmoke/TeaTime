@@ -13,25 +13,25 @@ public abstract class BaseRepository(IMySqlConnectionFactory factory)
     protected Task<int> ExecuteAsync(string sql, object obj, CancellationToken cancellationToken = default)
     {
         var command = CreateCommandDefinition(sql, obj, CommandFlags.Buffered, cancellationToken);
-        return GetConnection(conn => conn.ExecuteAsync(command));
+        return GetConnectionAsync(conn => conn.ExecuteAsync(command));
     }
 
     protected Task<T?> SingleOrDefaultAsync<T>(string sql, object? obj = null, CancellationToken cancellationToken = default)
     {
         var command = CreateCommandDefinition(sql, obj, cancellationToken: cancellationToken);
-        return GetConnection(conn => conn.QuerySingleOrDefaultAsync<T>(command));
+        return GetConnectionAsync(conn => conn.QuerySingleOrDefaultAsync<T>(command));
     }
 
     protected Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? obj = null, CancellationToken cancellationToken = default)
     {
         var command = CreateCommandDefinition(sql, obj, cancellationToken: cancellationToken);
-        return GetConnection(conn => conn.QueryFirstOrDefaultAsync<T>(command));
+        return GetConnectionAsync(conn => conn.QueryFirstOrDefaultAsync<T>(command));
     }
 
     protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object? obj = null, CancellationToken cancellationToken = default)
     {
         var command = CreateCommandDefinition(sql, obj, CommandFlags.Buffered, cancellationToken: cancellationToken);
-        return GetConnection(conn => conn.QueryAsync<T>(command));
+        return GetConnectionAsync(conn => conn.QueryAsync<T>(command));
     }
 
     private static CommandDefinition CreateCommandDefinition(string sql,
@@ -45,7 +45,7 @@ public abstract class BaseRepository(IMySqlConnectionFactory factory)
             cancellationToken: cancellationToken);
     }
 
-    private async Task<T> GetConnection<T>(Func<MySqlConnection, Task<T>> func)
+    private async Task<T> GetConnectionAsync<T>(Func<MySqlConnection, Task<T>> func)
     {
         await using var conn = factory.GetConnection();
         return await func(conn);

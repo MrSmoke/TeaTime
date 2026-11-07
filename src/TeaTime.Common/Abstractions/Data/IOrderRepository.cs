@@ -1,15 +1,17 @@
-namespace TeaTime.Common.Abstractions.Data
+namespace TeaTime.Common.Abstractions.Data;
+
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Models.Data;
+
+public interface IOrderRepository
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Models.Data;
+    Task CreateAsync(Order order, CancellationToken cancellationToken = default);
+    Task UpdateAsync(Order order, CancellationToken cancellationToken = default);
+    Task<Order?> GetAsync(long id, CancellationToken cancellationToken = default);
 
-    public interface IOrderRepository
-    {
-        Task CreateAsync(Order order);
-        Task UpdateAsync(Order order);
-        Task<Order?> GetAsync(long id);
+    Task<IEnumerable<Order>> GetOrdersAsync(long runId, CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<Order>> GetOrdersAsync(long runId);
-    }
+    Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default);
 }

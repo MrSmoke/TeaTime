@@ -6,18 +6,22 @@ using Common.Abstractions;
 using Common.Abstractions.Data;
 using Common.Collections;
 using Factories;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repositories;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddMySql(this IServiceCollection services, MySqlConnectionOptions options)
+    public static void AddMySql(this IServiceCollection services, IConfiguration configuration)
     {
-        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(configuration);
 
-        options.Validate();
+        services.AddOptions<MySqlConnectionOptions>()
+            .Bind(configuration)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        services.AddSingleton<IMySqlConnectionFactory>(new MySqlConnectionFactory(options));
+        services.AddSingleton<IMySqlConnectionFactory, MySqlConnectionFactory>();
 
         services.AddSingleton<ILinkRepository, LinkRepository>();
         services.AddSingleton<IRoomRepository, RoomRepository>();

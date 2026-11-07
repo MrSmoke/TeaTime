@@ -1,163 +1,192 @@
-namespace TeaTime.Slack.Controllers
+namespace TeaTime.Slack.Controllers;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using CommandRouter;
+using CommandRouter.Exceptions;
+using CommandRouter.Integration.AspNetCore;
+using Common.Exceptions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Models.Interactivity;
+using Models.SlashCommands;
+using Resources;
+using Services;
+
+[Route("slack")]
+public class SlackController(
+    ICommandRunner commandRunner,
+    ISlackService slackService,
+    ILogger<SlackController> logger)
+    : ControllerBase
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using CommandRouter;
-    using CommandRouter.Exceptions;
-    using CommandRouter.Integration.AspNetCore;
-    using Common.Exceptions;
-    using Exceptions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using Models.InteractiveMessages;
-    using Models.SlashCommands;
-    using Resources;
-    using Services;
-
-    [Route("slack")]
-    public class SlackController : ControllerBase
+    [SlackVerifyRequest]
+    [HttpPost("slash")]
+    public async Task<IActionResult> SlashCommandHook(SlashCommand slashCommand)
     {
-        private readonly ICommandRunner _commandRunner;
-        private readonly ISlackService _slackService;
-        private readonly ILogger<SlackController> _logger;
-
-        public SlackController(ICommandRunner commandRunner,
-            ISlackService slackService,
-            ILogger<SlackController> logger)
+        if (slashCommand == null)
         {
-            _commandRunner = commandRunner;
-            _slackService = slackService;
-            _logger = logger;
+            logger.LogError("Null slash command");
+            return Ok(ErrorStrings.General(), ResponseType.User);
         }
 
-        [SlackVerifyRequest]
-        [HttpPost("slash")]
-        public async Task<IActionResult> SlashCommandHook(SlashCommand slashCommand)
+        // Slack's SSL certificate check only needs an empty 200
+        if (slashCommand.SslCheck == "1")
+            return Ok();
+
+        using var scope = BeginSlackScope(slashCommand.UserId, slashCommand.ChannelId, slashCommand.TeamId);
+
+        var commandText = slashCommand.Text;
+        if (string.IsNullOrWhiteSpace(commandText))
         {
-            if (slashCommand == null)
-            {
-                _logger.LogError("Null slash command");
-                return Ok(ErrorStrings.General(), ResponseType.User);
-            }
-
-            if (string.IsNullOrWhiteSpace(slashCommand.Text))
-            {
-                _logger.LogWarning("Slash command contains no text");
-                return Ok(ErrorStrings.General(), ResponseType.User);
-            }
-
-            _logger.LogInformation("Received slash command {Text} {@Command}", slashCommand.Text, slashCommand);
-
-            try
-            {
-                var result = await _commandRunner.RunAsync(slashCommand.Text, new Dictionary<string, object>
-                {
-                    {Constants.CommandContextKeys.SlashCommand, slashCommand}
-                });
-
-                Response.ContentType = "application/json";
-                return new CommandRouterResult(result);
-            }
-            catch (CommandNotFoundException)
-            {
-                return Ok(ErrorStrings.CommandUnknown(slashCommand.Text), ResponseType.User);
-            }
-            catch (RunStartException e)
-            {
-                switch (e.Reason)
-                {
-                    case RunStartException.RunStartExceptionReason.ExistingActiveRun:
-                        return Ok(ErrorStrings.StartRun_RunAlreadyStarted(), ResponseType.User);
-
-                    case RunStartException.RunStartExceptionReason.Unspecified:
-                    default:
-                        break;
-                }
-
-                _logger.LogError(e, "Failed to start run");
-            }
-            catch (RunEndException e)
-            {
-                switch (e.Reason)
-                {
-                    case RunEndException.RunEndExceptionReason.NoActiveRun:
-                        return Ok(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User);
-
-                    case RunEndException.RunEndExceptionReason.NoOrders:
-                        return Ok(ErrorStrings.EndRun_NoOrders(), ResponseType.User);
-
-                    case RunEndException.RunEndExceptionReason.NotJoined:
-                        return Ok(ErrorStrings.EndRun_NotJoined(), ResponseType.User);
-
-                    case RunEndException.RunEndExceptionReason.Unspecified:
-                    default:
-                        break;
-                }
-
-                _logger.LogError(e, "Failed to end run");
-            }
-            catch (PermissionException e)
-            {
-                return Ok(e.Message, ResponseType.User);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to run command");
-            }
-
-            return Ok(ErrorStrings.CommandFailed(), ResponseType.User);
+            // If a slash command has no text, show the help menu
+            commandText = "help";
+        }
+        else
+        {
+            // Slack likes to replace quotes so bring them back to normal ascii
+            commandText = commandText
+                .Replace('\u201C', '"')
+                .Replace('\u201D', '"');
         }
 
-        [SlackVerifyRequest]
-        [HttpPost("interactive-messages")]
-        public async Task<IActionResult> InteractiveMessageHook(MessageRequest request)
+        // Command text is user input so isn't logged
+        logger.LogInformation("Received slash command from {SlackUserId} in {SlackChannelId} ({SlackTeamId})",
+            slashCommand.UserId, slashCommand.ChannelId, slashCommand.TeamId);
+
+        try
         {
-            if (request == null)
+            var result = await commandRunner.RunAsync(commandText, new Dictionary<string, object>
             {
-                _logger.LogError("Null interactive message request");
-                return Ok(ErrorStrings.General(), ResponseType.User);
+                {Constants.CommandContextKeys.SlashCommand, slashCommand}
+            });
+
+            Response.ContentType = "application/json";
+            return new CommandRouterResult(result);
+        }
+        catch (CommandNotFoundException)
+        {
+            logger.LogInformation("Slash command not found");
+            return Ok(ErrorStrings.CommandUnknown(commandText), ResponseType.User);
+        }
+        catch (ParameterBindingException e)
+        {
+            // Parameter name is ours; the value is user input so it isn't logged
+            logger.LogInformation("Slash command arguments invalid for parameter {ParameterName}", e.ParameterName);
+            return Ok(ErrorStrings.CommandBadArguments(commandText), ResponseType.User);
+        }
+        catch (RunStartException e)
+        {
+            logger.LogInformation("Failed to start run: {Reason}", e.Reason);
+
+            switch (e.Reason)
+            {
+                case RunStartException.RunStartExceptionReason.ExistingActiveRun:
+                    return Ok(ErrorStrings.StartRun_RunAlreadyStarted(), ResponseType.User);
+
+                case RunStartException.RunStartExceptionReason.Unspecified:
+                default:
+                    break;
             }
 
-            if (string.IsNullOrWhiteSpace(request.PayloadJson))
+            logger.LogError(e, "Failed to start run");
+        }
+        catch (RunEndException e)
+        {
+            logger.LogInformation("Failed to end run: {Reason}", e.Reason);
+
+            switch (e.Reason)
             {
-                _logger.LogError("PayloadJson is empty");
-                return Ok(ErrorStrings.General(), ResponseType.User);
+                case RunEndException.RunEndExceptionReason.NoActiveRun:
+                    return Ok(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User);
+
+                case RunEndException.RunEndExceptionReason.NoOrders:
+                    return Ok(ErrorStrings.EndRun_NoOrders(), ResponseType.User);
+
+                case RunEndException.RunEndExceptionReason.NotJoined:
+                    return Ok(ErrorStrings.EndRun_NotJoined(), ResponseType.User);
+
+                case RunEndException.RunEndExceptionReason.Unspecified:
+                default:
+                    break;
             }
 
-            var message = SlackJsonSerializer.Deserialize<MessageRequestPayload>(request.PayloadJson);
-            if (message == null)
-            {
-                _logger.LogError("Failed to deserialize interactive message request");
-                return Ok(ErrorStrings.General(), ResponseType.User);
-            }
-
-            _logger.LogInformation("Received interactive message {@Request}", message);
-
-            try
-            {
-                await _slackService.JoinRunAsync(message);
-
-                return Ok();
-            }
-            catch (SlackTeaTimeException e)
-            {
-                return Ok(e.Message, ResponseType.User);
-            }
-            catch (PermissionException e)
-            {
-                return Ok(e.Message, ResponseType.User);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to join run");
-                return Ok(ErrorStrings.General(), ResponseType.User);
-            }
+            logger.LogError(e, "Failed to end run");
+        }
+        catch (PermissionException e)
+        {
+            logger.LogInformation(e, "Slash command denied");
+            return Ok(e.Message, ResponseType.User);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Failed to run command");
         }
 
-        private OkObjectResult Ok(string message, ResponseType responseType)
+        return Ok(ErrorStrings.CommandFailed(), ResponseType.User);
+    }
+
+    [SlackVerifyRequest]
+    [HttpPost("interactions")]
+    [HttpPost("interactive-messages")]
+    public async Task<IActionResult> InteractionHook(InteractionRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request?.PayloadJson))
         {
-            return Ok(new SlashCommandResponse(message, responseType));
+            logger.LogError("Interaction payload is empty");
+            return Ok();
         }
+
+        BlockActionsPayload? payload;
+        try
+        {
+            payload = SlackJsonSerializer.Deserialize<BlockActionsPayload>(request.PayloadJson);
+        }
+        catch (JsonException e)
+        {
+            logger.LogError(e, "Failed to deserialise interaction payload");
+            return Ok();
+        }
+
+        if (payload == null)
+        {
+            logger.LogError("Interaction payload deserialised to null");
+            return Ok();
+        }
+
+        if (payload.Type != BlockActionsPayload.PayloadType)
+        {
+            logger.LogInformation("Ignoring unsupported interaction type {Type}", payload.Type);
+            return Ok();
+        }
+
+        using var scope = BeginSlackScope(payload.User.Id, payload.Channel?.Id, payload.Team?.Id);
+
+        // Action IDs are ours; response_url is a credential so the payload isn't logged
+        logger.LogInformation("Received block actions {ActionIds} from {SlackUserId} in {SlackChannelId} ({SlackTeamId})",
+            payload.Actions.Select(a => a.ActionId), payload.User.Id, payload.Channel?.Id, payload.Team?.Id);
+
+        await slackService.HandleBlockActionsAsync(payload);
+
+        return Ok();
+    }
+
+    private IDisposable? BeginSlackScope(string? userId, string? channelId, string? teamId)
+    {
+        return logger.BeginScope(new Dictionary<string, object?>
+        {
+            ["SlackUserId"] = userId,
+            ["SlackChannelId"] = channelId,
+            ["SlackTeamId"] = teamId
+        });
+    }
+
+    private ContentResult Ok(string message, ResponseType responseType)
+    {
+        var json = SlackJsonSerializer.Serialize(new SlashCommandResponse(message, responseType));
+        return Content(json, "application/json");
     }
 }

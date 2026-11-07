@@ -1,66 +1,58 @@
-namespace TeaTime.Common.Features.Orders
+namespace TeaTime.Common.Features.Orders;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using Exceptions;
+using MediatR;
+using Models.Data;
+using Models.Domain;
+using Queries;
+
+public class OrdersQueryHandler(
+    IOrderRepository orderRepository,
+    IUserRepository userRepository,
+    IOptionsRepository optionsRepository,
+    IRunRepository runRepository) :
+    IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>,
+    IRequestHandler<GetUserOrderQuery, Order?>
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using Exceptions;
-    using MediatR;
-    using Models.Data;
-    using Models.Domain;
-    using Queries;
-
-    public class OrdersQueryHandler :
-        IRequestHandler<GetRunOrdersQuery, IEnumerable<OrderModel>>,
-        IRequestHandler<GetUserOrderQuery, Order?>
+    public async Task<IEnumerable<OrderModel>> Handle(GetRunOrdersQuery request,
+        CancellationToken cancellationToken)
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IOptionsRepository _optionsRepository;
-        private readonly IRunRepository _runRepository;
+        var run = await runRepository.GetAsync(request.RunId, cancellationToken);
+        if (run is null)
+            throw new TeaTimeException($"Unknown RunId {request.RunId}");
 
-        public OrdersQueryHandler(IOrderRepository orderRepository, IUserRepository userRepository,
-            IOptionsRepository optionsRepository, IRunRepository runRepository)
-        {
-            _orderRepository = orderRepository;
-            _userRepository = userRepository;
-            _optionsRepository = optionsRepository;
-            _runRepository = runRepository;
-        }
+        var orders = (await orderRepository.GetOrdersAsync(run.Id, cancellationToken)).ToList();
+        if (orders.Count == 0)
+            return [];
 
-        public async Task<IEnumerable<OrderModel>> Handle(GetRunOrdersQuery request,
-            CancellationToken cancellationToken)
-        {
-            var run = await _runRepository.GetAsync(request.RunId);
-            if (run is null)
-                throw new TeaTimeException($"Unknown RunId {request.RunId}");
+        var users = userRepository.GetManyAsync(orders.Select(o => o.UserId), cancellationToken);
+        var options = optionsRepository.GetManyAsync(orders.Select(o => o.OptionId), cancellationToken);
 
-            var orders = (await _orderRepository.GetOrdersAsync(run.Id)).ToList();
-            if (orders.Count == 0)
-                return new List<OrderModel>();
+        var userDict = (await users).ToDictionary(k => k.Id);
+        var optionsDict = (await options).ToDictionary(k => k.Id);
 
-            var users = _userRepository.GetManyAsync(orders.Select(o => o.UserId));
-            var options = _optionsRepository.GetManyAsync(orders.Select(o => o.OptionId));
-
-            var userDict = (await users).ToDictionary(k => k.Id);
-            var optionsDict = (await options).ToDictionary(k => k.Id);
-
-            return orders.Select(order => new OrderModel
+        return orders
+            .Select(order => new OrderModel
             {
                 Id = order.Id,
                 CreatedDate = order.CreatedDate,
                 Run = run,
                 User = userDict.GetValueOrDefault(order.UserId),
                 Option = optionsDict.GetValueOrDefault(order.OptionId)
-            });
-        }
+            })
+            // Order by users display name for consistent ordering
+            .OrderBy(o => o.User?.DisplayName);
+    }
 
-        public async Task<Order?> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
-        {
-            var orders = await _orderRepository.GetOrdersAsync(request.RunId);
+    public async Task<Order?> Handle(GetUserOrderQuery request, CancellationToken cancellationToken)
+    {
+        var orders = await orderRepository.GetOrdersAsync(request.RunId, cancellationToken);
 
-            return orders.FirstOrDefault(o => o.UserId == request.UserId);
-        }
+        return orders.FirstOrDefault(o => o.UserId == request.UserId);
     }
 }

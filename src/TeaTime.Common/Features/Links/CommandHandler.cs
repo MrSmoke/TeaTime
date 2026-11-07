@@ -1,23 +1,15 @@
-namespace TeaTime.Common.Features.Links
+namespace TeaTime.Common.Features.Links;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using Commands;
+using MediatR;
+
+public class LinkCommandHandler(ILinkRepository linkRepository) : IRequestHandler<CreateLinkCommand>
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using Commands;
-    using MediatR;
-
-    public class LinkCommandHandler : IRequestHandler<CreateLinkCommand>
+    public Task Handle(CreateLinkCommand request, CancellationToken cancellationToken)
     {
-        private readonly ILinkRepository _linkRepository;
-
-        public LinkCommandHandler(ILinkRepository linkRepository)
-        {
-            _linkRepository = linkRepository;
-        }
-
-        public Task Handle(CreateLinkCommand request, CancellationToken cancellationToken)
-        {
-            return _linkRepository.Add(request.ObjectId, request.LinkType, request.Value);
-        }
+        return linkRepository.AddAsync(request.ObjectId, request.LinkType, request.Value, cancellationToken);
     }
 }

@@ -1,0 +1,30 @@
+name: Test
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v7
+      -
+        name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      -
+        name: Test
+        run: dotnet test -c Release --results-directory TestResults --report-xunit-markdown
+      -
+        name: Test summary
+        if: always()
+        run: |
+          if compgen -G "TestResults/*.md" > /dev/null; then
+            cat TestResults/*.md >> "$GITHUB_STEP_SUMMARY"
+          fi

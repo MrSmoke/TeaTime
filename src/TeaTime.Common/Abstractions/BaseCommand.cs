@@ -4,5 +4,5 @@ using System.Collections.Generic;
 
 public abstract record BaseCommand : ICommand
 {
-    public Dictionary<string, object> State { get; } = new();
+    public Dictionary<string, object> State { get; } = [];
 }

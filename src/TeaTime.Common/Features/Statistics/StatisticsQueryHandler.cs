@@ -1,31 +1,25 @@
-namespace TeaTime.Common.Features.Statistics
+namespace TeaTime.Common.Features.Statistics;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using MediatR;
+using Models;
+using Queries;
+
+public class StatisticsQueryHandler(
+    IStatisticsRepository statisticsRepository)
+    : IRequestHandler<GetGlobalTotalsQuery, GlobalTotals>
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using MediatR;
-    using Models;
-    using Queries;
-
-    public class StatisticsQueryHandler : IRequestHandler<GetGlobalTotalsQuery, GlobalTotals>
+    public async Task<GlobalTotals> Handle(GetGlobalTotalsQuery request, CancellationToken cancellationToken)
     {
-        private readonly IStatisticsRepository _statisticsRepository;
+        var ordersTask = statisticsRepository.CountGlobalOrdersMadeAsync(cancellationToken);
+        var runsTask = statisticsRepository.CountGlobalEndedRunsAsync(cancellationToken);
 
-        public StatisticsQueryHandler(IStatisticsRepository statisticsRepository)
+        return new GlobalTotals
         {
-            _statisticsRepository = statisticsRepository;
-        }
-
-        public async Task<GlobalTotals> Handle(GetGlobalTotalsQuery request, CancellationToken cancellationToken)
-        {
-            var ordersTask = _statisticsRepository.CountGlobalOrdersMadeAsync();
-            var runsTask = _statisticsRepository.CountGlobalEndedRunsAsync();
-
-            return new GlobalTotals
-            {
-                OrdersMade = await ordersTask,
-                RunsEnded = await runsTask
-            };
-        }
+            OrdersMade = await ordersTask,
+            RunsEnded = await runsTask
+        };
     }
 }

@@ -1,19 +1,23 @@
-namespace TeaTime.Slack.Services
+namespace TeaTime.Slack.Services;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Common.Models.Data;
+using Models.Interactivity;
+using Models.OAuth;
+using Models.SlashCommands;
+
+public interface ISlackService
 {
-    using System.Threading.Tasks;
-    using Common.Models.Data;
-    using Models.InteractiveMessages;
-    using Models.OAuth;
-    using Models.SlashCommands;
+    Task InstallAsync(OAuthTokenResponse response, CancellationToken cancellationToken = default);
 
-    public interface ISlackService
-    {
-        Task<User> GetOrCreateUser(string userId, string name);
-        Task<Room> GetOrCreateRoom(string channelId, string channelName, long userId);
+    Task<User> GetOrCreateUserAsync(string userId, string? name, CancellationToken cancellationToken = default);
 
-        Task JoinRunAsync(SlashCommand slashCommand, string optionName);
-        Task JoinRunAsync(MessageRequestPayload requestPayload);
+    Task<Room> GetOrCreateRoomAsync(string channelId, string? channelName, long userId,
+        CancellationToken cancellationToken = default);
 
-        Task InstallAsync(OAuthTokenResponse response);
-    }
+    Task JoinRunAsync(SlashCommand slashCommand, string optionName, CancellationToken cancellationToken = default);
+    Task LeaveRunAsync(SlashCommand slashCommand, CancellationToken cancellationToken = default);
+
+    Task HandleBlockActionsAsync(BlockActionsPayload requestPayload, CancellationToken cancellationToken = default);
 }

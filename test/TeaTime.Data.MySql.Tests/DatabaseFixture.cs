@@ -5,14 +5,15 @@ using System.Threading.Tasks;
 using Dapper;
 using Factories;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 public class DatabaseFixture : IAsyncLifetime
 {
     public IMySqlConnectionFactory ConnectionFactory { get; } =
-        new MySqlConnectionFactory(TestConfig.ConnectionOptions);
+        new MySqlConnectionFactory(Options.Create(TestConfig.ConnectionOptions));
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await using var conn = ConnectionFactory.GetConnection();
 
@@ -46,8 +47,8 @@ public class DatabaseFixture : IAsyncLifetime
         migration.Execute();
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 }

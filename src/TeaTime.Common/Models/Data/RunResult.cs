@@ -1,19 +1,18 @@
-namespace TeaTime.Common.Models.Data
+namespace TeaTime.Common.Models.Data;
+
+using System;
+
+public record RunResult
 {
-    using System;
+    public required long RunId { get; init; }
 
-    public class RunResult
-    {
-        public long RunId { get; set; }
+    /// <summary>
+    /// The user id of the runner
+    /// </summary>
+    public required long RunnerUserId { get; init; }
 
-        /// <summary>
-        /// The user id of the runner
-        /// </summary>
-        public long RunnerUserId { get; set; }
-
-        /// <summary>
-        /// The time the run ended
-        /// </summary>
-        public DateTimeOffset EndedTime { get; set; }
-    }
+    /// <summary>
+    /// The time the run ended
+    /// </summary>
+    public required DateTimeOffset EndedTime { get; init; }
 }

@@ -1,8 +1,7 @@
-namespace TeaTime.Common.Models
+namespace TeaTime.Common.Models;
+
+public enum LinkType
 {
-    public enum LinkType
-    {
-        Room = 1,
-        User = 2
-    }
+    Room = 1,
+    User = 2
 }

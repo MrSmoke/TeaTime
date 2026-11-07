@@ -1,46 +1,31 @@
-namespace TeaTime.Common.Cache
+namespace TeaTime.Common.Cache;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions;
+using MediatR;
+using Microsoft.Extensions.Caching.Hybrid;
+
+public class CacheBehaviour<TRequest, TResponse>(HybridCache cache) : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using MediatR;
-
-    public class CacheBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
-        private readonly ICache _cache;
+        if (request is not ICacheableQuery cacheQuery)
+            return await next(cancellationToken);
 
-        public CacheBehaviour(ICache cache)
+        var options = new HybridCacheEntryOptions
         {
-            _cache = cache;
-        }
+            Expiration = cacheQuery.CacheExpiry,
+            LocalCacheExpiration = cacheQuery.CacheExpiry
+        };
 
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
-        {
-            if (request is not ICacheableQuery cacheQuery)
-                return await next();
-
-            var cacheKey = cacheQuery.CacheKey;
-
-            // try and get from the cache first
-            var cacheItem = await _cache.GetAsync<TResponse>(cacheKey, cancellationToken);
-            if (cacheItem != null)
-                return cacheItem.Value;
-
-            // no result found in cache, so run the rest of the pipeline and cache the result
-            var response = await next();
-
-            // dont cache null values
-            if (response == null)
-                return response;
-
-            // serialize and store in the cache
-            await _cache.SetAsync(cacheKey, response, new CacheEntryOptions
-            {
-                Sliding = cacheQuery.SlidingCache,
-                Expiration = cacheQuery.CacheExpiry
-            }, cancellationToken);
-
-            return response;
-        }
+        return await cache.GetOrCreateAsync(
+            key: cacheQuery.CacheKey,
+            state: next,
+            factory: static async (handler, token) => await handler(token),
+            options: options,
+            cancellationToken: cancellationToken);
     }
 }

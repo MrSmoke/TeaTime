@@ -6,21 +6,14 @@ using Common.Models.Data;
 using MySql.Repositories;
 using Xunit;
 
-public class RunRepositoryTests : IClassFixture<DatabaseFixture>
+public class RunRepositoryTests(DatabaseFixture databaseFixture) : IClassFixture<DatabaseFixture>
 {
-    private readonly DatabaseFixture _databaseFixture;
-
-    public RunRepositoryTests(DatabaseFixture databaseFixture)
-    {
-        _databaseFixture = databaseFixture;
-    }
-
     //[Fact]
     [Fact(Skip = "Requires local mysql")]
     public async Task GetAsync_Returns()
     {
         // This is gross
-        var userRepo = new UserRepository(_databaseFixture.ConnectionFactory);
+        var userRepo = new UserRepository(databaseFixture.ConnectionFactory);
         var user = new User
         {
             Id = TestData.NewInt64(),
@@ -28,9 +21,9 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
             CreatedDate = TestData.MySqlNow(),
             DisplayName = TestData.NewString()
         };
-        await userRepo.CreateAsync(user);
+        await userRepo.CreateAsync(user, TestContext.Current.CancellationToken);
 
-        var roomRepo = new RoomRepository(_databaseFixture.ConnectionFactory);
+        var roomRepo = new RoomRepository(databaseFixture.ConnectionFactory);
         var room = new Room
         {
             Id = TestData.NewInt64(),
@@ -38,9 +31,9 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
             CreatedBy = user.Id,
             CreatedDate = TestData.MySqlNow()
         };
-        await roomRepo.CreateAsync(room);
+        await roomRepo.CreateAsync(room, TestContext.Current.CancellationToken);
 
-        var optionRepo = new OptionsRepository(_databaseFixture.ConnectionFactory, TimeProvider.System);
+        var optionRepo = new OptionsRepository(databaseFixture.ConnectionFactory, TimeProvider.System);
         var group = new RoomItemGroup
         {
             Id = TestData.NewInt64(),
@@ -49,19 +42,20 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
             CreatedDate = TestData.MySqlNow(),
             RoomId = room.Id
         };
-        await optionRepo.CreateGroupAsync(group);
+        await optionRepo.CreateGroupAsync(group, TestContext.Current.CancellationToken);
 
         var option = new Option
         {
             Id = TestData.NewInt64(),
             Name = TestData.NewString(),
+            Available = true,
             CreatedBy = user.Id,
             CreatedDate = TestData.MySqlNow(),
             GroupId = group.Id
         };
-        await optionRepo.CreateAsync(option);
+        await optionRepo.CreateAsync(option, TestContext.Current.CancellationToken);
 
-        var runRepo = new RunRepository(_databaseFixture.ConnectionFactory);
+        var runRepo = new RunRepository(databaseFixture.ConnectionFactory);
         var run = new Run
         {
             Id = TestData.NewInt64(),
@@ -72,10 +66,10 @@ public class RunRepositoryTests : IClassFixture<DatabaseFixture>
             UserId = user.Id,
             Ended = false
         };
-        await runRepo.CreateAsync(run);
+        await runRepo.CreateAsync(run, TestContext.Current.CancellationToken);
 
         // Ok setup done, now we can actually do the test
-        var result = await runRepo.GetAsync(run.Id);
+        var result = await runRepo.GetAsync(run.Id, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(run, result);

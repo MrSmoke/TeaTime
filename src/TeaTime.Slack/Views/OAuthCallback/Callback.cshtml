@@ -8,7 +8,14 @@
             <div class="columns">
                 <div class="column">
                     <h1 class="title is-1">Success ✔️</h1>
-                    <p>TeaTime has successfully been installed in your slack workspace <strong>@Model.TeamName</strong> 🎉</p>
+                    @if (string.IsNullOrWhiteSpace(Model.TeamName))
+                    {
+                        <p>TeaTime has successfully been installed in your slack workspace 🎉</p>
+                    }
+                    else
+                    {
+                        <p>TeaTime has successfully been installed in your slack workspace <strong>@Model.TeamName</strong> 🎉</p>
+                    }
                 </div>
             </div>
             <div class="columns">
@@ -18,7 +25,7 @@
                     <div class="level">
                         <div class="level-item">
                             <figure class="image" style="width: 532px; height: 52px">
-                                <img src="/slack/assets/images/slack_tea_command.jpg" alt="/teatime tea"/>
+                                <img src="/slack/assets/images/slack_tea_command.jpg" alt="/teatime start"/>
                             </figure>
                         </div>
                     </div>

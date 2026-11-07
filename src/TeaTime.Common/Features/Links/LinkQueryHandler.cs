@@ -1,23 +1,15 @@
-namespace TeaTime.Common.Features.Links
+namespace TeaTime.Common.Features.Links;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using MediatR;
+using Queries;
+
+public class LinkQueryHandler(ILinkRepository linkRepository) : IRequestHandler<GetObjectIdByLinkValueQuery, long?>
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using MediatR;
-    using Queries;
-
-    public class LinkQueryHandler : IRequestHandler<GetObjectIdByLinkValueQuery, long?>
+    public Task<long?> Handle(GetObjectIdByLinkValueQuery request, CancellationToken cancellationToken)
     {
-        private readonly ILinkRepository _linkRepository;
-
-        public LinkQueryHandler(ILinkRepository linkRepository)
-        {
-            _linkRepository = linkRepository;
-        }
-
-        public Task<long?> Handle(GetObjectIdByLinkValueQuery request, CancellationToken cancellationToken)
-        {
-            return _linkRepository.GetObjectId(request.Value, request.LinkType);
-        }
+        return linkRepository.GetObjectIdAsync(request.Value, request.LinkType, cancellationToken);
     }
 }

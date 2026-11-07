@@ -22,6 +22,9 @@ csharp_using_directive_placement = inside_namespace
 # Underscores from member names
 dotnet_diagnostic.CA1707.severity = none
 
+# Logging overhead not a concern at this request volume
+dotnet_diagnostic.CA1873.severity = none
+
 [*.{xml,config,*proj,nuspec,props,resx,targets,yml,tasks}]
 indent_size = 2
 

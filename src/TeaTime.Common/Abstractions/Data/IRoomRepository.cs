@@ -1,11 +1,11 @@
-namespace TeaTime.Common.Abstractions.Data
-{
-    using System.Threading.Tasks;
-    using Models.Data;
+namespace TeaTime.Common.Abstractions.Data;
 
-    public interface IRoomRepository
-    {
-        Task CreateAsync(Room room);
-        Task<Room?> GetAsync(long id);
-    }
+using System.Threading;
+using System.Threading.Tasks;
+using Models.Data;
+
+public interface IRoomRepository
+{
+    Task CreateAsync(Room room, CancellationToken cancellationToken = default);
+    Task<Room?> GetAsync(long id, CancellationToken cancellationToken = default);
 }

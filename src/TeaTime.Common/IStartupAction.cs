@@ -1,8 +1,7 @@
-namespace TeaTime.Common
+namespace TeaTime.Common;
+
+public interface IStartupAction
 {
-    public interface IStartupAction
-    {
-        string Name { get; }
-        void Execute();
-    }
+    string Name { get; }
+    void Execute();
 }

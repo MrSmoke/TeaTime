@@ -1,34 +1,31 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 # Copy in csproj so we can restore
 WORKDIR /build
-COPY TeaTime.sln TeaTime.sln
 COPY Directory.Build.props Directory.Build.props
 COPY ["src/TeaTime/TeaTime.csproj", "src/TeaTime/"]
 COPY ["src/TeaTime.Data.MySql/TeaTime.Data.MySql.csproj", "src/TeaTime.Data.MySql/"]
 COPY ["src/TeaTime.Common/TeaTime.Common.csproj", "src/TeaTime.Common/"]
 COPY ["src/TeaTime.Slack/TeaTime.Slack.csproj", "src/TeaTime.Slack/"]
-COPY ["test/TeaTime.Data.MySql.Tests/TeaTime.Data.MySql.Tests.csproj", "test/TeaTime.Data.MySql.Tests/"]
-COPY ["test/TeaTime.Slack.Tests/TeaTime.Slack.Tests.csproj", "test/TeaTime.Slack.Tests/"]
-COPY ["test/TeaTime.Common.Tests/TeaTime.Common.Tests.csproj", "test/TeaTime.Common.Tests/"]
-RUN dotnet restore
+RUN dotnet restore src/TeaTime/TeaTime.csproj
 
 # Copy in everything else
 COPY sql/ sql/
 COPY src/ src/
-COPY test/ test/
 
 # Build
+# VERSION overrides the whole version for release builds
+# VERSION_SUFFIX is appended to the props VersionPrefix for dev builds
+ARG VERSION
+ARG VERSION_SUFFIX
 WORKDIR /build/
-RUN dotnet build --no-restore -c Release
-
-# Test
-RUN dotnet test -c Release --no-build
+RUN dotnet build src/TeaTime/TeaTime.csproj --no-restore -c Release \
+    ${VERSION:+-p:Version=$VERSION} \
+    ${VERSION_SUFFIX:+-p:VersionSuffix=$VERSION_SUFFIX}
 
 # Publish
 FROM build AS publish

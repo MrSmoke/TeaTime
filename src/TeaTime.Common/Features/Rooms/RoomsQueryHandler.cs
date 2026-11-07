@@ -1,24 +1,16 @@
-namespace TeaTime.Common.Features.Rooms
+namespace TeaTime.Common.Features.Rooms;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using MediatR;
+using Models.Data;
+using Queries;
+
+public class RoomsQueryHandler(IRoomRepository roomRepository) : IRequestHandler<GetRoomQuery, Room?>
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using MediatR;
-    using Models.Data;
-    using Queries;
-
-    public class RoomsQueryHandler : IRequestHandler<GetRoomQuery, Room?>
+    public Task<Room?> Handle(GetRoomQuery request, CancellationToken cancellationToken)
     {
-        private readonly IRoomRepository _roomRepository;
-
-        public RoomsQueryHandler(IRoomRepository roomRepository)
-        {
-            _roomRepository = roomRepository;
-        }
-
-        public Task<Room?> Handle(GetRoomQuery request, CancellationToken cancellationToken)
-        {
-            return _roomRepository.GetAsync(request.RoomId);
-        }
+        return roomRepository.GetAsync(request.RoomId, cancellationToken);
     }
 }

@@ -1,10 +1,9 @@
-namespace TeaTime.Common.Abstractions
-{
-    using System.Threading;
-    using System.Threading.Tasks;
+namespace TeaTime.Common.Abstractions;
 
-    public interface ICommandPreProcessor<in TCommand>
-    {
-        Task ProcessAsync(TCommand request, CancellationToken cancellationToken);
-    }
+using System.Threading;
+using System.Threading.Tasks;
+
+public interface ICommandPreProcessor<in TCommand>
+{
+    Task ProcessAsync(TCommand request, CancellationToken cancellationToken = default);
 }

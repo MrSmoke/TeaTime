@@ -1,9 +1,3 @@
-namespace TeaTime.Common.Exceptions
-{
-    public class PermissionException : TeaTimeException
-    {
-        public PermissionException(string message) : base(message)
-        {
-        }
-    }
-}
+namespace TeaTime.Common.Exceptions;
+
+public class PermissionException(string message) : TeaTimeException(message);

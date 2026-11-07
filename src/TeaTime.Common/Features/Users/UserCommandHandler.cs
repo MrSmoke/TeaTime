@@ -1,37 +1,27 @@
-namespace TeaTime.Common.Features.Users
+namespace TeaTime.Common.Features.Users;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using Commands;
+using MediatR;
+using Models.Data;
+
+public class UserCommandHandler(IUserRepository userRepository, TimeProvider clock) : IRequestHandler<CreateUserCommand>
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using Commands;
-    using MediatR;
-    using Models.Data;
-
-    public class UserCommandHandler : IRequestHandler<CreateUserCommand>
+    public Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        private readonly IUserRepository _userRepository;
-        private readonly TimeProvider _clock;
-
-        public UserCommandHandler(IUserRepository userRepository, TimeProvider clock)
+        var user = new User
         {
-            _userRepository = userRepository;
-            _clock = clock;
-        }
+            Id = request.Id,
+            Username = request.Username,
+            CreatedDate = clock.GetUtcNow(),
+            DisplayName = request.DisplayName
+        };
 
-        public Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
-        {
-            var user = new User
-            {
-                Id = request.Id,
-                Username = request.Username,
-                CreatedDate = _clock.GetUtcNow(),
-                DisplayName = request.DisplayName
-            };
+        return userRepository.CreateAsync(user, cancellationToken);
 
-            return _userRepository.CreateAsync(user);
-
-            //todo: create event
-        }
+        //todo: create event
     }
 }

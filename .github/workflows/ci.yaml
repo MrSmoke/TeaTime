@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [dev, master]
+
+permissions:
+  contents: read
+
+# A newer push to the same PR makes the running build pointless, but branch builds always finish
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      PUSH: ${{ github.event_name == 'push' && github.ref == 'refs/heads/dev' }}
+    steps:
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      -
+        name: Short SHA
+        id: sha
+        run: echo "short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: |
+            dockdockcontainer/teatime
+          tags: |
+            type=ref,event=branch
+            type=sha
+      -
+        name: Login to DockerHub
+        if: env.PUSH == 'true'
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build
+        uses: docker/build-push-action@v7
+        with:
+          push: ${{ env.PUSH == 'true' }}
+          build-args: |
+            VERSION_SUFFIX=dev+${{ steps.sha.outputs.short }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

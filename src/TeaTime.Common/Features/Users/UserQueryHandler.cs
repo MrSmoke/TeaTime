@@ -1,24 +1,16 @@
-namespace TeaTime.Common.Features.Users
+namespace TeaTime.Common.Features.Users;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions.Data;
+using MediatR;
+using Models.Data;
+using Queries;
+
+public class UserQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUserQuery, User?>
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.Data;
-    using MediatR;
-    using Models.Data;
-    using Queries;
-
-    public class UserQueryHandler : IRequestHandler<GetUserQuery, User?>
+    public Task<User?> Handle(GetUserQuery request, CancellationToken cancellationToken)
     {
-        private readonly IUserRepository _userRepository;
-
-        public UserQueryHandler(IUserRepository userRepository)
-        {
-            _userRepository = userRepository;
-        }
-
-        public Task<User?> Handle(GetUserQuery request, CancellationToken cancellationToken)
-        {
-            return _userRepository.GetAsync(request.UserId);
-        }
+        return userRepository.GetAsync(request.UserId, cancellationToken);
     }
 }

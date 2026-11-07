@@ -2,6 +2,11 @@ namespace TeaTime.Slack;
 
 internal static class Constants
 {
+    internal static readonly string[] OAuthScopes =
+    [
+        "commands"
+    ];
+
     internal static class CommandContextKeys
     {
         internal const string SlashCommand = "SLASHCOMMAND";
@@ -18,9 +23,4 @@ internal static class Constants
     {
         public const string OauthCallback = "SlackOauthCallback";
     }
-
-    internal static readonly string[] OAuthScopes =
-    [
-        "commands"
-    ];
 }
