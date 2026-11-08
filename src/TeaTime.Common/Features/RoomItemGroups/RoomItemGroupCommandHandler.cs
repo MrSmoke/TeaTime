@@ -18,7 +18,7 @@ public class RoomItemGroupCommandHandler(IOptionsRepository optionsRepository, T
         {
             Id = request.Id,
             Name = request.Name,
-            CreatedBy = request.UserId,
+            CreatedBy = request.CurrentUserId,
             CreatedDate = clock.GetUtcNow(),
             RoomId = request.RoomId
         };

@@ -14,7 +14,7 @@ public class OrderPermissions :
         CancellationToken cancellationToken = default)
     {
         // Only allow users to delete their own order
-        if (request.Order.UserId != request.UserId)
+        if (request.Order.UserId != request.CurrentUserId)
             return Task.FromResult(PermissionCheckResult.NotOk("You cannot delete other users' orders"));
 
         return Task.FromResult(PermissionCheckResult.Ok());
@@ -24,7 +24,7 @@ public class OrderPermissions :
         CancellationToken cancellationToken = default)
     {
         // Only allow users to change their own order
-        if (request.Order.UserId != request.UserId)
+        if (request.Order.UserId != request.CurrentUserId)
             return Task.FromResult(PermissionCheckResult.NotOk("You cannot change other users' orders"));
 
         return Task.FromResult(PermissionCheckResult.Ok());

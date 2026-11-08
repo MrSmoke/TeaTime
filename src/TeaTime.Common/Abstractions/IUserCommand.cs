@@ -5,5 +5,5 @@ namespace TeaTime.Common.Abstractions;
 /// </summary>
 public interface IUserCommand : ICommand
 {
-    long UserId { get; }
+    long CurrentUserId { get; }
 }

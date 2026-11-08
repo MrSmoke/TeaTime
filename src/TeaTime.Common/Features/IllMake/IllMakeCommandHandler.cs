@@ -16,7 +16,7 @@ public class IllMakeCommandHandler(IIllMakeRepository repository, TimeProvider c
         {
             Id = request.Id,
             RunId = request.RunId,
-            UserId = request.UserId,
+            UserId = request.CurrentUserId,
             CreatedDate = clock.GetUtcNow()
         };
 

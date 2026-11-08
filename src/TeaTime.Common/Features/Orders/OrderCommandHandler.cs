@@ -33,7 +33,7 @@ public class OrderCommandHandler(
             CreatedDate = clock.GetUtcNow(),
             OptionId = request.OptionId,
             RunId = request.RunId,
-            UserId = request.UserId
+            UserId = request.CurrentUserId
         };
 
         await orderRepository.CreateAsync(order, cancellationToken);
@@ -81,7 +81,7 @@ public class OrderCommandHandler(
         var evt = new OrderOptionChangedEvent
         (
             OrderId: request.Order.Id,
-            UserId: request.UserId,
+            UserId: request.CurrentUserId,
             PreviousOptionId: previousOptionId,
             OptionId: request.OptionId
         )

@@ -1,6 +1,6 @@
 namespace TeaTime.Common.Features.Runs.Queries;
 
 using Abstractions;
-using Models.Data;
+using Models.Domain;
 
-public record GetRunQuery(long RunId) : IQuery<RunEntity?>;
+public record GetRunQuery(long RunId) : IQuery<Run?>;

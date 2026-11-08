@@ -11,7 +11,7 @@ using Models.Domain;
 
 public class DefaultRunnerRandomizer : IRunnerRandomizer
 {
-    public ValueTask<long> GetRunnerUserIdAsync(IEnumerable<OrderModel> orders, CancellationToken cancellationToken = default)
+    public ValueTask<long> GetRunnerUserIdAsync(IEnumerable<Order> orders, CancellationToken cancellationToken = default)
     {
         var userIds = orders
             .WhereNotNull(o => o.User)

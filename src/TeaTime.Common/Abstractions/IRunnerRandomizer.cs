@@ -7,5 +7,5 @@ using Models.Domain;
 
 public interface IRunnerRandomizer
 {
-    ValueTask<long> GetRunnerUserIdAsync(IEnumerable<OrderModel> orders, CancellationToken cancellationToken = default);
+    ValueTask<long> GetRunnerUserIdAsync(IEnumerable<Order> orders, CancellationToken cancellationToken = default);
 }

@@ -27,7 +27,7 @@ public class GroupsCommand(
             Id: await idGenerator.GenerateAsync(),
             RoomId: context.Room.Id,
             Name: name,
-            UserId: context.User.Id
+            CurrentUserId: context.User.Id
         );
 
         await mediator.Send(command);
@@ -49,7 +49,7 @@ public class GroupsCommand(
 
         var command = new DeleteRoomItemGroupCommand(
             GroupId: group.Id,
-            UserId: context.User.Id
+            CurrentUserId: context.User.Id
         );
 
         await mediator.Send(command);

@@ -197,7 +197,7 @@ public class SlackServiceTests
 
         var command = Assert.IsType<UpdateOrderOptionCommand>(Assert.Single(sent.Values));
         Assert.Equal(existingOrder, command.Order);
-        Assert.Equal(5, command.UserId);
+        Assert.Equal(5, command.CurrentUserId);
         Assert.Equal(1, command.OptionId);
         Assert.Empty(replies.Values);
     }

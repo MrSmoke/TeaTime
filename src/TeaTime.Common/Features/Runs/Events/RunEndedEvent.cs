@@ -11,5 +11,5 @@ public record RunEndedEvent
     long RoomId,
     DateTimeOffset EndedTime,
     long RunnerUserId,
-    IEnumerable<OrderModel> Orders
+    IEnumerable<Order> Orders
 ) : BaseEvent;

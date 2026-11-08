@@ -32,7 +32,7 @@ public class OptionsCommandHandler(TimeProvider clock, IOptionsRepository option
             Name = request.Name,
             Available = true,
             GroupId = request.GroupId,
-            CreatedBy = request.UserId,
+            CreatedBy = request.CurrentUserId,
             CreatedDate = clock.GetUtcNow(),
         };
 

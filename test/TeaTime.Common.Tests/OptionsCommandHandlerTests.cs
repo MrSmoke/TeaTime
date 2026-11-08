@@ -22,7 +22,7 @@ public class OptionsCommandHandlerTests
         var repository = CreateRepository();
         var handler = new OptionsCommandHandler(TimeProvider.System, repository);
 
-        var command = new CreateOptionCommand(Id: 10, UserId: 1, GroupId: GroupId, Name: "earl GREY");
+        var command = new CreateOptionCommand(Id: 10, CurrentUserId: 1, GroupId: GroupId, Name: "earl GREY");
 
         var e = await Assert.ThrowsAsync<OptionException>(
             () => handler.Handle(command, TestContext.Current.CancellationToken));
@@ -40,7 +40,7 @@ public class OptionsCommandHandlerTests
         A.CallTo(() => repository.CreateAsync(saved._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
         var handler = new OptionsCommandHandler(TimeProvider.System, repository);
-        var command = new CreateOptionCommand(Id: 10, UserId: 1, GroupId: GroupId, Name: "Green");
+        var command = new CreateOptionCommand(Id: 10, CurrentUserId: 1, GroupId: GroupId, Name: "Green");
 
         await handler.Handle(command, TestContext.Current.CancellationToken);
 

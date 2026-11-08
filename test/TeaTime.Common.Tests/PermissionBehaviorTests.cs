@@ -37,7 +37,7 @@ public class PermissionBehaviorTests
         var mediator = provider.GetRequiredService<IMediator>();
         var handler = provider.GetRequiredService<HandledRecorder>();
 
-        var command = new DeleteOrderCommand(CreateOrder(userId: 1), UserId: 2);
+        var command = new DeleteOrderCommand(CreateOrder(userId: 1), CurrentUserId: 2);
 
         var ex = await Assert.ThrowsAsync<PermissionException>(
             () => mediator.Send(command, TestContext.Current.CancellationToken));
@@ -54,7 +54,7 @@ public class PermissionBehaviorTests
         var mediator = provider.GetRequiredService<IMediator>();
         var handler = provider.GetRequiredService<HandledRecorder>();
 
-        var command = new DeleteOrderCommand(CreateOrder(userId: 1), UserId: 1);
+        var command = new DeleteOrderCommand(CreateOrder(userId: 1), CurrentUserId: 1);
 
         await mediator.Send(command, TestContext.Current.CancellationToken);
 
@@ -69,7 +69,7 @@ public class PermissionBehaviorTests
         var mediator = provider.GetRequiredService<IMediator>();
         var handler = provider.GetRequiredService<HandledRecorder>();
 
-        var command = new UpdateOrderOptionCommand(CreateOrder(userId: 1), UserId: 2, OptionId: 40);
+        var command = new UpdateOrderOptionCommand(CreateOrder(userId: 1), CurrentUserId: 2, OptionId: 40);
 
         var ex = await Assert.ThrowsAsync<PermissionException>(
             () => mediator.Send(command, TestContext.Current.CancellationToken));
@@ -86,7 +86,7 @@ public class PermissionBehaviorTests
         var mediator = provider.GetRequiredService<IMediator>();
         var handler = provider.GetRequiredService<HandledRecorder>();
 
-        var command = new UpdateOrderOptionCommand(CreateOrder(userId: 1), UserId: 1, OptionId: 40);
+        var command = new UpdateOrderOptionCommand(CreateOrder(userId: 1), CurrentUserId: 1, OptionId: 40);
 
         await mediator.Send(command, TestContext.Current.CancellationToken);
 

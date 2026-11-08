@@ -94,7 +94,7 @@ internal class SlackService(ISender mediator,
         (
             Id: await idGenerator.GenerateAsync(cancellationToken),
             Name: string.IsNullOrWhiteSpace(channelName) ? FallbackChannelName(channelId) : channelName,
-            UserId: userId
+            CurrentUserId: userId
         );
 
         await mediator.Send(command, cancellationToken);
@@ -342,7 +342,7 @@ internal class SlackService(ISender mediator,
             (
                 Id: await idGenerator.GenerateAsync(cancellationToken),
                 RunId: run.Id,
-                UserId: userId,
+                CurrentUserId: userId,
                 OptionId: option.Id
             );
         }

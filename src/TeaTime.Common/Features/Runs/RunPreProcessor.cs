@@ -15,7 +15,7 @@ public class RunPreProcessor : ICommandPreProcessor<EndRunCommand>
             throw new RunEndException("Cannot end run with no orders",
                 RunEndException.RunEndExceptionReason.NoOrders);
 
-        if (request.Orders.All(o => o.User?.Id.Equals(request.UserId) == false))
+        if (request.Orders.All(o => o.User?.Id.Equals(request.CurrentUserId) == false))
             throw new RunEndException("Cannot end run without joining first",
                 RunEndException.RunEndExceptionReason.NotJoined);
 

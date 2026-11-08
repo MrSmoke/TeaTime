@@ -10,6 +10,7 @@ using Common.Features.Orders.Queries;
 using Common.Features.RoomItemGroups.Queries;
 using Common.Features.Rooms.Queries;
 using Common.Features.Runs.Commands;
+using Common.Features.Runs.Queries;
 using Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -46,7 +47,7 @@ public class RunCommand(
         var command = new StartRunCommand
         (
             Id: await idGenerator.GenerateAsync(),
-            UserId: context.User.Id,
+            CurrentUserId: context.User.Id,
             RoomId: context.Room.Id,
             RoomGroupId: roomItemGroup.Id,
             StartTime: clock.GetUtcNow()
@@ -105,16 +106,13 @@ public class RunCommand(
     {
         var context = await GetContextAsync();
 
-        var run = await mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
-        if (run == null)
+        var currentRun = await mediator.Send(new GetCurrentRunQuery(context.Room.Id, context.User.Id));
+        if (currentRun == null)
             return Response(ErrorStrings.EndRun_RunNotStarted(), ResponseType.User);
 
-        var orders = await mediator.Send(new GetRunOrdersQuery(run.Id, context.User.Id));
-
         var command = new EndRunCommand(
-            Run: run,
-            UserId: context.User.Id,
-            Orders: orders
+            RunId: currentRun.RunId,
+            CurrentUserId: context.User.Id
         );
 
         command.AddCallbackState(context.Command.ToCallbackData());

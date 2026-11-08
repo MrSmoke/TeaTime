@@ -104,7 +104,6 @@ public class OrdersQueryHandlerTests
     private OrdersQueryHandler CreateHandler() => new(
         orderRepository: _orderRepository,
         userRepository: _userRepository,
-        optionsRepository: A.Fake<IOptionsRepository>(),
-        runRepository: _runRepository
+        optionsRepository: A.Fake<IOptionsRepository>()
     );
 }

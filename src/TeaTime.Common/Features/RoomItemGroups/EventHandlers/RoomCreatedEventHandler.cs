@@ -23,7 +23,7 @@ public class RoomCreatedEventHandler(
         var command = new CreateRoomItemGroupCommand(
             Id: await idGenerator.GenerateAsync(CancellationToken.None),
             RoomId: notification.Id,
-            UserId: notification.CreatedBy,
+            CurrentUserId: notification.CreatedBy,
             Name: "tea");
 
         await mediator.Send(command, CancellationToken.None);
@@ -33,7 +33,7 @@ public class RoomCreatedEventHandler(
         {
             var optionCommand = new CreateOptionCommand(
                 Id: await idGenerator.GenerateAsync(CancellationToken.None),
-                UserId: notification.CreatedBy,
+                CurrentUserId: notification.CreatedBy,
                 GroupId: command.Id,
                 Name: name);
 

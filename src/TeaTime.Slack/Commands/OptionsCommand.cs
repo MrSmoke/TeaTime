@@ -39,7 +39,7 @@ public class OptionsCommand(
 
         var command = new CreateOptionCommand(
                 Id: await idGenerator.GenerateAsync(),
-                UserId: context.User.Id,
+                CurrentUserId: context.User.Id,
                 GroupId: group.Id,
                 Name: optionName);
 

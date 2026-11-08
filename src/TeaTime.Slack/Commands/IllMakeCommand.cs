@@ -28,7 +28,7 @@ public class IllMakeCommand(
         var command = new Common.Features.IllMake.Commands.IllMakeCommand(
             Id: await idGenerator.GenerateAsync(),
             RunId: run.Id,
-            UserId: context.User.Id
+            CurrentUserId: context.User.Id
         );
 
         await mediator.Send(command);

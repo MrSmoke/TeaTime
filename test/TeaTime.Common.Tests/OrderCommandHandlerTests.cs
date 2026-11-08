@@ -54,7 +54,7 @@ public class OrderCommandHandlerTests
         var saved = A.Captured<OrderEntity>();
         A.CallTo(() => orderRepository.CreateAsync(saved._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
-        var command = new CreateOrderCommand(Id: 30, RunId: ActiveRunId, UserId: 5, OptionId: AvailableOptionId);
+        var command = new CreateOrderCommand(Id: 30, RunId: ActiveRunId, CurrentUserId: 5, OptionId: AvailableOptionId);
 
         await handler.Handle(command, TestContext.Current.CancellationToken);
 
@@ -69,7 +69,7 @@ public class OrderCommandHandlerTests
     [InlineData(DeletedOptionId)]
     public async Task Handle_Create_OptionNotAvailable_Throws(long optionId)
     {
-        var command = new CreateOrderCommand(Id: 30, RunId: ActiveRunId, UserId: 5, OptionId: optionId);
+        var command = new CreateOrderCommand(Id: 30, RunId: ActiveRunId, CurrentUserId: 5, OptionId: optionId);
 
         var e = await Assert.ThrowsAsync<OrderException>(
             () => handler.Handle(command, TestContext.Current.CancellationToken));
@@ -87,7 +87,7 @@ public class OrderCommandHandlerTests
         var order = ExistingOrder with { OptionId = AvailableOptionId };
         A.CallTo(() => orderRepository.GetAsync(order.Id, A<CancellationToken>._)).Returns(order);
 
-        var command = new UpdateOrderOptionCommand(order, UserId: 5, OptionId: optionId);
+        var command = new UpdateOrderOptionCommand(order, CurrentUserId: 5, OptionId: optionId);
 
         var e = await Assert.ThrowsAsync<OrderException>(
             () => handler.Handle(command, TestContext.Current.CancellationToken));
@@ -100,7 +100,7 @@ public class OrderCommandHandlerTests
     [Fact]
     public async Task Handle_Update_SameOption_DoesNothing()
     {
-        var command = new UpdateOrderOptionCommand(ExistingOrder, UserId: 5, OptionId: UnavailableOptionId);
+        var command = new UpdateOrderOptionCommand(ExistingOrder, CurrentUserId: 5, OptionId: UnavailableOptionId);
 
         await handler.Handle(command, TestContext.Current.CancellationToken);
 
@@ -117,7 +117,7 @@ public class OrderCommandHandlerTests
         var published = A.Captured<OrderOptionChangedEvent>();
         A.CallTo(() => eventPublisher.PublishAsync(published._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
-        var command = new UpdateOrderOptionCommand(ExistingOrder, UserId: 5, OptionId: AvailableOptionId);
+        var command = new UpdateOrderOptionCommand(ExistingOrder, CurrentUserId: 5, OptionId: AvailableOptionId);
 
         await handler.Handle(command, TestContext.Current.CancellationToken);
 
@@ -136,7 +136,7 @@ public class OrderCommandHandlerTests
         var published = A.Captured<OrderDeletedEvent>();
         A.CallTo(() => eventPublisher.PublishAsync(published._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
-        var command = new DeleteOrderCommand(ExistingOrder, UserId: 5);
+        var command = new DeleteOrderCommand(ExistingOrder, CurrentUserId: 5);
 
         await handler.Handle(command, TestContext.Current.CancellationToken);
 
@@ -148,7 +148,7 @@ public class OrderCommandHandlerTests
     [Fact]
     public async Task Handle_Create_RunEnded_Throws()
     {
-        var command = new CreateOrderCommand(Id: 30, RunId: EndedRunId, UserId: 5, OptionId: AvailableOptionId);
+        var command = new CreateOrderCommand(Id: 30, RunId: EndedRunId, CurrentUserId: 5, OptionId: AvailableOptionId);
 
         var e = await Assert.ThrowsAsync<OrderException>(
             () => handler.Handle(command, TestContext.Current.CancellationToken));
@@ -164,7 +164,7 @@ public class OrderCommandHandlerTests
         var order = ExistingOrder with { RunId = EndedRunId };
         A.CallTo(() => orderRepository.GetAsync(order.Id, A<CancellationToken>._)).Returns(order);
 
-        var command = new UpdateOrderOptionCommand(order, UserId: 5, OptionId: AvailableOptionId);
+        var command = new UpdateOrderOptionCommand(order, CurrentUserId: 5, OptionId: AvailableOptionId);
 
         var e = await Assert.ThrowsAsync<OrderException>(
             () => handler.Handle(command, TestContext.Current.CancellationToken));
@@ -178,7 +178,7 @@ public class OrderCommandHandlerTests
     public async Task Handle_Delete_RunEnded_Throws()
     {
         var order = ExistingOrder with { RunId = EndedRunId };
-        var command = new DeleteOrderCommand(order, UserId: 5);
+        var command = new DeleteOrderCommand(order, CurrentUserId: 5);
 
         var e = await Assert.ThrowsAsync<OrderException>(
             () => handler.Handle(command, TestContext.Current.CancellationToken));

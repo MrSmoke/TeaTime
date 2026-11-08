@@ -21,7 +21,7 @@ public class RoomCommandHandler(
         {
             Id = request.Id,
             Name = request.Name,
-            CreatedBy = request.UserId,
+            CreatedBy = request.CurrentUserId,
             CreatedDate = clock.GetUtcNow()
         };
 
@@ -31,7 +31,7 @@ public class RoomCommandHandler(
         (
             Id: request.Id,
             Name: request.Name,
-            CreatedBy: request.UserId,
+            CreatedBy: request.CurrentUserId,
             CreateDefaultItemGroup: request.CreateDefaultItemGroup
         );
 

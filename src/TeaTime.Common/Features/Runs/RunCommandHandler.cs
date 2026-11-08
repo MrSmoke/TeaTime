@@ -30,7 +30,7 @@ public class RunCommandHandler(
             GroupId = request.RoomGroupId,
             RoomId = request.RoomId,
             StartTime = request.StartTime,
-            UserId = request.UserId
+            UserId = request.CurrentUserId
         };
 
         await runRepository.CreateAsync(run, cancellationToken);
